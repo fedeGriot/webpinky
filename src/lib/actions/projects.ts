@@ -1,0 +1,155 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import { verifySession } from "@/lib/dal";
+import { saveUploadedFile } from "@/lib/uploads";
+
+function str(formData: FormData, key: string) {
+  return String(formData.get(key) ?? "").trim();
+}
+
+function optionalStr(formData: FormData, key: string) {
+  const value = str(formData, key);
+  return value.length > 0 ? value : null;
+}
+
+function int(formData: FormData, key: string, fallback = 0) {
+  const value = Number(formData.get(key));
+  return Number.isFinite(value) ? value : fallback;
+}
+
+function linesToArray(value: string) {
+  return value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function projectFieldsFromForm(formData: FormData) {
+  return {
+    slug: str(formData, "slug"),
+    title: str(formData, "title"),
+    clientName: str(formData, "clientName"),
+    industry: str(formData, "industry"),
+    year: int(formData, "year", new Date().getFullYear()),
+    featured: formData.get("featured") === "on",
+    order: int(formData, "order"),
+    category: str(formData, "category"),
+    heroHeadline: str(formData, "heroHeadline"),
+    accentColor: str(formData, "accentColor") || "#D81470",
+    summary: str(formData, "summary"),
+    resultBadge: str(formData, "resultBadge"),
+    resultLabel: str(formData, "resultLabel"),
+    challengeTitle: str(formData, "challengeTitle"),
+    challengeBody: str(formData, "challengeBody"),
+    solutionTitle: str(formData, "solutionTitle"),
+    solutionBody: str(formData, "solutionBody"),
+    quoteText: optionalStr(formData, "quoteText"),
+    quoteAuthor: optionalStr(formData, "quoteAuthor"),
+    servicesTagsJson: JSON.stringify(linesToArray(str(formData, "servicesTags"))),
+  };
+}
+
+function revalidateProjectPaths(slug?: string) {
+  revalidatePath("/");
+  revalidatePath("/proyectos");
+  if (slug) revalidatePath(`/proyectos/${slug}`);
+}
+
+export async function createProject(formData: FormData) {
+  await verifySession();
+  const cover = formData.get("coverImage") as File | null;
+  const coverImageUrl = cover && cover.size > 0 ? await saveUploadedFile(cover) : null;
+
+  const project = await prisma.project.create({
+    data: { ...projectFieldsFromForm(formData), coverImageUrl },
+  });
+
+  revalidateProjectPaths(project.slug);
+  redirect(`/admin/proyectos/${project.id}/editar`);
+}
+
+export async function updateProject(formData: FormData) {
+  await verifySession();
+  const id = str(formData, "id");
+  const cover = formData.get("coverImage") as File | null;
+  const coverImageUrl = cover && cover.size > 0 ? await saveUploadedFile(cover) : undefined;
+
+  const project = await prisma.project.update({
+    where: { id },
+    data: {
+      ...projectFieldsFromForm(formData),
+      ...(coverImageUrl !== undefined ? { coverImageUrl } : {}),
+    },
+  });
+
+  revalidateProjectPaths(project.slug);
+  revalidatePath(`/admin/proyectos/${id}/editar`);
+}
+
+export async function deleteProject(formData: FormData) {
+  await verifySession();
+  const id = str(formData, "id");
+  const project = await prisma.project.delete({ where: { id } });
+  revalidateProjectPaths(project.slug);
+  redirect("/admin/proyectos");
+}
+
+// --- Stats del proyecto ---
+
+export async function createProjectStat(formData: FormData) {
+  await verifySession();
+  const projectId = str(formData, "projectId");
+  await prisma.projectStat.create({
+    data: {
+      projectId,
+      order: int(formData, "order"),
+      value: str(formData, "value"),
+      label: str(formData, "label"),
+    },
+  });
+  await revalidateProjectAndRedirect(projectId);
+}
+
+export async function deleteProjectStat(formData: FormData) {
+  await verifySession();
+  const projectId = str(formData, "projectId");
+  await prisma.projectStat.delete({ where: { id: str(formData, "id") } });
+  await revalidateProjectAndRedirect(projectId);
+}
+
+// --- Piezas del proyecto ---
+
+export async function createProjectPiece(formData: FormData) {
+  await verifySession();
+  const projectId = str(formData, "projectId");
+  const image = formData.get("image") as File | null;
+  const imageUrl = image && image.size > 0 ? await saveUploadedFile(image) : null;
+
+  await prisma.projectPiece.create({
+    data: {
+      projectId,
+      order: int(formData, "order"),
+      type: str(formData, "type") || "pieza",
+      title: str(formData, "title"),
+      subtitle: optionalStr(formData, "subtitle"),
+      imageUrl,
+    },
+  });
+  await revalidateProjectAndRedirect(projectId);
+}
+
+export async function deleteProjectPiece(formData: FormData) {
+  await verifySession();
+  const projectId = str(formData, "projectId");
+  await prisma.projectPiece.delete({ where: { id: str(formData, "id") } });
+  await revalidateProjectAndRedirect(projectId);
+}
+
+async function revalidateProjectAndRedirect(projectId: string) {
+  const project = await prisma.project.findUnique({ where: { id: projectId } });
+  revalidateProjectPaths(project?.slug);
+  redirect(`/admin/proyectos/${projectId}/editar`);
+}
