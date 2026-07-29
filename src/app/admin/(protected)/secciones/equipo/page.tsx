@@ -8,9 +8,9 @@ export default async function EquipoPage() {
   const team = await getTeamMembers();
 
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-3xl">
       <h1 className="mb-1 text-2xl font-bold text-white">Equipo</h1>
-      <p className="mb-8 text-white/50">Iniciales del equipo mostradas en ¿Quiénes somos?.</p>
+      <p className="mb-8 text-white/50">Integrantes mostrados en ¿Quiénes somos?.</p>
 
       <div className="mb-10 rounded-2xl border border-white/10 bg-card p-6">
         <h2 className="mb-4 font-bold text-white">Agregar integrante</h2>
@@ -31,40 +31,54 @@ export default async function EquipoPage() {
             <label className={labelClass}>Orden</label>
             <input name="order" type="number" defaultValue={team.length} className={`${inputClass} w-20`} />
           </div>
+          <div className="flex flex-col gap-1.5">
+            <label className={labelClass}>Foto (opcional)</label>
+            <input name="photo" type="file" accept="image/*" className="text-sm text-white/70" />
+          </div>
           <SaveButton label="Agregar" />
         </form>
       </div>
 
       <div className="flex flex-col gap-3">
         {team.map((member) => (
-          <form
-            key={member.id}
-            action={updateTeamMember}
-            className="flex flex-wrap items-end gap-4 rounded-2xl border border-white/10 bg-card p-4"
-          >
-            <input type="hidden" name="id" value={member.id} />
-            <div className="flex flex-col gap-1.5">
-              <label className={labelClass}>Inicial</label>
-              <input name="initial" defaultValue={member.initial} maxLength={2} required className={`${inputClass} w-16`} />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className={labelClass}>Nombre completo</label>
-              <input name="fullName" defaultValue={member.fullName ?? ""} className={inputClass} />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className={labelClass}>Rol</label>
-              <input name="role" defaultValue={member.role ?? ""} className={inputClass} />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className={labelClass}>Orden</label>
-              <input name="order" type="number" defaultValue={member.order} className={`${inputClass} w-20`} />
-            </div>
-            <SaveButton />
+          <div key={member.id} className="flex items-center gap-4 rounded-2xl border border-white/10 bg-card p-4">
+            {member.photoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={member.photoUrl} alt={member.fullName ?? member.initial} className="h-12 w-12 rounded-full object-cover" />
+            ) : (
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-ink-light text-sm font-bold text-white">
+                {member.initial}
+              </span>
+            )}
+            <form action={updateTeamMember} className="flex flex-1 flex-wrap items-end gap-4">
+              <input type="hidden" name="id" value={member.id} />
+              <div className="flex flex-col gap-1.5">
+                <label className={labelClass}>Inicial</label>
+                <input name="initial" defaultValue={member.initial} maxLength={2} required className={`${inputClass} w-16`} />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className={labelClass}>Nombre completo</label>
+                <input name="fullName" defaultValue={member.fullName ?? ""} className={inputClass} />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className={labelClass}>Rol</label>
+                <input name="role" defaultValue={member.role ?? ""} className={inputClass} />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className={labelClass}>Orden</label>
+                <input name="order" type="number" defaultValue={member.order} className={`${inputClass} w-20`} />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className={labelClass}>Foto</label>
+                <input name="photo" type="file" accept="image/*" className="text-xs text-white/50" />
+              </div>
+              <SaveButton />
+            </form>
             <form action={deleteTeamMember}>
               <input type="hidden" name="id" value={member.id} />
-              <DeleteButton confirmMessage={`¿Eliminar a "${member.initial}"?`} />
+              <DeleteButton confirmMessage={`¿Eliminar a "${member.fullName ?? member.initial}"?`} />
             </form>
-          </form>
+          </div>
         ))}
       </div>
     </div>

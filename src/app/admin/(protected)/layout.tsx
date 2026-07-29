@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { verifySession } from "@/lib/dal";
 import { logout } from "@/lib/actions/auth";
+import { PinkyLogo } from "@/components/pinky-logo";
 
 const NAV_ITEMS = [
   { href: "/admin", label: "Inicio" },
@@ -15,9 +16,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="flex min-h-screen flex-col sm:flex-row">
       <aside className="flex shrink-0 flex-row items-center justify-between border-b border-white/10 bg-card px-5 py-4 sm:w-64 sm:flex-col sm:items-stretch sm:justify-between sm:border-b-0 sm:border-r sm:py-6">
         <div className="flex items-center gap-6 sm:flex-col sm:items-stretch sm:gap-0">
-          <div className="flex items-baseline gap-2 sm:mb-8">
-            <span className="text-xl font-extrabold text-white">pinky</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+          <div className="flex items-center gap-2 sm:mb-8">
+            <PinkyLogo size="sm" subtext={false} />
             <span className="text-[10px] font-bold uppercase leading-none text-white/50">
               Admin
             </span>

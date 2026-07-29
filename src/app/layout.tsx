@@ -4,10 +4,16 @@ import "./globals.css";
 
 // Fuentes auto-hospedadas (descargadas de Google Fonts) en vez de next/font/google:
 // evita que el servidor de dev/build dependa de red para compilar el layout raíz.
-const nunito = localFont({
-  src: "./fonts/nunito-variable.woff2",
-  variable: "--font-nunito",
-  weight: "400 900",
+const poppins = localFont({
+  src: [
+    { path: "./fonts/poppins-400.woff2", weight: "400" },
+    { path: "./fonts/poppins-500.woff2", weight: "500" },
+    { path: "./fonts/poppins-600.woff2", weight: "600" },
+    { path: "./fonts/poppins-700.woff2", weight: "700" },
+    { path: "./fonts/poppins-800.woff2", weight: "800" },
+    { path: "./fonts/poppins-900.woff2", weight: "900" },
+  ],
+  variable: "--font-poppins",
   display: "swap",
 });
 
@@ -30,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${nunito.variable} ${caveat.variable} h-full antialiased`}>
+    <html lang="es" className={`${poppins.variable} ${caveat.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-ink text-white">{children}</body>
     </html>
   );

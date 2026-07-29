@@ -38,7 +38,7 @@ function projectFieldsFromForm(formData: FormData) {
     order: int(formData, "order"),
     category: str(formData, "category"),
     heroHeadline: str(formData, "heroHeadline"),
-    accentColor: str(formData, "accentColor") || "#D81470",
+    accentColor: str(formData, "accentColor") || "#D90B91",
     summary: str(formData, "summary"),
     resultBadge: str(formData, "resultBadge"),
     resultLabel: str(formData, "resultLabel"),

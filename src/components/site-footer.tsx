@@ -1,11 +1,16 @@
 import Link from "next/link";
 import { getSiteSettings } from "@/lib/data";
+import { PinkyLogo } from "@/components/pinky-logo";
+import { SOCIAL_ICONS, PhoneIcon } from "@/components/social-icons";
 
 const AGENCY_LINKS = [
   { href: "/quienes-somos", label: "¿Quiénes somos?" },
   { href: "/que-hacemos", label: "¿Qué hacemos?" },
   { href: "/proyectos", label: "Proyectos" },
+  { href: "/contacto", label: "Contacto" },
 ];
+
+const toTel = (phone: string) => `tel:${phone.replace(/[^\d+]/g, "")}`;
 
 const SOCIAL_LINKS = (settings: { instagramUrl: string | null; linkedinUrl: string | null; youtubeUrl: string | null; twitterUrl: string | null }) =>
   [
@@ -15,78 +20,77 @@ const SOCIAL_LINKS = (settings: { instagramUrl: string | null; linkedinUrl: stri
     { label: "X / Twitter", href: settings.twitterUrl },
   ].filter((s) => s.href);
 
-export async function SiteFooter() {
+export async function SiteFooter({ variant = "default" }: { variant?: "default" | "alt" }) {
   const settings = await getSiteSettings();
   if (!settings) return null;
 
   const social = SOCIAL_LINKS(settings);
+  const bg = variant === "alt" ? "bg-card/40" : "bg-ink";
 
   return (
-    <footer className="border-t border-white/[0.08] bg-ink px-6 py-14 sm:px-14">
-      <div className="grid grid-cols-1 gap-10 sm:grid-cols-4">
-        <div>
-          <div className="mb-2 flex items-baseline gap-2">
-            <span className="text-xl font-extrabold text-white">pinky</span>
-            <span className="h-[6px] w-[6px] rounded-full bg-accent" />
-          </div>
-          <p className="text-sm text-white/50">
-            The Fit Agency. Desde {settings.foundedYear}.
-          </p>
-        </div>
+    <footer className={`border-t border-white/[0.08] ${bg} px-6 sm:px-14`}>
+      <div className="flex flex-wrap items-center justify-between gap-6 py-7">
+        <div className="flex flex-wrap items-center gap-7">
+          <PinkyLogo size="sm" subtext={false} />
 
-        <div>
-          <p className="mb-3 text-xs font-bold uppercase tracking-wide text-white/40">Agencia</p>
-          <ul className="flex flex-col gap-2">
+          <nav className="flex flex-wrap items-center gap-7">
             {AGENCY_LINKS.map((link) => (
-              <li key={link.href}>
-                <Link href={link.href} className="text-sm text-white/65 hover:text-white">
-                  {link.label}
-                </Link>
-              </li>
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-sm font-medium text-white/65 hover:text-white"
+              >
+                {link.label}
+              </Link>
             ))}
-          </ul>
+          </nav>
         </div>
 
-        <div>
-          <p className="mb-3 text-xs font-bold uppercase tracking-wide text-white/40">Contacto</p>
-          <ul className="flex flex-col gap-2 text-sm text-white/65">
-            <li>
-              <a href={`mailto:${settings.email}`} className="hover:text-white">
-                {settings.email}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-3 rounded-full border border-accent/30 bg-accent/10 px-4 py-2.5">
+            <PhoneIcon className="h-4 w-4 shrink-0 text-accent" />
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-bold text-white">
+              <a href={toTel(settings.phone1)} className="transition hover:text-accent">
+                {settings.phone1}
               </a>
-            </li>
-            <li>{settings.phone1}</li>
-            {settings.phone2 && <li>{settings.phone2}</li>}
-            <li>{settings.address}</li>
-          </ul>
-        </div>
+              {settings.phone2 && (
+                <>
+                  <span className="text-white/20">|</span>
+                  <a href={toTel(settings.phone2)} className="transition hover:text-accent">
+                    {settings.phone2}
+                  </a>
+                </>
+              )}
+            </div>
+          </div>
 
-        {social.length > 0 && (
-          <div>
-            <p className="mb-3 text-xs font-bold uppercase tracking-wide text-white/40">Seguinos</p>
-            <ul className="flex flex-col gap-2">
-              {social.map((s) => (
-                <li key={s.label}>
+          {social.length > 0 && (
+            <div className="flex items-center gap-3">
+              {social.map((s) => {
+                const Icon = SOCIAL_ICONS[s.label];
+                return (
                   <a
+                    key={s.label}
                     href={s.href!}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-sm text-white/65 hover:text-white"
+                    aria-label={s.label}
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-white/70 transition hover:border-accent hover:text-white"
                   >
-                    {s.label}
+                    {Icon && <Icon className="h-4 w-4" />}
                   </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="mt-10 flex flex-col gap-3 border-t border-white/[0.08] pt-6 text-xs text-white/40 sm:flex-row sm:items-center sm:justify-between">
-        <p>© {new Date().getFullYear()} Pinky. The Fit Agency. Todos los derechos reservados.</p>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.08] py-4 text-xs text-white/40">
+        <p>© {new Date().getFullYear()} Pinky. The Fit Agency.</p>
         <div className="flex gap-4">
           <Link href="/privacidad" className="hover:text-white/70">
-            Política de privacidad
+            Privacidad
           </Link>
           <Link href="/terminos" className="hover:text-white/70">
             Términos

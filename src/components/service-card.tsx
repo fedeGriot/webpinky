@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ServiceIcon } from "@/components/service-icon";
 
 export type ServiceCardData = {
   slug: string;
@@ -10,22 +11,54 @@ export type ServiceCardData = {
   bullets: string[];
 };
 
-export function ServiceCard({ service, detailed = false }: { service: ServiceCardData; detailed?: boolean }) {
+export function ServiceCard({
+  service,
+  detailed = false,
+  compact = false,
+}: {
+  service: ServiceCardData;
+  detailed?: boolean;
+  compact?: boolean;
+}) {
+  if (compact) {
+    return (
+      <Link
+        href={`/que-hacemos#${service.slug}`}
+        className="flex items-start justify-between gap-4 rounded-3xl border border-white/10 bg-card p-6 transition hover:border-accent/50"
+      >
+        <div>
+          <p className="mb-2 text-xs font-bold text-white/30">
+            {String(service.order + 1).padStart(2, "0")}
+          </p>
+          <h3 className="text-lg font-extrabold leading-tight text-white">{service.title}.</h3>
+          <p className="mt-2 text-sm font-bold text-accent">{service.tagline}</p>
+        </div>
+        <div className="flex h-20 w-20 shrink-0 items-center justify-center">
+          <ServiceIcon slug={service.slug} fallback={service.icon} className="h-[76px] w-[76px]" />
+        </div>
+      </Link>
+    );
+  }
+
   return (
     <article
       id={service.slug}
       className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-card p-8"
     >
-      <div className="flex items-center gap-3">
-        <span className="text-2xl">{service.icon}</span>
-        <span className="text-xs font-bold text-white/30">
-          {String(service.order + 1).padStart(2, "0")}
-        </span>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="mb-2 text-xs font-bold text-white/30">
+            {String(service.order + 1).padStart(2, "0")}
+          </p>
+          <h3 className="text-2xl font-extrabold leading-tight text-white">{service.title}.</h3>
+        </div>
+        <div className="flex h-24 w-24 shrink-0 items-center justify-center">
+          <ServiceIcon slug={service.slug} fallback={service.icon} className="h-20 w-20" />
+        </div>
       </div>
-      <h3 className="text-2xl font-extrabold leading-tight text-white">{service.title}.</h3>
       <p className="text-base font-bold text-accent">{service.tagline}</p>
-      <p className="text-sm leading-relaxed text-white/60">{service.description}</p>
-      <ul className="flex flex-col gap-2 text-sm text-white/60">
+      <p className="text-sm leading-relaxed text-white">{service.description}</p>
+      <ul className="flex flex-col gap-2 text-sm text-white">
         {service.bullets.map((bullet) => (
           <li key={bullet} className="flex gap-2">
             <span className="text-accent">·</span>

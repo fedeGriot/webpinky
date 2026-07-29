@@ -263,12 +263,15 @@ export async function deleteValue(formData: FormData) {
 
 export async function createTeamMember(formData: FormData) {
   await verifySession();
+  const photo = formData.get("photo") as File | null;
+  const photoUrl = photo && photo.size > 0 ? await saveUploadedFile(photo) : null;
   await prisma.teamMember.create({
     data: {
       order: int(formData, "order"),
       initial: str(formData, "initial"),
       fullName: optionalStr(formData, "fullName"),
       role: optionalStr(formData, "role"),
+      photoUrl,
     },
   });
   revalidatePath("/quienes-somos");
@@ -277,6 +280,8 @@ export async function createTeamMember(formData: FormData) {
 
 export async function updateTeamMember(formData: FormData) {
   await verifySession();
+  const photo = formData.get("photo") as File | null;
+  const photoUrl = photo && photo.size > 0 ? await saveUploadedFile(photo) : undefined;
   await prisma.teamMember.update({
     where: { id: str(formData, "id") },
     data: {
@@ -284,6 +289,7 @@ export async function updateTeamMember(formData: FormData) {
       initial: str(formData, "initial"),
       fullName: optionalStr(formData, "fullName"),
       role: optionalStr(formData, "role"),
+      ...(photoUrl !== undefined ? { photoUrl } : {}),
     },
   });
   revalidatePath("/quienes-somos");

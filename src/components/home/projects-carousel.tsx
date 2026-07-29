@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
+import { staggerForRow } from "@/lib/stagger";
 
 type CarouselProject = {
   id: string;
@@ -18,7 +19,7 @@ type CarouselProject = {
 
 export function ProjectsCarousel({ projects }: { projects: CarouselProject[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState(0);
+  const [progress, setProgress] = useState(0);
   const dragState = useRef<{ startX: number; scrollLeft: number; dragging: boolean }>({
     startX: 0,
     scrollLeft: 0,
@@ -46,76 +47,112 @@ export function ProjectsCarousel({ projects }: { projects: CarouselProject[] }) 
   function onScroll() {
     const track = trackRef.current;
     if (!track) return;
-    const cardWidth = track.scrollWidth / projects.length;
-    setActive(Math.round(track.scrollLeft / cardWidth));
+    const maxScroll = track.scrollWidth - track.clientWidth;
+    setProgress(maxScroll > 0 ? track.scrollLeft / maxScroll : 0);
   }
+
+  function scrollByCard(direction: 1 | -1) {
+    const track = trackRef.current;
+    if (!track) return;
+    const cardWidth = track.scrollWidth / projects.length;
+    track.scrollBy({ left: cardWidth * direction, behavior: "smooth" });
+  }
+
+  const active = Math.round(progress * (projects.length - 1));
 
   return (
     <div>
-      <div
-        ref={trackRef}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onScroll={onScroll}
-        className="flex cursor-grab gap-6 overflow-x-auto pb-4 select-none [scrollbar-width:none] active:cursor-grabbing"
-      >
-        {projects.map((project, i) => (
-          <Link
-            key={project.id}
-            href={`/proyectos/${project.slug}`}
-            className="group relative flex w-[85vw] shrink-0 flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-card p-8 sm:w-[440px] sm:p-10"
-            style={{ minHeight: 380 }}
-          >
-            {project.coverImageUrl && (
-              <>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={project.coverImageUrl}
-                  alt={project.clientName}
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-card via-card/75 to-card/30" />
-              </>
-            )}
-            <div className="relative flex items-center justify-between text-xs font-bold uppercase tracking-wide text-white/40">
-              <span>
-                {String(i + 1).padStart(2, "0")} / {String(projects.length).padStart(2, "0")}
-              </span>
-              <span>{project.category}</span>
-            </div>
-
-            <h3 className="relative my-8 text-2xl font-extrabold leading-tight text-white sm:text-3xl">
-              {project.heroHeadline}
-            </h3>
-
-            <div className="relative">
-              <div className="mb-4 flex items-center justify-between">
-                <div>
-                  <p className="text-lg font-bold text-white">{project.clientName}</p>
-                  <p className="text-sm text-white/50">{project.summary}</p>
-                </div>
-                <span
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg text-white transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                  style={{ background: project.accentColor }}
-                >
-                  ↗
+      <div className="relative">
+        <div
+          ref={trackRef}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onScroll={onScroll}
+          className="flex cursor-grab gap-6 overflow-x-auto pb-8 pt-8 select-none [scrollbar-width:none] active:cursor-grabbing"
+        >
+          {projects.map((project, i) => (
+            <Link
+              key={project.id}
+              href={`/proyectos/${project.slug}`}
+              className={`group w-[82vw] shrink-0 sm:w-[380px] ${staggerForRow(project.id)}`}
+            >
+              <div className="mb-3 flex items-center justify-between text-xs font-bold uppercase tracking-wide text-white/40">
+                <span>
+                  {String(i + 1).padStart(2, "0")} / {String(projects.length).padStart(2, "0")}
                 </span>
+                <span>{project.category}</span>
               </div>
-              <div className="flex items-baseline gap-2 border-t border-white/10 pt-4">
-                <span className="text-2xl font-extrabold text-accent">{project.resultBadge}</span>
-                <span className="text-sm text-white/50">{project.resultLabel}</span>
+
+              <div
+                className="relative aspect-[9/16] overflow-hidden rounded-3xl"
+                style={
+                  project.coverImageUrl
+                    ? undefined
+                    : { background: `linear-gradient(150deg, ${project.accentColor}, ${project.accentColor}99)` }
+                }
+              >
+                {project.coverImageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={project.coverImageUrl}
+                    alt={project.clientName}
+                    className="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                  />
+                ) : (
+                  <div
+                    className="absolute inset-0 opacity-25"
+                    style={{
+                      backgroundImage: "radial-gradient(#fff 1.2px, transparent 1.2px)",
+                      backgroundSize: "14px 14px",
+                    }}
+                  />
+                )}
               </div>
-            </div>
-          </Link>
-        ))}
+
+              <div className="mt-4 flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="font-bold text-white">{project.clientName}</p>
+                  <p className="line-clamp-2 text-sm text-white">{project.summary}</p>
+                </div>
+                <div className="shrink-0 text-right">
+                  <p className="text-xl font-extrabold text-accent">{project.resultBadge}</p>
+                  <p className="text-xs uppercase text-white/50">{project.resultLabel}</p>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          aria-label="Anterior"
+          onClick={() => scrollByCard(-1)}
+          className="absolute left-0 top-[370px] z-10 hidden h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full bg-accent text-lg text-white shadow-lg transition hover:bg-accent-dark sm:flex"
+        >
+          ‹
+        </button>
+        <button
+          type="button"
+          aria-label="Siguiente"
+          onClick={() => scrollByCard(1)}
+          className="absolute right-0 top-[370px] z-10 hidden h-11 w-11 translate-x-1/2 items-center justify-center rounded-full bg-accent text-lg text-white shadow-lg transition hover:bg-accent-dark sm:flex"
+        >
+          ›
+        </button>
       </div>
 
-      <div className="mt-4 flex items-center justify-between text-sm text-white/40">
-        <span>
+      <div className="mt-4 flex items-center gap-4">
+        <span className="shrink-0 text-sm text-white/40">
           {String(active + 1).padStart(2, "0")} / {String(projects.length).padStart(2, "0")}
         </span>
-        <span>Arrastrá →</span>
+        <div className="h-px flex-1 bg-white/10">
+          <div
+            className="h-px bg-accent transition-[width]"
+            style={{ width: `${Math.max(progress * 100, 4)}%` }}
+          />
+        </div>
+        <span className="shrink-0 text-sm text-white/40">Arrastrá →</span>
       </div>
     </div>
   );

@@ -260,10 +260,43 @@ async function main() {
     data: values.map((v, i) => ({ ...v, order: i })),
   });
 
-  // --- Equipo (iniciales) ---
-  const initials = ["F", "M", "A", "S", "V", "L", "J", "C", "R", "N", "P", "G", "T", "D", "B", "I"];
+  // --- Equipo ---
+  const team = [
+    "Fabri",
+    "Jime",
+    "Sofi F.",
+    "Nico",
+    "Xime",
+    "Ruth",
+    "Majo",
+    "Fede",
+    "Sofi R.",
+    "Aldana",
+    "Nati",
+    "Mika",
+    "Matías Leal",
+    "Christian",
+    "Gime",
+    "Mathi P.",
+    "Lauta",
+    "Mathi",
+    "Vic",
+    "Robert",
+    "Lucas",
+    "Ramona",
+  ];
   await prisma.teamMember.createMany({
-    data: initials.map((initial, i) => ({ initial, order: i })),
+    data: team.map((fullName, i) => ({
+      fullName,
+      initial: fullName[0],
+      photoUrl: `/team/${fullName
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[̀-ͯ]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "")}.png`,
+      order: i,
+    })),
   });
 
   // --- Stats reutilizables ---
@@ -271,7 +304,7 @@ async function main() {
     data: [
       { context: "about", order: 0, value: "+15", label: "años construyendo", sublabel: "marcas que crecen" },
       { context: "about", order: 1, value: "+500", label: "clientes que confían", sublabel: "en nosotros" },
-      { context: "about", order: 2, value: "24", label: "personas detrás", sublabel: "del equipo Pinky" },
+      { context: "about", order: 2, value: "22", label: "personas detrás", sublabel: "del equipo Pinky" },
       { context: "about", order: 3, value: "6", label: "servicios integrados", sublabel: "bajo un solo techo" },
       {
         context: "services",

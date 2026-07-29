@@ -7,7 +7,7 @@ const BLOB_PATH =
 
 export function DecorativeBlob({
   className = "",
-  color = "#D81470",
+  color = "#D90B91",
   opacity = 0.6,
 }: {
   className?: string;

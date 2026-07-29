@@ -9,11 +9,11 @@
   --color-ink: #2b2247;
   --color-ink-light: #362a58;
   --color-card: #211933;
-  --color-accent: #d81470;
-  --color-accent-dark: #a80f57;
+  --color-accent: #d90b91;
+  --color-accent-dark: #a90871;
   --color-cream: #f4d83c;
 
-  --font-sans: var(--font-nunito);
+  --font-sans: var(--font-poppins);
   --font-script: var(--font-caveat);
   --font-serif: Georgia, "Times New Roman", serif;
 }
@@ -22,15 +22,6 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), sans-serif;
-}
-
-@keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

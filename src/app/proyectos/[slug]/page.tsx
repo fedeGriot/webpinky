@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
-import { StatCard } from "@/components/stat-card";
 import { getProjectBySlug, getMoreFromClient, getNextProject } from "@/lib/data";
 
 // Renderizado dinámico: el contenido viene del CMS y debe reflejarse sin rebuild.
@@ -20,6 +19,24 @@ export async function generateMetadata({
   return { title: `${project.title} — Pinky` };
 }
 
+function renderHeroTitle(title: string) {
+  const words = title.trim().split(" ");
+  const tailCount = Math.min(2, words.length);
+  const head = words.slice(0, words.length - tailCount);
+  const tail = words.slice(words.length - tailCount).join(" ");
+  return (
+    <>
+      {head.map((word, i) => (
+        <span key={i}>{word} </span>
+      ))}
+      <span className="relative inline-block text-accent">
+        {tail}
+        <span className="absolute -bottom-1 -left-1 -right-2 -z-10 h-2 -rotate-1 rounded-full bg-accent/90" />
+      </span>
+    </>
+  );
+}
+
 export default async function ProjectDetailPage({
   params,
 }: {
@@ -34,129 +51,183 @@ export default async function ProjectDetailPage({
     getNextProject(project.order),
   ]);
 
+  const ficha = [
+    { label: "Cliente", value: project.clientName },
+    { label: "Industria", value: project.industry },
+    { label: "Año", value: String(project.year) },
+  ];
+
   return (
     <>
-      <SiteNav />
+      <SiteNav active="proyectos" />
       <main>
-        <section className="px-6 pb-4 pt-8 text-sm text-white/40 sm:px-14">
-          <Link href="/" className="hover:text-white/70">
-            Home
-          </Link>{" "}
-          /{" "}
-          <Link href="/proyectos" className="hover:text-white/70">
-            Proyectos
-          </Link>{" "}
-          / <span className="text-white/60">{project.title}</span>
-          <div className="mt-4">
+        <section className="px-6 pt-8 sm:px-14">
+          <div className="flex items-center justify-between text-sm text-white/40">
+            <Link href="/" className="hover:text-white/70">
+              Home
+            </Link>
             <Link href="/proyectos" className="font-bold text-accent hover:text-white">
               ← Volver a proyectos
             </Link>
           </div>
         </section>
 
-        <section className="px-6 pb-16 pt-6 sm:px-14">
-          <p className="mb-4 text-sm font-bold uppercase tracking-wide text-accent">
-            Proyecto destacado
-          </p>
-          <h1 className="max-w-3xl text-4xl font-extrabold leading-[1.05] text-white sm:text-6xl">
-            {project.heroHeadline}
-          </h1>
-          <p className="mt-6 max-w-2xl text-lg text-white/60">{project.summary}</p>
+        {/* Hero: título + ficha */}
+        <section className="grid grid-cols-1 gap-10 px-6 py-10 sm:px-14 lg:grid-cols-[1fr_280px]">
+          <div>
+            <h1 className="max-w-2xl text-4xl font-extrabold leading-[1.05] text-white sm:text-5xl">
+              {renderHeroTitle(project.heroHeadline)}
+            </h1>
+            <p className="mt-6 max-w-xl text-lg text-white">{project.summary}</p>
+          </div>
 
-          <div className="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-4">
-            <div>
-              <p className="text-xs font-bold uppercase text-white/40">Cliente</p>
-              <p className="mt-1 font-semibold text-white">{project.clientName}</p>
-            </div>
-            <div>
-              <p className="text-xs font-bold uppercase text-white/40">Industria</p>
-              <p className="mt-1 font-semibold text-white">{project.industry}</p>
-            </div>
-            <div>
-              <p className="text-xs font-bold uppercase text-white/40">Año</p>
-              <p className="mt-1 font-semibold text-white">{project.year}</p>
-            </div>
-            <div>
-              <p className="text-xs font-bold uppercase text-white/40">Servicios</p>
-              <p className="mt-1 font-semibold text-white">{project.servicesTags.join(", ")}</p>
+          <div className="flex flex-col divide-y divide-white/10 border-t border-white/10">
+            {ficha.map((row) => (
+              <div key={row.label} className="py-3">
+                <p className="text-xs font-bold uppercase tracking-wide text-white/40">{row.label}</p>
+                <p className="mt-1 font-semibold text-white">{row.value}</p>
+              </div>
+            ))}
+            <div className="py-3">
+              <p className="mb-2 text-xs font-bold uppercase tracking-wide text-white/40">Servicios</p>
+              <div className="flex flex-wrap gap-2">
+                {project.servicesTags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full bg-accent/15 px-3 py-1 text-xs font-semibold text-accent"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
-        {project.stats.length > 0 && (
-          <section className="border-t border-white/[0.08] px-6 py-16 sm:px-14">
-            <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
-              {project.stats.map((stat) => (
-                <StatCard key={stat.id} value={stat.value} label={stat.label} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        <section className="border-t border-white/[0.08] px-6 py-16 sm:px-14">
-          <p className="mb-2 text-sm font-bold text-accent">— El desafío</p>
-          <h2 className="mb-6 max-w-2xl text-3xl font-extrabold leading-tight text-white sm:text-4xl">
-            {project.challengeTitle}
-          </h2>
-          <p className="max-w-2xl text-lg leading-relaxed text-white/60">{project.challengeBody}</p>
-
-          {project.quoteText && (
-            <blockquote className="mt-10 max-w-2xl border-l-2 border-accent pl-6" style={{ fontFamily: "var(--font-serif)" }}>
-              <p className="text-xl italic text-white/80">&ldquo;{project.quoteText}&rdquo;</p>
-              {project.quoteAuthor && (
-                <cite className="mt-3 block text-sm not-italic text-white/40">
-                  — {project.quoteAuthor}
-                </cite>
-              )}
-            </blockquote>
-          )}
-        </section>
-
-        <section className="border-t border-white/[0.08] px-6 py-16 sm:px-14">
-          <p className="mb-2 text-sm font-bold text-accent">— La solución</p>
-          <h2 className="mb-6 max-w-2xl text-3xl font-extrabold leading-tight text-white sm:text-4xl">
-            {project.solutionTitle}
-          </h2>
-          <p className="max-w-2xl text-lg leading-relaxed text-white/60">{project.solutionBody}</p>
-        </section>
-
-        {project.pieces.length > 0 && (
-          <section className="border-t border-white/[0.08] px-6 py-16 sm:px-14">
-            <h2 className="mb-2 text-3xl font-extrabold text-white sm:text-4xl">
-              Piezas del <span className="text-accent">proyecto.</span>
-            </h2>
-            <p className="mb-10 text-white/50">{project.pieces.length} piezas seleccionadas</p>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {project.pieces.map((piece) => (
+        {/* Lámina clara: portada + piezas + resultados */}
+        <div className="rounded-b-[3rem] bg-white px-6 py-14 sm:px-14">
+          <div
+            className="relative flex h-96 items-center justify-center overflow-hidden rounded-3xl sm:h-[34rem]"
+            style={
+              project.coverImageUrl
+                ? undefined
+                : { background: `linear-gradient(160deg, ${project.accentColor}, ${project.accentColor}99)` }
+            }
+          >
+            {project.coverImageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={project.coverImageUrl}
+                alt={project.title}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            ) : (
+              <>
                 <div
-                  key={piece.id}
-                  className="relative flex aspect-[4/3] flex-col justify-end overflow-hidden rounded-2xl border border-white/10 p-6"
-                  style={!piece.imageUrl ? { background: `${project.accentColor}22` } : undefined}
-                >
-                  {piece.imageUrl && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={piece.imageUrl}
-                      alt={piece.title}
-                      className="absolute inset-0 h-full w-full object-cover"
-                    />
-                  )}
-                  <div className={piece.imageUrl ? "relative bg-gradient-to-t from-black/80 to-transparent -m-6 p-6 pt-16" : "relative"}>
-                    <p className="text-lg font-extrabold leading-tight text-white">{piece.title}</p>
-                    {piece.subtitle && <p className="mt-2 text-sm text-white/50">{piece.subtitle}</p>}
+                  className="absolute inset-0 opacity-40"
+                  style={{
+                    backgroundImage: `radial-gradient(${project.accentColor} 1.4px, transparent 1.4px)`,
+                    backgroundSize: "18px 18px",
+                  }}
+                />
+                <p className="relative max-w-md px-6 text-center text-2xl font-extrabold text-white sm:text-3xl">
+                  {project.heroHeadline}
+                </p>
+              </>
+            )}
+          </div>
+
+          {project.pieces.length > 0 && (
+            <div className="mt-14">
+              <h2 className="mb-2 text-3xl font-extrabold text-ink sm:text-4xl">
+                Piezas del <span className="text-accent">proyecto.</span>
+              </h2>
+              <p className="mb-10 text-ink/50">Una selección de piezas de la campaña</p>
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+                {project.pieces.slice(0, 3).map((piece) => (
+                  <div
+                    key={piece.id}
+                    className="relative flex aspect-[9/16] flex-col justify-end overflow-hidden rounded-2xl p-5"
+                    style={
+                      !piece.imageUrl
+                        ? { background: `linear-gradient(160deg, ${project.accentColor}, ${project.accentColor}99)` }
+                        : undefined
+                    }
+                  >
+                    {piece.imageUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={piece.imageUrl}
+                        alt={piece.title}
+                        className="absolute inset-0 h-full w-full object-cover"
+                      />
+                    )}
+                    <div
+                      className={
+                        piece.imageUrl
+                          ? "relative -m-5 bg-gradient-to-t from-black/80 to-transparent p-5 pt-16"
+                          : "relative"
+                      }
+                    >
+                      <p className="text-base font-extrabold leading-tight text-white">{piece.title}</p>
+                      {piece.subtitle && <p className="mt-1 text-xs text-white/70">{piece.subtitle}</p>}
+                    </div>
                   </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {project.stats.length > 0 && (
+            <div className="mt-14 flex flex-wrap gap-x-12 gap-y-6 border-t border-ink/10 pt-10">
+              {project.stats.map((stat) => (
+                <div key={stat.id}>
+                  <p className="text-3xl font-extrabold text-accent sm:text-4xl">{stat.value}</p>
+                  <p className="mt-1 max-w-[14rem] text-sm text-ink/60">{stat.label}</p>
                 </div>
               ))}
             </div>
-          </section>
-        )}
+          )}
+        </div>
+
+        {/* Desafío / Solución en dos columnas */}
+        <section className="grid grid-cols-1 gap-10 px-6 py-16 sm:px-14 lg:grid-cols-2">
+          <div>
+            <p className="mb-2 text-sm font-bold text-accent">— El desafío</p>
+            <h2 className="mb-6 text-3xl font-extrabold leading-tight text-white">
+              {project.challengeTitle}
+            </h2>
+            <p className="text-lg leading-relaxed text-white">{project.challengeBody}</p>
+
+            {project.quoteText && (
+              <blockquote
+                className="mt-8 border-l-2 border-accent pl-6"
+                style={{ fontFamily: "var(--font-serif)" }}
+              >
+                <p className="text-xl italic text-white">&ldquo;{project.quoteText}&rdquo;</p>
+                {project.quoteAuthor && (
+                  <cite className="mt-3 block text-sm not-italic text-white/40">
+                    — {project.quoteAuthor}
+                  </cite>
+                )}
+              </blockquote>
+            )}
+          </div>
+
+          <div>
+            <p className="mb-2 text-sm font-bold text-accent">— La solución</p>
+            <h2 className="mb-6 text-3xl font-extrabold leading-tight text-white">
+              {project.solutionTitle}
+            </h2>
+            <p className="text-lg leading-relaxed text-white">{project.solutionBody}</p>
+          </div>
+        </section>
 
         {moreFromClient.length > 0 && (
           <section className="border-t border-white/[0.08] px-6 py-16 sm:px-14">
             <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
               <h2 className="text-2xl font-extrabold text-white sm:text-3xl">
-                Más de este cliente ·{" "}
-                <span className="text-accent">Otros proyectos con {project.clientName}.</span>
+                Otros proyectos <span className="text-accent">con {project.clientName}.</span>
               </h2>
               <Link href="/proyectos" className="text-sm font-bold text-white/70 hover:text-white">
                 Ver todos →
@@ -167,11 +238,26 @@ export default async function ProjectDetailPage({
                 <Link
                   key={p.id}
                   href={`/proyectos/${p.slug}`}
-                  className="group rounded-2xl border border-white/10 bg-card p-6"
+                  className="group overflow-hidden rounded-2xl border border-white/10 bg-card"
                 >
-                  <p className="mb-3 text-xs font-bold uppercase text-white/40">{p.category}</p>
-                  <p className="font-bold text-white">{p.title}</p>
-                  <p className="mt-1 text-sm text-white/50">{p.resultLabel}</p>
+                  <div
+                    className="relative h-32"
+                    style={
+                      p.coverImageUrl
+                        ? undefined
+                        : { background: `linear-gradient(160deg, ${p.accentColor}55, ${p.accentColor}10)` }
+                    }
+                  >
+                    {p.coverImageUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={p.coverImageUrl} alt={p.title} className="absolute inset-0 h-full w-full object-cover" />
+                    )}
+                  </div>
+                  <div className="p-5">
+                    <p className="mb-2 text-xs font-bold uppercase text-white/40">{p.category}</p>
+                    <p className="font-bold text-white">{p.title}</p>
+                    <p className="mt-1 text-sm text-white/50">{p.resultLabel}</p>
+                  </div>
                 </Link>
               ))}
             </div>

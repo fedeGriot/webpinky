@@ -58,7 +58,7 @@ export function ProjectFields({ defaults = {} }: { defaults?: ProjectFieldDefaul
           <input
             name="accentColor"
             type="color"
-            defaultValue={defaults.accentColor ?? "#D81470"}
+            defaultValue={defaults.accentColor ?? "#D90B91"}
             className={`${inputClass} h-11 p-1`}
           />
         </Field>

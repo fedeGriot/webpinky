@@ -27,7 +27,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <SiteNav />
+      <SiteNav active="home" />
       <main>
         {/* Hero */}
         <section className="relative overflow-hidden px-6 pb-20 pt-20 sm:px-14 sm:pt-24">
@@ -42,7 +42,7 @@ export default async function HomePage() {
               </span>{" "}
               <HeroRotator words={hero?.rotatingWords ?? []} />
             </h1>
-            <p className="mt-8 max-w-xl text-lg text-white/60">{hero?.subtitle}</p>
+            <p className="mt-8 max-w-xl text-lg text-white">{hero?.subtitle}</p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
                 href="/proyectos"
@@ -52,7 +52,7 @@ export default async function HomePage() {
               </Link>
               <Link
                 href="/quienes-somos"
-                className="text-sm font-bold text-white/70 transition hover:text-white"
+                className="rounded-full border border-white/20 px-7 py-4 text-sm font-bold text-white/80 transition hover:border-white hover:text-white"
               >
                 {hero?.ctaSecondaryLabel ?? "Conocenos →"}
               </Link>
@@ -61,7 +61,7 @@ export default async function HomePage() {
         </section>
 
         {/* Clientes */}
-        <section className="border-y border-white/[0.08] px-6 py-16 sm:px-14">
+        <section id="clientes" className="border-y border-white/[0.08] px-6 py-16 sm:px-14">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
               Nuestros <span className="text-accent">clientes.</span>
@@ -95,21 +95,24 @@ export default async function HomePage() {
         </section>
 
         {/* Servicios */}
-        <section className="border-t border-white/[0.08] px-6 py-24 sm:px-14">
-          <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
-            <h2 className="text-3xl font-extrabold leading-tight text-white sm:text-4xl">
-              Servicios · ¿Qué <span className="text-accent">hacemos?</span>
-            </h2>
-            <Link
-              href="/que-hacemos"
-              className="text-sm font-bold text-white/70 transition hover:text-white"
-            >
-              Ver todo →
+        <section className="border-t border-white/[0.08] px-6 pb-0 pt-24 sm:px-14">
+          <div className="mb-10">
+            <p className="mb-3 text-sm font-bold uppercase tracking-wide text-white/40">
+              — Servicios
+            </p>
+            <Link href="/que-hacemos" className="group inline-flex items-center gap-3">
+              <h2 className="text-3xl font-extrabold leading-tight text-white sm:text-4xl">
+                ¿Qué <span className="relative inline-block text-accent">
+                  hacemos?
+                  <span className="absolute -bottom-1 left-0 right-0 -z-10 h-2.5 -rotate-1 rounded-full bg-accent/90" />
+                </span>
+              </h2>
+              <span className="text-2xl text-accent transition group-hover:translate-x-1">→</span>
             </Link>
           </div>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {services.map((service) => (
-              <ServiceCard key={service.slug} service={service} />
+              <ServiceCard key={service.slug} service={service} compact />
             ))}
           </div>
         </section>
@@ -118,6 +121,7 @@ export default async function HomePage() {
           eyebrow="Estamos abiertos a nuevos proyectos"
           titleLine1="Hagamos que"
           titleAccent="tu marca crezca."
+          spacingClassName="pt-[100px] pb-[100px]"
         />
       </main>
       <SiteFooter />
