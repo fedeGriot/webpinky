@@ -37,7 +37,10 @@ export async function SiteFooter({ variant = "default" }: { variant?: "default" 
           forma desprolija, y el bloque de teléfono/redes quedaba pegado al
           margen izquierdo en vez de centrado. */}
       <div className="flex flex-col items-center gap-6 py-7 text-center sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:text-left">
-        <div className="flex flex-col items-center gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-7">
+        {/* hidden sm:flex: en mobile el footer muestra solo la tarjeta de
+            teléfono/redes (pedido explícito) — logo y menú quedan ocultos
+            hasta sm:, donde vuelve el layout de escritorio completo. */}
+        <div className="hidden flex-col items-center gap-4 sm:flex sm:flex-row sm:flex-wrap sm:items-center sm:gap-7">
           <PinkyLogo size="sm" subtext={false} />
 
           <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-3 sm:justify-start sm:gap-7">

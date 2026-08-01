@@ -104,8 +104,18 @@ export function ProjectsCarousel({ projects }: { projects: CarouselProject[] }) 
   return (
     <div>
       <div className="relative">
+        {/* data-lenis-prevent: Lenis (root mode) intercepta el touch/wheel de
+            todo el documento para su scroll suave. Sin este atributo, no
+            sabe que este contenedor ya tiene su propio scroll horizontal
+            nativo (overflow-x-auto + touch-pan-x) y, al arrastrar hacia los
+            costados acá, su estado interno de touch quedaba desincronizado
+            — el resultado era que el scroll vertical de la página se
+            trababa hasta tocar en otra zona. Con este atributo, Lenis
+            ignora por completo los gestos que empiezan dentro de este
+            contenedor y deja que el navegador los maneje nativamente. */}
         <div
           ref={trackRef}
+          data-lenis-prevent
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={endDrag}
