@@ -2,6 +2,14 @@ import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 import { SITE_URL } from "@/lib/seo";
 
+// Sin esto, Next intenta pre-renderizar /sitemap.xml en build time, y ahí
+// consulta la base — en Railway el volumen persistente (/data, donde vive
+// la base SQLite) recién se monta en runtime, no durante el build, así que
+// el build fallaba con "Cannot open database because the directory does
+// not exist". force-dynamic hace que se genere en cada request en runtime,
+// como el resto de las páginas del sitio.
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const projects = await prisma.project.findMany({
     select: { slug: true, updatedAt: true },
