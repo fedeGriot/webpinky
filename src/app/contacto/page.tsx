@@ -12,6 +12,13 @@ export const metadata: Metadata = {
   openGraph: { title: "Contacto — Pinky", url: "/contacto" },
 };
 
+// SiteNav/SiteFooter consultan la base (getSiteSettings). Sin esto, Next
+// intenta pre-renderizar esta página en build time, y en Railway el volumen
+// persistente (donde vive el SQLite de producción) recién se monta en
+// runtime, no durante el build — mismo patrón que el resto de las páginas
+// del sitio (ver README).
+export const dynamic = "force-dynamic";
+
 export default function ContactoPage() {
   return (
     <>

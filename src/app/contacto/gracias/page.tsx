@@ -10,6 +10,11 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
+// Ver nota en src/app/contacto/page.tsx: SiteNav/SiteFooter consultan la
+// base, y en build time (Railway) el volumen persistente todavía no está
+// montado.
+export const dynamic = "force-dynamic";
+
 export default function GraciasPage() {
   return (
     <>
