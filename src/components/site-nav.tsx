@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { PinkyLogo } from "@/components/pinky-logo";
 import { MobileNav } from "@/components/mobile-nav";
+import { FillButton } from "@/components/fill-button";
+import { FillHoverText } from "@/components/fill-hover-text";
 
 const LINKS = [
+  { href: "/", label: "Home" },
   { href: "/quienes-somos", label: "¿Quiénes somos?" },
   { href: "/que-hacemos", label: "¿Qué hacemos?" },
   { href: "/proyectos", label: "Proyectos" },
   { href: "/contacto", label: "Contacto" },
-  { href: "/", label: "Home" },
 ];
 
 export type NavActive = "home" | "quienes-somos" | "que-hacemos" | "proyectos" | "contacto";
@@ -27,23 +29,32 @@ export function SiteNav({ active }: { active?: NavActive }) {
             <Link
               key={link.label}
               href={link.href}
-              className={`whitespace-nowrap text-sm font-semibold transition hover:text-white ${
+              className={`group whitespace-nowrap text-sm font-semibold ${
                 isActive ? "text-accent" : "text-white/65"
               }`}
             >
-              {link.label}
+              <FillHoverText>{link.label}</FillHoverText>
             </Link>
           );
         })}
       </nav>
 
       <div className="flex shrink-0 items-center gap-3">
-        <Link
-          href="/contacto"
-          className="whitespace-nowrap rounded-full bg-accent px-6 py-[11px] text-[13px] font-bold text-white transition hover:bg-accent-dark"
-        >
-          Hablemos →
-        </Link>
+        {active === "contacto" ? (
+          <span
+            aria-disabled="true"
+            className="whitespace-nowrap rounded-full bg-white/5 px-6 py-[11px] text-[13px] font-bold text-white/40"
+          >
+            Hablemos →
+          </span>
+        ) : (
+          <FillButton
+            href="/contacto"
+            className="whitespace-nowrap bg-accent px-6 py-[11px] text-[13px]"
+          >
+            Hablemos →
+          </FillButton>
+        )}
         <MobileNav links={LINKS} active={active} />
       </div>
     </header>

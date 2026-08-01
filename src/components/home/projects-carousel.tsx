@@ -20,28 +20,69 @@ type CarouselProject = {
 export function ProjectsCarousel({ projects }: { projects: CarouselProject[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
-  const dragState = useRef<{ startX: number; scrollLeft: number; dragging: boolean }>({
+  const dragState = useRef<{ startX: number; scrollLeft: number; pointerDown: boolean; dragging: boolean; captured: boolean }>({
     startX: 0,
     scrollLeft: 0,
+    pointerDown: false,
     dragging: false,
+    captured: false,
   });
 
+  // Umbral de movimiento antes de considerar el gesto un arrastre. Sin esto,
+  // setPointerCapture se llamaba en TODO pointerdown con mouse, incluso en un
+  // click simple sin mover el mouse — y una vez capturado el puntero, el click
+  // resultante pasa a tener como target el propio track (el elemento que
+  // capturó), no la tarjeta bajo el cursor. Como el track es ancestro del
+  // <Link>, ese click nunca burbujeaba hasta el link y la navegación no
+  // pasaba nunca al hacer click con mouse (en cualquier tarjeta, no solo las
+  // pegadas a las flechas). Ahora solo se captura el puntero una vez que el
+  // movimiento supera el umbral, o sea cuando realmente hay un arrastre.
+  const DRAG_THRESHOLD = 4;
+
   function onPointerDown(e: React.PointerEvent) {
+    // Solo mouse: en touch, capturar el puntero acá puede pisar el gesto de
+    // scroll vertical de la página cuando arranca sobre el carrusel. El touch
+    // ya tiene scroll horizontal nativo vía overflow-x-auto + touch-pan-x.
+    if (e.pointerType !== "mouse") return;
     const track = trackRef.current;
     if (!track) return;
-    dragState.current = { startX: e.clientX, scrollLeft: track.scrollLeft, dragging: true };
-    track.setPointerCapture(e.pointerId);
+    dragState.current = { startX: e.clientX, scrollLeft: track.scrollLeft, pointerDown: true, dragging: false, captured: false };
   }
 
   function onPointerMove(e: React.PointerEvent) {
+    if (e.pointerType !== "mouse") return;
     const track = trackRef.current;
-    if (!track || !dragState.current.dragging) return;
-    const delta = e.clientX - dragState.current.startX;
-    track.scrollLeft = dragState.current.scrollLeft - delta;
+    const state = dragState.current;
+    // "pointermove" se dispara con solo pasar el mouse por encima, sin botón
+    // apretado — sin este chequeo, cualquier hover after-the-fact reusaba un
+    // startX/scrollLeft viejo de la última vez que sí hubo un pointerdown y
+    // "saltaba" el scroll solo, o dejaba dragging trabado en true para
+    // siempre (nunca llega un pointerup real que lo apague) hasta el próximo
+    // click, que recién ahí reinicia el estado.
+    if (!track || !state.pointerDown) return;
+    const delta = e.clientX - state.startX;
+    if (!state.dragging) {
+      if (Math.abs(delta) < DRAG_THRESHOLD) return;
+      state.dragging = true;
+      track.setPointerCapture(e.pointerId);
+      state.captured = true;
+    }
+    track.scrollLeft = state.scrollLeft - delta;
   }
 
-  function onPointerUp() {
-    dragState.current.dragging = false;
+  // pointercancel (no solo pointerup) tiene que limpiar el mismo estado: el
+  // navegador lo dispara en vez de pointerup cuando decide que el gesto ya
+  // no es un click/drag normal (por ejemplo al competir con un gesto propio
+  // del trackpad) — sin este handler, ese caso nunca apagaba pointerDown y
+  // el arrastre quedaba "pegado" al mouse hasta el próximo click.
+  function endDrag(e: React.PointerEvent) {
+    const state = dragState.current;
+    if (state.captured) {
+      trackRef.current?.releasePointerCapture(e.pointerId);
+    }
+    state.pointerDown = false;
+    state.dragging = false;
+    state.captured = false;
   }
 
   function onScroll() {
@@ -67,9 +108,10 @@ export function ProjectsCarousel({ projects }: { projects: CarouselProject[] }) 
           ref={trackRef}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
           onScroll={onScroll}
-          className="flex cursor-grab gap-6 overflow-x-auto pb-8 pt-8 select-none [scrollbar-width:none] active:cursor-grabbing"
+          className="flex touch-pan-x cursor-grab gap-6 overflow-x-auto pb-8 pt-8 select-none [scrollbar-width:none] active:cursor-grabbing"
         >
           {projects.map((project, i) => (
             <Link
@@ -124,11 +166,15 @@ export function ProjectsCarousel({ projects }: { projects: CarouselProject[] }) 
           ))}
         </div>
 
+        {/* clip-path recorta también el área de clic (no solo la pintura, a
+            diferencia de rounded-full): sin esto, las esquinas cuadradas e
+            invisibles del botón quedaban encima de la imagen del primer/
+            tercer proyecto y se comían el clic pensado para la tarjeta. */}
         <button
           type="button"
           aria-label="Anterior"
           onClick={() => scrollByCard(-1)}
-          className="absolute left-0 top-[370px] z-10 hidden h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full bg-accent text-lg text-white shadow-lg transition hover:bg-accent-dark sm:flex"
+          className="absolute left-0 top-[370px] z-10 hidden h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full bg-accent text-lg text-white shadow-lg transition hover:bg-accent-dark sm:flex [clip-path:circle(50%)]"
         >
           ‹
         </button>
@@ -136,7 +182,7 @@ export function ProjectsCarousel({ projects }: { projects: CarouselProject[] }) 
           type="button"
           aria-label="Siguiente"
           onClick={() => scrollByCard(1)}
-          className="absolute right-0 top-[370px] z-10 hidden h-11 w-11 translate-x-1/2 items-center justify-center rounded-full bg-accent text-lg text-white shadow-lg transition hover:bg-accent-dark sm:flex"
+          className="absolute right-0 top-[370px] z-10 hidden h-11 w-11 translate-x-1/2 items-center justify-center rounded-full bg-accent text-lg text-white shadow-lg transition hover:bg-accent-dark sm:flex [clip-path:circle(50%)]"
         >
           ›
         </button>

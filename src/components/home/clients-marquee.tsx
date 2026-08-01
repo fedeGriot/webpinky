@@ -13,14 +13,20 @@ export function ClientsMarquee({ clients }: { clients: ClientItem[] }) {
   const speedRef = useRef(0);
   const targetSpeedRef = useRef(0);
   const baseSpeedRef = useRef(0);
+  const halfWidthRef = useRef(0);
 
   useEffect(() => {
     const track = trackRef.current;
     if (!track || clients.length === 0) return;
 
+    // Ojo con esto: leer scrollWidth fuerza al navegador a recalcular el
+    // layout (reflow síncrono) porque depende del tamaño real ya
+    // renderizado. Hacerlo una sola vez acá (por resize) en vez de en cada
+    // frame del rAF de abajo evita ese costo 60 veces por segundo, que es lo
+    // que generaba el tironeo/temblor al scrollear.
     function measure() {
-      const halfWidth = track!.scrollWidth / 2;
-      baseSpeedRef.current = halfWidth / CYCLE_SECONDS;
+      halfWidthRef.current = track!.scrollWidth / 2;
+      baseSpeedRef.current = halfWidthRef.current / CYCLE_SECONDS;
       targetSpeedRef.current = baseSpeedRef.current;
     }
     measure();
@@ -37,7 +43,7 @@ export function ClientsMarquee({ clients }: { clients: ClientItem[] }) {
       speedRef.current += (targetSpeedRef.current - speedRef.current) * Math.min(dt * 4, 1);
       offsetRef.current += speedRef.current * dt;
 
-      const halfWidth = track!.scrollWidth / 2;
+      const halfWidth = halfWidthRef.current;
       if (halfWidth > 0 && offsetRef.current >= halfWidth) {
         offsetRef.current -= halfWidth;
       }
@@ -66,13 +72,13 @@ export function ClientsMarquee({ clients }: { clients: ClientItem[] }) {
     >
       <div ref={trackRef} className="flex w-max items-center gap-14 py-2">
         {[...clients, ...clients].map((client, i) => (
-          <div key={`${client.id}-${i}`} className="flex h-8 shrink-0 items-center">
+          <div key={`${client.id}-${i}`} className="flex h-16 w-[150px] shrink-0 items-center justify-center">
             {client.logoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={client.logoUrl}
                 alt={client.name}
-                className="h-full max-w-[140px] object-contain brightness-0 invert opacity-70 transition hover:opacity-100"
+                className="h-full w-full object-contain brightness-0 invert opacity-70 transition hover:opacity-100"
               />
             ) : (
               <span className="whitespace-nowrap text-lg font-extrabold uppercase tracking-tight text-white/70">

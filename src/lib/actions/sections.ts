@@ -5,8 +5,12 @@ import { prisma } from "@/lib/prisma";
 import { verifySession } from "@/lib/dal";
 import { saveUploadedFile } from "@/lib/uploads";
 
+// Tope defensivo: nada en este CMS necesita legítimamente un campo de texto
+// de más de 20k caracteres; esto solo frena payloads patológicos.
+const MAX_TEXT_LENGTH = 20_000;
+
 function str(formData: FormData, key: string) {
-  return String(formData.get(key) ?? "").trim();
+  return String(formData.get(key) ?? "").trim().slice(0, MAX_TEXT_LENGTH);
 }
 
 function optionalStr(formData: FormData, key: string) {
@@ -24,6 +28,29 @@ function linesToArray(value: string) {
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean);
+}
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function parseEmail(formData: FormData, key: string) {
+  const value = str(formData, key);
+  if (!EMAIL_RE.test(value)) {
+    throw new Error(`"${key}" debe ser un email válido.`);
+  }
+  return value;
+}
+
+// Solo http(s), para no terminar guardando un href tipo javascript: en un <a>.
+function parseOptionalUrl(formData: FormData, key: string) {
+  const value = optionalStr(formData, key);
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "http:" && url.protocol !== "https:") throw new Error("protocol");
+  } catch {
+    throw new Error(`"${key}" debe ser una URL http(s) válida.`);
+  }
+  return value;
 }
 
 // --- Contenido singleton ---
@@ -76,14 +103,14 @@ export async function upsertAbout(formData: FormData) {
 export async function upsertSiteSettings(formData: FormData) {
   await verifySession();
   const data = {
-    email: str(formData, "email"),
+    email: parseEmail(formData, "email"),
     phone1: str(formData, "phone1"),
     phone2: optionalStr(formData, "phone2"),
     address: str(formData, "address"),
-    instagramUrl: optionalStr(formData, "instagramUrl"),
-    linkedinUrl: optionalStr(formData, "linkedinUrl"),
-    youtubeUrl: optionalStr(formData, "youtubeUrl"),
-    twitterUrl: optionalStr(formData, "twitterUrl"),
+    instagramUrl: parseOptionalUrl(formData, "instagramUrl"),
+    linkedinUrl: parseOptionalUrl(formData, "linkedinUrl"),
+    youtubeUrl: parseOptionalUrl(formData, "youtubeUrl"),
+    twitterUrl: parseOptionalUrl(formData, "twitterUrl"),
     foundedYear: int(formData, "foundedYear", 2010),
   };
   await prisma.siteSettings.upsert({
@@ -338,9 +365,22 @@ export async function updateStat(formData: FormData) {
   revalidatePath("/admin/secciones/stats");
 }
 
+// Mínimo de stats por sección: por debajo de esto el módulo de números
+// destacados en la web pública se ve pobre/desbalanceado.
+const MIN_STATS_PER_CONTEXT = 3;
+
 export async function deleteStat(formData: FormData) {
   await verifySession();
-  await prisma.stat.delete({ where: { id: str(formData, "id") } });
+  const id = str(formData, "id");
+  const stat = await prisma.stat.findUnique({ where: { id } });
+  if (!stat) return;
+
+  const count = await prisma.stat.count({ where: { context: stat.context } });
+  if (count <= MIN_STATS_PER_CONTEXT) {
+    throw new Error(`Tiene que haber al menos ${MIN_STATS_PER_CONTEXT} stats en "${stat.context}".`);
+  }
+
+  await prisma.stat.delete({ where: { id } });
   revalidatePath("/quienes-somos");
   revalidatePath("/que-hacemos");
   revalidatePath("/admin/secciones/stats");

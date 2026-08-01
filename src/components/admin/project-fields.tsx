@@ -11,6 +11,7 @@ export type ProjectFieldDefaults = {
   category?: string;
   heroHeadline?: string;
   accentColor?: string;
+  videoUrl?: string | null;
   summary?: string;
   resultBadge?: string;
   resultLabel?: string;
@@ -117,6 +118,16 @@ export function ProjectFields({ defaults = {} }: { defaults?: ProjectFieldDefaul
 
       <Field label="Imagen de portada (opcional)">
         <input name="coverImage" type="file" accept="image/*" className="text-sm text-white/70" />
+      </Field>
+
+      <Field label="Link de video de YouTube (opcional)">
+        <input
+          name="videoUrl"
+          type="url"
+          placeholder="https://www.youtube.com/watch?v=..."
+          defaultValue={defaults.videoUrl ?? ""}
+          className={inputClass}
+        />
       </Field>
     </>
   );

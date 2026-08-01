@@ -90,15 +90,6 @@ export async function getProjectById(id: string) {
   return mapProject(project);
 }
 
-export async function getMoreFromClient(clientName: string, excludeSlug: string) {
-  const projects = await prisma.project.findMany({
-    where: { clientName, slug: { not: excludeSlug } },
-    orderBy: { order: "asc" },
-    take: 3,
-  });
-  return projects.map(mapProject);
-}
-
 export async function getNextProject(order: number) {
   const next = await prisma.project.findFirst({
     where: { order: { gt: order } },

@@ -24,12 +24,10 @@ export function ServiceCard({
     return (
       <Link
         href={`/que-hacemos#${service.slug}`}
-        className="flex items-start justify-between gap-4 rounded-3xl border border-white/10 bg-card p-6 transition hover:border-accent/50"
+        className="group relative isolate flex items-start justify-between gap-4 overflow-hidden rounded-3xl bg-card p-6"
       >
+        <span className="absolute inset-0 -z-10 origin-left scale-x-0 bg-accent/[0.08] transition-transform duration-500 ease-out group-hover:scale-x-100" />
         <div>
-          <p className="mb-2 text-xs font-bold text-white/30">
-            {String(service.order + 1).padStart(2, "0")}
-          </p>
           <h3 className="text-lg font-extrabold leading-tight text-white">{service.title}.</h3>
           <p className="mt-2 text-sm font-bold text-accent">{service.tagline}</p>
         </div>

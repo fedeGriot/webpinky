@@ -5,9 +5,14 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { verifySession } from "@/lib/dal";
 import { saveUploadedFile } from "@/lib/uploads";
+import { isYouTubeUrl } from "@/lib/youtube";
+
+// Tope defensivo: nada en este CMS necesita legítimamente un campo de texto
+// de más de 20k caracteres; esto solo frena payloads patológicos.
+const MAX_TEXT_LENGTH = 20_000;
 
 function str(formData: FormData, key: string) {
-  return String(formData.get(key) ?? "").trim();
+  return String(formData.get(key) ?? "").trim().slice(0, MAX_TEXT_LENGTH);
 }
 
 function optionalStr(formData: FormData, key: string) {
@@ -27,18 +32,53 @@ function linesToArray(value: string) {
     .filter(Boolean);
 }
 
+const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
+const SLUG_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+const DEFAULT_ACCENT_COLOR = "#D90B91";
+
+function parseSlug(formData: FormData) {
+  const value = str(formData, "slug");
+  if (!SLUG_RE.test(value)) {
+    throw new Error("El slug solo puede tener minúsculas, números y guiones (ej: mi-proyecto).");
+  }
+  return value;
+}
+
+function parseYear(formData: FormData) {
+  const year = int(formData, "year", new Date().getFullYear());
+  if (year < 2000 || year > 2100) {
+    throw new Error("El año debe estar entre 2000 y 2100.");
+  }
+  return year;
+}
+
+function parseAccentColor(formData: FormData) {
+  const value = str(formData, "accentColor");
+  return HEX_COLOR_RE.test(value) ? value : DEFAULT_ACCENT_COLOR;
+}
+
+function parseVideoUrl(formData: FormData) {
+  const value = str(formData, "videoUrl");
+  if (value.length === 0) return null;
+  if (!isYouTubeUrl(value)) {
+    throw new Error("El link de video tiene que ser una URL de YouTube válida.");
+  }
+  return value;
+}
+
 function projectFieldsFromForm(formData: FormData) {
   return {
-    slug: str(formData, "slug"),
+    slug: parseSlug(formData),
     title: str(formData, "title"),
     clientName: str(formData, "clientName"),
     industry: str(formData, "industry"),
-    year: int(formData, "year", new Date().getFullYear()),
+    year: parseYear(formData),
     featured: formData.get("featured") === "on",
     order: int(formData, "order"),
     category: str(formData, "category"),
     heroHeadline: str(formData, "heroHeadline"),
-    accentColor: str(formData, "accentColor") || "#D90B91",
+    accentColor: parseAccentColor(formData),
+    videoUrl: parseVideoUrl(formData),
     summary: str(formData, "summary"),
     resultBadge: str(formData, "resultBadge"),
     resultLabel: str(formData, "resultLabel"),

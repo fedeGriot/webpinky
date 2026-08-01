@@ -1,18 +1,27 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
-import { DecorativeBlob } from "@/components/decorative-blob";
+import { BackgroundShape } from "@/components/background-shape";
 import { HeroRotator } from "@/components/home/hero-rotator";
 import { ClientsMarquee } from "@/components/home/clients-marquee";
 import { ProjectsCarousel } from "@/components/home/projects-carousel";
 import { ServiceCard } from "@/components/service-card";
 import { CtaSection } from "@/components/cta-section";
+import { Reveal } from "@/components/reveal";
+import { FillButton } from "@/components/fill-button";
 import {
   getHeroContent,
   getClients,
   getFeaturedProjects,
   getServices,
 } from "@/lib/data";
+
+// Sin título propio: la Home hereda el título/descripción por defecto del
+// layout raíz (que ya son el nombre y la descripción del sitio).
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 // Renderizado dinámico: el contenido viene del CMS y debe reflejarse sin rebuild.
 export const dynamic = "force-dynamic";
@@ -30,9 +39,8 @@ export default async function HomePage() {
       <SiteNav active="home" />
       <main>
         {/* Hero */}
-        <section className="relative overflow-hidden px-6 pb-20 pt-20 sm:px-14 sm:pt-24">
-          <DecorativeBlob className="right-[-140px] top-10 h-[620px] w-[620px] opacity-40" />
-          <DecorativeBlob className="left-[-200px] bottom-[-180px] h-[500px] w-[500px] opacity-25" />
+        <section className="relative px-6 pb-20 pt-20 sm:px-14 sm:pt-24">
+          <BackgroundShape shape="01" className="right-[-180px] top-[-40px] h-[680px] w-[680px] opacity-50" />
           <div className="relative z-10 max-w-4xl">
             <h1 className="text-[15vw] font-extrabold leading-[0.96] tracking-[-0.03em] text-white sm:text-[80px] lg:text-[96px]">
               <span className="block">{hero?.titleLine1}</span>
@@ -44,12 +52,9 @@ export default async function HomePage() {
             </h1>
             <p className="mt-8 max-w-xl text-lg text-white">{hero?.subtitle}</p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
-              <Link
-                href="/proyectos"
-                className="rounded-full bg-accent px-7 py-4 text-sm font-bold text-white transition hover:bg-accent-dark"
-              >
+              <FillButton href="/proyectos" className="bg-accent px-7 py-4 text-sm">
                 {hero?.ctaPrimaryLabel ?? "Ver proyectos"}
-              </Link>
+              </FillButton>
               <Link
                 href="/quienes-somos"
                 className="rounded-full border border-white/20 px-7 py-4 text-sm font-bold text-white/80 transition hover:border-white hover:text-white"
@@ -61,27 +66,47 @@ export default async function HomePage() {
         </section>
 
         {/* Clientes */}
-        <section id="clientes" className="border-y border-white/[0.08] px-6 py-16 sm:px-14">
-          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+        {/* relative z-10: el blob del hero es position:absolute y por reglas de
+            stacking de CSS pinta por encima del contenido normal de esta
+            sección aunque esté "detrás" en el DOM; con z-10 esta sección pasa
+            a tener su propio nivel de apilamiento por encima del blob. */}
+        <section id="clientes" className="relative z-10 px-6 pt-16 sm:px-14">
+          <Reveal className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
-              Nuestros <span className="text-accent">clientes.</span>
+              Nuestros <span className="text-accent">clientes</span>
             </h2>
             <p className="text-sm text-white/50">
               +500 marcas · +15 años construyendo relaciones a largo plazo.
             </p>
+          </Reveal>
+          {/* -mx cancela el padding de la sección (px-6/sm:px-14) para que el
+              marquee llegue de punta a punta de la pantalla, sin el corte que
+              generaba ese margen a los costados. Se usa el padding del propio
+              contenedor en vez de 100vw/w-screen a propósito: w-screen puede
+              quedar unos px más ancho que el viewport real cuando hay
+              scrollbar visible y generar scroll horizontal — este enfoque no
+              toca unidades de viewport, así que no corre ese riesgo. */}
+          <div className="-mx-6 sm:-mx-14">
+            <ClientsMarquee clients={clients} />
           </div>
-          <ClientsMarquee clients={clients} />
         </section>
 
         {/* Proyectos destacados */}
-        <section className="px-6 py-24 sm:px-14">
-          <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
+        <section className="px-6 sm:px-14 section-gap">
+          {/* flex-col + sm:flex-row (no flex-wrap): que el botón "Ver todos"
+              quede debajo del titular en mobile es un criterio fijo por
+              breakpoint, no algo que dependa de si el texto de esta sección
+              en particular alcanza a entrar al lado del título — con
+              flex-wrap, dos secciones con textos de largo distinto podían
+              quebrar en anchos de pantalla distintos y verse inconsistentes
+              entre sí. */}
+          <Reveal className="mb-10 flex flex-col items-start gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="mb-3 text-sm font-bold uppercase tracking-wide text-white/40">
-                Trabajos · Seleccionados
+                Trabajos Seleccionados
               </p>
               <h2 className="text-3xl font-extrabold leading-tight text-white sm:text-4xl">
-                Casos que nos <span className="text-accent">enorgullecen.</span>
+                Casos que nos <span className="text-accent">enorgullecen</span>
               </h2>
             </div>
             <Link
@@ -90,38 +115,43 @@ export default async function HomePage() {
             >
               Ver todos los proyectos →
             </Link>
-          </div>
+          </Reveal>
           <ProjectsCarousel projects={projects} />
         </section>
 
         {/* Servicios */}
-        <section className="border-t border-white/[0.08] px-6 pb-0 pt-24 sm:px-14">
-          <div className="mb-10">
-            <p className="mb-3 text-sm font-bold uppercase tracking-wide text-white/40">
-              — Servicios
-            </p>
-            <Link href="/que-hacemos" className="group inline-flex items-center gap-3">
+        <section className="px-6 sm:px-14 section-gap">
+          <Reveal className="mb-10 flex flex-col items-start gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="mb-3 text-sm font-bold uppercase tracking-wide text-white/40">
+                Servicios
+              </p>
               <h2 className="text-3xl font-extrabold leading-tight text-white sm:text-4xl">
                 ¿Qué <span className="relative inline-block text-accent">
                   hacemos?
                   <span className="absolute -bottom-1 left-0 right-0 -z-10 h-2.5 -rotate-1 rounded-full bg-accent/90" />
                 </span>
               </h2>
-              <span className="text-2xl text-accent transition group-hover:translate-x-1">→</span>
+            </div>
+            <Link
+              href="/que-hacemos"
+              className="text-sm font-bold text-white/70 transition hover:text-white"
+            >
+              Ver todos los servicios →
             </Link>
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          </Reveal>
+          <Reveal delay={0.1} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {services.map((service) => (
               <ServiceCard key={service.slug} service={service} compact />
             ))}
-          </div>
+          </Reveal>
         </section>
 
         <CtaSection
           eyebrow="Estamos abiertos a nuevos proyectos"
           titleLine1="Hagamos que"
-          titleAccent="tu marca crezca."
-          spacingClassName="pt-[100px] pb-[100px]"
+          titleAccent="tu marca crezca"
+          spacingClassName="section-gap pb-24"
         />
       </main>
       <SiteFooter />

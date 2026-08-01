@@ -25,8 +25,14 @@ async function main() {
   await prisma.adminUser.deleteMany();
 
   // --- Admin user ---
-  const adminEmail = process.env.ADMIN_EMAIL ?? "hola@pinky.com.uy";
-  const adminPassword = process.env.ADMIN_PASSWORD ?? "change-me";
+  // Sin fallback: crear un admin con una contraseña conocida por defecto
+  // sería una puerta trasera si alguien corre el seed en producción sin
+  // configurar el .env primero.
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (!adminEmail || !adminPassword) {
+    throw new Error("Definí ADMIN_EMAIL y ADMIN_PASSWORD en .env antes de correr el seed.");
+  }
   await prisma.adminUser.create({
     data: {
       email: adminEmail,
@@ -650,7 +656,7 @@ async function main() {
     });
   }
 
-  console.log(`Seed OK — admin: ${adminEmail} / ${adminPassword}`);
+  console.log(`Seed OK — admin creado: ${adminEmail}`);
 }
 
 main()

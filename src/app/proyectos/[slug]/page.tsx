@@ -3,7 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
-import { getProjectBySlug, getMoreFromClient, getNextProject } from "@/lib/data";
+import { getProjectBySlug, getNextProject } from "@/lib/data";
+import { JsonLd } from "@/components/json-ld";
+import { SITE_URL } from "@/lib/seo";
+import { Reveal } from "@/components/reveal";
+import { VideoLightboxTrigger } from "@/components/video-lightbox";
+import { getYouTubeId } from "@/lib/youtube";
 
 // Renderizado dinámico: el contenido viene del CMS y debe reflejarse sin rebuild.
 export const dynamic = "force-dynamic";
@@ -16,7 +21,17 @@ export async function generateMetadata({
   const { slug } = await params;
   const project = await getProjectBySlug(slug);
   if (!project) return {};
-  return { title: `${project.title} — Pinky` };
+  return {
+    title: project.title,
+    description: project.summary,
+    alternates: { canonical: `/proyectos/${slug}` },
+    openGraph: {
+      title: `${project.title} — Pinky`,
+      description: project.summary,
+      url: `/proyectos/${slug}`,
+      images: project.coverImageUrl ? [{ url: project.coverImageUrl }] : undefined,
+    },
+  };
 }
 
 function renderHeroTitle(title: string) {
@@ -46,10 +61,8 @@ export default async function ProjectDetailPage({
   const project = await getProjectBySlug(slug);
   if (!project) notFound();
 
-  const [moreFromClient, nextProject] = await Promise.all([
-    getMoreFromClient(project.clientName, project.slug),
-    getNextProject(project.order),
-  ]);
+  const nextProject = await getNextProject(project.order);
+  const videoId = project.videoUrl ? getYouTubeId(project.videoUrl) : null;
 
   const ficha = [
     { label: "Cliente", value: project.clientName },
@@ -57,15 +70,25 @@ export default async function ProjectDetailPage({
     { label: "Año", value: String(project.year) },
   ];
 
+  const caseStudyJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    name: project.title,
+    description: project.summary,
+    url: `${SITE_URL}/proyectos/${project.slug}`,
+    image: project.coverImageUrl ? `${SITE_URL}${project.coverImageUrl}` : undefined,
+    datePublished: `${project.year}`,
+    creator: { "@type": "Organization", name: "Pinky. The Fit Agency" },
+    about: project.clientName,
+  };
+
   return (
     <>
+      <JsonLd data={caseStudyJsonLd} />
       <SiteNav active="proyectos" />
       <main>
         <section className="px-6 pt-8 sm:px-14">
-          <div className="flex items-center justify-between text-sm text-white/40">
-            <Link href="/" className="hover:text-white/70">
-              Home
-            </Link>
+          <div className="flex items-center justify-end text-sm text-white/40">
             <Link href="/proyectos" className="font-bold text-accent hover:text-white">
               ← Volver a proyectos
             </Link>
@@ -135,19 +158,24 @@ export default async function ProjectDetailPage({
                 </p>
               </>
             )}
+            {videoId && (
+              <>
+                <div className="absolute inset-0 bg-black/20" />
+                <VideoLightboxTrigger videoId={videoId} label={`Ver video — ${project.title}`} />
+              </>
+            )}
           </div>
 
           {project.pieces.length > 0 && (
-            <div className="mt-14">
-              <h2 className="mb-2 text-3xl font-extrabold text-ink sm:text-4xl">
+            <Reveal className="mt-14">
+              <h2 className="mb-10 text-3xl font-extrabold text-ink sm:text-4xl">
                 Piezas del <span className="text-accent">proyecto.</span>
               </h2>
-              <p className="mb-10 text-ink/50">Una selección de piezas de la campaña</p>
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
                 {project.pieces.slice(0, 3).map((piece) => (
                   <div
                     key={piece.id}
-                    className="relative flex aspect-[9/16] flex-col justify-end overflow-hidden rounded-2xl p-5"
+                    className="relative aspect-[9/16] overflow-hidden rounded-2xl"
                     style={
                       !piece.imageUrl
                         ? { background: `linear-gradient(160deg, ${project.accentColor}, ${project.accentColor}99)` }
@@ -162,38 +190,28 @@ export default async function ProjectDetailPage({
                         className="absolute inset-0 h-full w-full object-cover"
                       />
                     )}
-                    <div
-                      className={
-                        piece.imageUrl
-                          ? "relative -m-5 bg-gradient-to-t from-black/80 to-transparent p-5 pt-16"
-                          : "relative"
-                      }
-                    >
-                      <p className="text-base font-extrabold leading-tight text-white">{piece.title}</p>
-                      {piece.subtitle && <p className="mt-1 text-xs text-white/70">{piece.subtitle}</p>}
-                    </div>
                   </div>
                 ))}
               </div>
-            </div>
+            </Reveal>
           )}
 
           {project.stats.length > 0 && (
-            <div className="mt-14 flex flex-wrap gap-x-12 gap-y-6 border-t border-ink/10 pt-10">
+            <Reveal className="mt-14 flex flex-wrap gap-x-8 gap-y-6 sm:flex-nowrap">
               {project.stats.map((stat) => (
-                <div key={stat.id}>
+                <div key={stat.id} className="basis-[45%] sm:basis-0 sm:flex-1">
                   <p className="text-3xl font-extrabold text-accent sm:text-4xl">{stat.value}</p>
                   <p className="mt-1 max-w-[14rem] text-sm text-ink/60">{stat.label}</p>
                 </div>
               ))}
-            </div>
+            </Reveal>
           )}
         </div>
 
         {/* Desafío / Solución en dos columnas */}
-        <section className="grid grid-cols-1 gap-10 px-6 py-16 sm:px-14 lg:grid-cols-2">
+        <Reveal as="section" className="grid grid-cols-1 gap-10 px-6 sm:px-14 lg:grid-cols-2 section-gap">
           <div>
-            <p className="mb-2 text-sm font-bold text-accent">— El desafío</p>
+            <p className="mb-2 text-sm font-bold uppercase text-accent">— El desafío</p>
             <h2 className="mb-6 text-3xl font-extrabold leading-tight text-white">
               {project.challengeTitle}
             </h2>
@@ -215,69 +233,35 @@ export default async function ProjectDetailPage({
           </div>
 
           <div>
-            <p className="mb-2 text-sm font-bold text-accent">— La solución</p>
+            <p className="mb-2 text-sm font-bold uppercase text-accent">— La solución</p>
             <h2 className="mb-6 text-3xl font-extrabold leading-tight text-white">
               {project.solutionTitle}
             </h2>
             <p className="text-lg leading-relaxed text-white">{project.solutionBody}</p>
           </div>
-        </section>
-
-        {moreFromClient.length > 0 && (
-          <section className="border-t border-white/[0.08] px-6 py-16 sm:px-14">
-            <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-              <h2 className="text-2xl font-extrabold text-white sm:text-3xl">
-                Otros proyectos <span className="text-accent">con {project.clientName}.</span>
-              </h2>
-              <Link href="/proyectos" className="text-sm font-bold text-white/70 hover:text-white">
-                Ver todos →
-              </Link>
-            </div>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-              {moreFromClient.map((p) => (
-                <Link
-                  key={p.id}
-                  href={`/proyectos/${p.slug}`}
-                  className="group overflow-hidden rounded-2xl border border-white/10 bg-card"
-                >
-                  <div
-                    className="relative h-32"
-                    style={
-                      p.coverImageUrl
-                        ? undefined
-                        : { background: `linear-gradient(160deg, ${p.accentColor}55, ${p.accentColor}10)` }
-                    }
-                  >
-                    {p.coverImageUrl && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={p.coverImageUrl} alt={p.title} className="absolute inset-0 h-full w-full object-cover" />
-                    )}
-                  </div>
-                  <div className="p-5">
-                    <p className="mb-2 text-xs font-bold uppercase text-white/40">{p.category}</p>
-                    <p className="font-bold text-white">{p.title}</p>
-                    <p className="mt-1 text-sm text-white/50">{p.resultLabel}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
+        </Reveal>
 
         {nextProject && (
-          <section className="border-t border-white/[0.08] px-6 py-16 sm:px-14">
-            <Link href={`/proyectos/${nextProject.slug}`} className="group flex items-center justify-between">
+          <Reveal as="section" className="px-6 pb-24 sm:px-14 section-gap">
+            <Link
+              href={`/proyectos/${nextProject.slug}`}
+              className="group relative isolate flex items-center justify-between overflow-hidden rounded-3xl border border-white/10 bg-card px-8 py-10 sm:px-12 sm:py-14"
+            >
+              <span className="absolute inset-0 -z-10 origin-left scale-x-0 bg-accent-dark transition-transform duration-300 ease-out group-hover:scale-x-100" />
               <div>
-                <p className="mb-2 text-sm font-bold uppercase tracking-wide text-white/40">
+                <p className="mb-2 text-sm font-bold uppercase tracking-wide text-white/40 transition group-hover:text-white/70">
                   Siguiente proyecto
                 </p>
                 <p className="text-3xl font-extrabold text-white sm:text-4xl">
-                  {nextProject.clientName} <span className="text-accent">{nextProject.title}.</span>
+                  {nextProject.clientName}{" "}
+                  <span className="text-accent transition group-hover:text-white">{nextProject.title}.</span>
                 </p>
               </div>
-              <span className="text-3xl text-accent transition group-hover:translate-x-1">→</span>
+              <span className="shrink-0 text-3xl text-accent transition group-hover:translate-x-1 group-hover:text-white">
+                →
+              </span>
             </Link>
-          </section>
+          </Reveal>
         )}
       </main>
       <SiteFooter />

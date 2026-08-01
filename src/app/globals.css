@@ -18,10 +18,87 @@
   --font-serif: Georgia, "Times New Roman", serif;
 }
 
+/* Red de seguridad: algunos elementos decorativos (blobs) se posicionan con
+   offsets negativos para sangrar fuera de su sección; esto evita que generen
+   scroll horizontal en la página sin necesidad de recortarlos verticalmente
+   sección por sección. Usa "clip" y no "hidden": "hidden" convierte a html/body
+   en un contenedor de scroll propio (por la regla de overflow-x/y del spec de
+   CSS) y eso rompe el position:sticky del header; "clip" recorta el desborde
+   sin crear ese contenedor. */
+html,
+body {
+  overflow-x: clip;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), sans-serif;
+}
+
+/* Espaciado uniforme entre módulos de página (reemplaza a las líneas grises
+   separadoras que se quitaron): cada sección/bloque nuevo de una página usa
+   esta clase para separarse siempre la misma distancia del anterior. Se deja
+   afuera de los heroes con blobs decorativos para no alterar su altura y
+   volver a cortar el gráfico que sangra fuera de la sección. */
+.section-gap {
+  margin-top: 72px;
+}
+@media (min-width: 640px) {
+  .section-gap {
+    margin-top: 100px;
+  }
+}
+
+/* Movimiento ambiente para los gráficos de fondo (formas decorativas): una
+   "respiración" lenta (escala + rotación + desplazamiento chico) para que no
+   se sientan estáticos, sin llamar la atención por sobre el contenido. */
+@keyframes shape-drift {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+  33% {
+    transform: translate(-1.5%, 2%) rotate(2deg) scale(1.04);
+  }
+  66% {
+    transform: translate(1.5%, -1%) rotate(-2deg) scale(0.97);
+  }
+}
+.shape-drift {
+  animation: shape-drift 26s ease-in-out infinite;
+  /* Fuerza a que el navegador la anime en su propia capa de composición
+     (GPU) en vez de repintar en el hilo principal en cada frame — sin esto
+     algunos navegadores solo promueven la capa una vez que la animación ya
+     arrancó, lo que puede sentirse como un tirón al scrollear mientras
+     compite con el resto del trabajo de layout de la página. */
+  will-change: transform;
+}
+
+/* Relleno de tipografía en hover (nav, footer, teléfonos): una copia del
+   texto se revela de abajo hacia arriba mediante una máscara con degradado.
+   Se usa mask-image (borde difuminado) en vez de clip-path (corte geométrico
+   duro), porque clip-path no respeta el antialiasing de las letras y se ve
+   pixelado en el borde del corte; el degradado de la máscara evita eso. */
+.fill-hover-mask {
+  -webkit-mask-image: linear-gradient(to top, black 0%, black 42%, transparent 58%, transparent 100%);
+  mask-image: linear-gradient(to top, black 0%, black 42%, transparent 58%, transparent 100%);
+  -webkit-mask-size: 100% 250%;
+  mask-size: 100% 250%;
+  -webkit-mask-position: 0 0%;
+  mask-position: 0 0%;
+  transition:
+    -webkit-mask-position 0.45s ease-out,
+    mask-position 0.45s ease-out;
+}
+/* :active además de :hover: en touch no existe :hover real, así que sin esto
+   el efecto de relleno nunca se veía al tocar un link en mobile — con :active
+   se ve el relleno durante el toque (breve, pero da la misma señal visual que
+   el hover en desktop). */
+.group:hover .fill-hover-mask,
+.group:active .fill-hover-mask {
+  -webkit-mask-position: 0 100%;
+  mask-position: 0 100%;
 }
 
 @media (prefers-reduced-motion: reduce) {

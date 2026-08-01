@@ -143,6 +143,7 @@ model Project {
   category        String
   heroHeadline    String
   coverImageUrl   String?
+  videoUrl        String?
   accentColor     String  @default("#D90B91")
   summary         String
   resultBadge     String
@@ -182,4 +183,27 @@ model ProjectPiece {
   imageUrl  String?
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// Guarda cada solicitud de reunión del formulario de Contacto, sin importar
+// si el mail de notificación por Resend después falla o no — así ningún
+// lead se pierde solo porque el envío de mail tuvo un problema puntual
+// (dominio, cuota, corte de red). emailSent/emailError quedan para poder
+// diagnosticar y, si hace falta, reenviar la notificación a mano.
+model MeetingRequest {
+  id            String   @id @default(cuid())
+  name          String
+  email         String
+  phone         String
+  company       String
+  website       String?
+  role          String?
+  companySize   String
+  mainChallenge String
+  timeline      String
+  budget        String
+  message       String?
+  emailSent     Boolean  @default(false)
+  emailError    String?
+  createdAt     DateTime @default(now())
 }

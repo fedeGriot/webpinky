@@ -24,10 +24,7 @@ export function HeroRotator({ words }: { words: string[] }) {
             transform: i === index ? "translateY(0)" : "translateY(20px)",
           }}
         >
-          <span className="relative inline-block">
-            {word}
-            <span className="absolute -bottom-1 -left-1.5 -right-2 -z-10 h-2.5 -rotate-1 rounded-full bg-accent/90" />
-          </span>
+          <span className="relative inline-block">{word}</span>
         </span>
       ))}
     </span>
