@@ -1,11 +1,14 @@
-import { getAboutContent } from "@/lib/data";
-import { upsertAbout } from "@/lib/actions/sections";
+import { getAboutContent, getStats } from "@/lib/data";
+import { upsertAbout, createStat, updateStat, deleteStat } from "@/lib/actions/sections";
 import { SaveButton } from "@/components/admin/save-button";
+import { DeleteButton } from "@/components/admin/delete-button";
 import { labelClass, inputClass, textareaClass } from "@/components/admin/form-styles";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
+const STATS_CONTEXT = "about";
+
 export default async function AboutSectionPage() {
-  const about = await getAboutContent();
+  const [about, stats] = await Promise.all([getAboutContent(), getStats(STATS_CONTEXT)]);
 
   return (
     <div className="max-w-2xl">
@@ -57,6 +60,68 @@ export default async function AboutSectionPage() {
           <SaveButton />
         </div>
       </form>
+
+      <section className="mt-14">
+        <h2 className="mb-1 text-xl font-bold text-white">KPIs</h2>
+        <p className="mb-4 text-sm text-white/50">
+          Los 4 números destacados debajo del párrafo introductorio (ej. “+15 años construyendo…”).
+        </p>
+
+        <form action={createStat} className="mb-4 flex flex-wrap items-end gap-3">
+          <input type="hidden" name="context" value={STATS_CONTEXT} />
+          <div className="flex flex-col gap-1.5">
+            <label className={labelClass}>Valor</label>
+            <input name="value" required placeholder="Ej: +15" className={`${inputClass} w-24`} />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className={labelClass}>Label</label>
+            <input name="label" required placeholder="Ej: años construyendo" className={inputClass} />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className={labelClass}>Sublabel (opcional)</label>
+            <input name="sublabel" placeholder="Ej: marcas que crecen" className={inputClass} />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className={labelClass}>Orden</label>
+            <input name="order" type="number" defaultValue={stats.length} className={`${inputClass} w-20`} />
+          </div>
+          <SaveButton label="Agregar KPI" />
+        </form>
+
+        <div className="flex flex-col gap-3">
+          {stats.map((stat) => (
+            <form
+              key={stat.id}
+              action={updateStat}
+              className="flex flex-wrap items-end gap-3 rounded-2xl border border-white/10 bg-card p-4"
+            >
+              <input type="hidden" name="id" value={stat.id} />
+              <input type="hidden" name="context" value={STATS_CONTEXT} />
+              <div className="flex flex-col gap-1.5">
+                <label className={labelClass}>Valor</label>
+                <input name="value" defaultValue={stat.value} required className={`${inputClass} w-24`} />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className={labelClass}>Label</label>
+                <input name="label" defaultValue={stat.label} required className={inputClass} />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className={labelClass}>Sublabel</label>
+                <input name="sublabel" defaultValue={stat.sublabel ?? ""} className={inputClass} />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className={labelClass}>Orden</label>
+                <input name="order" type="number" defaultValue={stat.order} className={`${inputClass} w-20`} />
+              </div>
+              <SaveButton />
+              <form action={deleteStat}>
+                <input type="hidden" name="id" value={stat.id} />
+                <DeleteButton confirmMessage={`¿Eliminar el KPI "${stat.value} — ${stat.label}"?`} />
+              </form>
+            </form>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

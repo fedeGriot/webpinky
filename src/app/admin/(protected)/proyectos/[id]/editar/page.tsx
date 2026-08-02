@@ -39,15 +39,6 @@ export default async function EditarProyectoPage({
         </form>
       </div>
 
-      {project.coverImageUrl && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={project.coverImageUrl}
-          alt={project.title}
-          className="mb-6 h-40 w-full rounded-2xl object-cover"
-        />
-      )}
-
       <form action={updateProject} className="flex flex-col gap-4">
         <input type="hidden" name="id" value={project.id} />
         <ProjectFields defaults={project} />

@@ -2,13 +2,13 @@ import Link from "next/link";
 
 const SECTIONS = [
   { href: "/admin/secciones/hero", label: "Hero (Home)", description: "Título, palabras rotativas y CTAs del inicio." },
-  { href: "/admin/secciones/about", label: "Contenido — Quiénes somos", description: "Textos largos de la página institucional." },
+  { href: "/admin/secciones/about", label: "Contenido — Quiénes somos", description: "Textos largos de la página institucional y sus KPIs." },
   { href: "/admin/secciones/clientes", label: "Clientes", description: "Logos/nombres del marquee de clientes." },
   { href: "/admin/secciones/servicios", label: "Servicios", description: "Los 6 servicios, con bullets y tagline." },
   { href: "/admin/secciones/proceso", label: "Proceso de trabajo", description: "Los 4 pasos de 'Cómo trabajamos'." },
   { href: "/admin/secciones/valores", label: "Valores", description: "Las 4 creencias de la agencia." },
   { href: "/admin/secciones/equipo", label: "Equipo", description: "Iniciales del equipo Pinky." },
-  { href: "/admin/secciones/stats", label: "Stats", description: "Números destacados (about / services)." },
+  { href: "/admin/secciones/stats", label: "Stats de servicios", description: "Números de '¿Qué hacemos?' — rotan de a 3 en el sitio." },
   { href: "/admin/secciones/configuracion", label: "Configuración del sitio", description: "Contacto, dirección y redes sociales." },
 ];
 

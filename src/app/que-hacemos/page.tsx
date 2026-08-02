@@ -16,8 +16,23 @@ export const metadata: Metadata = {
   openGraph: { title: "¿Qué hacemos? — Pinky", url: "/que-hacemos" },
 };
 
-// Renderizado dinámico: el contenido viene del CMS y debe reflejarse sin rebuild.
+// Renderizado dinámico: el contenido viene del CMS y debe reflejarse sin
+// rebuild — además, acá es lo que hace posible la rotación de stats de abajo
+// (pickRandom), que necesita recalcularse en cada visita, no solo en build.
 export const dynamic = "force-dynamic";
+
+// El módulo "Resultados que hablan" siempre muestra 3, pero el admin puede
+// cargar más de 3 en /admin/secciones/stats — de esos, se eligen 3 al azar
+// en cada visita a la página, así van rotando entre todos los casos
+// cargados en vez de mostrar siempre los mismos.
+function pickRandom<T extends { order: number }>(items: T[], count: number): T[] {
+  const shuffled = [...items];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.slice(0, count).sort((a, b) => a.order - b.order);
+}
 
 function withBold(text: string, phrases: string[]) {
   if (phrases.length === 0) return text;
@@ -63,12 +78,13 @@ function colorLastWordAsIs(text: string) {
 }
 
 export default async function QueHacemosPage() {
-  const [services, processSteps, stats, about] = await Promise.all([
+  const [services, processSteps, allStats, about] = await Promise.all([
     getServices(),
     getProcessSteps(),
     getStats("services"),
     getAboutContent(),
   ]);
+  const stats = pickRandom(allStats, 3);
 
   return (
     <>

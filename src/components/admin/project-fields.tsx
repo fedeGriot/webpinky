@@ -14,6 +14,7 @@ export type ProjectFieldDefaults = {
   heroHeadline?: string;
   accentColor?: string;
   videoUrl?: string | null;
+  coverImageUrl?: string | null;
   summary?: string;
   resultBadge?: string | null;
   resultLabel?: string | null;
@@ -75,6 +76,33 @@ export function ProjectFields({ defaults = {} }: { defaults?: ProjectFieldDefaul
       <Field label="Headline (hero de la página de detalle)">
         <input name="heroHeadline" defaultValue={defaults.heroHeadline} required className={inputClass} />
       </Field>
+
+      <Field label="Imagen de portada (opcional)">
+        <div className="flex items-center gap-4">
+          {defaults.coverImageUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={defaults.coverImageUrl}
+              alt="Portada actual"
+              className="h-16 w-16 shrink-0 rounded-lg object-cover"
+            />
+          )}
+          <div className="flex-1">
+            <input name="coverImage" type="file" accept="image/*" className="text-sm text-white/70" />
+            <p className="mt-1 text-xs text-white/40">
+              {defaults.coverImageUrl
+                ? "Subí un archivo para reemplazar la imagen actual, o dejalo vacío para conservarla."
+                : "Todavía no tiene imagen de portada cargada."}
+            </p>
+            <UploadHint
+              size="Mínimo 1600×1600px"
+              format="JPG o WEBP"
+              note="se recorta distinto según dónde aparece (listado, portada, carousel) — evitá que lo importante de la foto quede pegado a los bordes"
+            />
+          </div>
+        </div>
+      </Field>
+
       <Field label="Resumen">
         <RichTextEditor name="summary" defaultValue={defaults.summary} />
       </Field>
@@ -125,15 +153,6 @@ export function ProjectFields({ defaults = {} }: { defaults?: ProjectFieldDefaul
           <input name="quoteAuthor" defaultValue={defaults.quoteAuthor ?? ""} className={inputClass} />
         </Field>
       </div>
-
-      <Field label="Imagen de portada (opcional)">
-        <input name="coverImage" type="file" accept="image/*" className="text-sm text-white/70" />
-        <UploadHint
-          size="Mínimo 1600×1600px"
-          format="JPG o WEBP"
-          note="se recorta distinto según dónde aparece (listado, portada, carousel) — evitá que lo importante de la foto quede pegado a los bordes"
-        />
-      </Field>
 
       <Field label="Link de video de YouTube (opcional)">
         <input
