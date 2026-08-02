@@ -3,6 +3,8 @@ import { PinkyLogo } from "@/components/pinky-logo";
 import { MobileNav } from "@/components/mobile-nav";
 import { FillButton } from "@/components/fill-button";
 import { FillHoverText } from "@/components/fill-hover-text";
+import { getSocialLinks } from "@/components/social-icons";
+import { getSiteSettings } from "@/lib/data";
 
 const LINKS = [
   { href: "/", label: "Home" },
@@ -14,7 +16,10 @@ const LINKS = [
 
 export type NavActive = "home" | "quienes-somos" | "que-hacemos" | "proyectos" | "contacto";
 
-export function SiteNav({ active }: { active?: NavActive }) {
+export async function SiteNav({ active }: { active?: NavActive }) {
+  const settings = await getSiteSettings();
+  const social = settings ? getSocialLinks(settings) : [];
+
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between border-b border-white/[0.08] bg-ink px-6 py-4 sm:px-14">
       <Link href="/">
@@ -55,7 +60,7 @@ export function SiteNav({ active }: { active?: NavActive }) {
             Hablemos →
           </FillButton>
         )}
-        <MobileNav links={LINKS} active={active} />
+        <MobileNav links={LINKS} active={active} social={social} />
       </div>
     </header>
   );

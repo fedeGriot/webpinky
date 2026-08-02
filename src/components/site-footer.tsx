@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getSiteSettings } from "@/lib/data";
 import { PinkyLogo } from "@/components/pinky-logo";
-import { SOCIAL_ICONS, PhoneIcon } from "@/components/social-icons";
+import { SOCIAL_ICONS, PhoneIcon, getSocialLinks } from "@/components/social-icons";
 import { FillHoverText } from "@/components/fill-hover-text";
 
 const AGENCY_LINKS = [
@@ -14,19 +14,11 @@ const AGENCY_LINKS = [
 
 const toTel = (phone: string) => `tel:${phone.replace(/[^\d+]/g, "")}`;
 
-const SOCIAL_LINKS = (settings: { instagramUrl: string | null; linkedinUrl: string | null; youtubeUrl: string | null; twitterUrl: string | null }) =>
-  [
-    { label: "Instagram", href: settings.instagramUrl },
-    { label: "LinkedIn", href: settings.linkedinUrl },
-    { label: "YouTube", href: settings.youtubeUrl },
-    { label: "X / Twitter", href: settings.twitterUrl },
-  ].filter((s) => s.href);
-
 export async function SiteFooter({ variant = "default" }: { variant?: "default" | "alt" }) {
   const settings = await getSiteSettings();
   if (!settings) return null;
 
-  const social = SOCIAL_LINKS(settings);
+  const social = getSocialLinks(settings);
   const bg = variant === "alt" ? "bg-card/40" : "bg-ink";
 
   return (
@@ -80,7 +72,7 @@ export async function SiteFooter({ variant = "default" }: { variant?: "default" 
                 return (
                   <a
                     key={s.label}
-                    href={s.href!}
+                    href={s.href}
                     target="_blank"
                     rel="noreferrer"
                     aria-label={s.label}

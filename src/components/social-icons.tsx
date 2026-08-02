@@ -76,3 +76,20 @@ export const SOCIAL_ICONS: Record<string, (props: React.SVGProps<SVGSVGElement>)
   YouTube: YouTubeIcon,
   "X / Twitter": TwitterIcon,
 };
+
+export type SiteSocialUrls = {
+  instagramUrl: string | null;
+  linkedinUrl: string | null;
+  youtubeUrl: string | null;
+  twitterUrl: string | null;
+};
+
+/** Compartido entre SiteFooter y MobileNav para no repetir el mismo mapeo. */
+export function getSocialLinks(settings: SiteSocialUrls) {
+  return [
+    { label: "Instagram", href: settings.instagramUrl },
+    { label: "LinkedIn", href: settings.linkedinUrl },
+    { label: "YouTube", href: settings.youtubeUrl },
+    { label: "X / Twitter", href: settings.twitterUrl },
+  ].filter((s): s is { label: string; href: string } => Boolean(s.href));
+}
