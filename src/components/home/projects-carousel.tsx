@@ -104,24 +104,32 @@ export function ProjectsCarousel({ projects }: { projects: CarouselProject[] }) 
   return (
     <div>
       <div className="relative">
-        {/* data-lenis-prevent: Lenis (root mode) intercepta el touch/wheel de
-            todo el documento para su scroll suave. Sin este atributo, no
-            sabe que este contenedor ya tiene su propio scroll horizontal
-            nativo (overflow-x-auto + touch-pan-x) y, al arrastrar hacia los
-            costados acá, su estado interno de touch quedaba desincronizado
-            — el resultado era que el scroll vertical de la página se
-            trababa hasta tocar en otra zona. Con este atributo, Lenis
-            ignora por completo los gestos que empiezan dentro de este
-            contenedor y deja que el navegador los maneje nativamente. */}
+        {/* data-lenis-prevent-touch (no el genérico data-lenis-prevent): ese
+            genérico bloqueaba a Lenis para TOUCH *y* WHEEL sobre este
+            contenedor. Bloquear wheel era el problema en desktop: al pasar
+            el mouse por encima mientras se scrollea la página, Lenis deja
+            de manejar esos eventos, su posición interna se desincroniza de
+            la real, y al volver a agarrar el control salta/se traba. Con la
+            versión "-touch" eso solo pasa para gestos táctiles (donde sí
+            hace falta, para no pisar el drag horizontal del carrusel), y el
+            scroll con rueda de mouse sobre este módulo queda intacto.
+
+            touch-auto (no touch-pan-x): pan-x le decía al navegador "un
+            gesto que arranca acá SOLO puede ser scroll horizontal", así que
+            un swipe vertical que arrancaba justo sobre una imagen del
+            carrusel no lo tomaba ni el navegador (por el pan-x) ni Lenis
+            (por el prevent) — no pasaba nada. Con touch-auto el navegador
+            decide la dirección según el gesto real, como en cualquier
+            carrusel horizontal dentro de una página con scroll vertical. */}
         <div
           ref={trackRef}
-          data-lenis-prevent
+          data-lenis-prevent-touch
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={endDrag}
           onPointerCancel={endDrag}
           onScroll={onScroll}
-          className="flex touch-pan-x cursor-grab gap-6 overflow-x-auto pb-8 pt-8 select-none [scrollbar-width:none] active:cursor-grabbing"
+          className="flex touch-auto cursor-grab gap-6 overflow-x-auto pb-8 pt-8 select-none [scrollbar-width:none] active:cursor-grabbing"
         >
           {projects.map((project, i) => (
             <Link
