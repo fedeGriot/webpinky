@@ -53,7 +53,7 @@ export default async function HomePage() {
             <p className="mt-8 max-w-xl text-lg text-white">{hero?.subtitle}</p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <FillButton href="/proyectos" className="bg-accent px-7 py-4 text-sm">
-                {hero?.ctaPrimaryLabel ?? "Ver proyectos"}
+                {hero?.ctaPrimaryLabel ?? "Ver proyectos →"}
               </FillButton>
               <Link
                 href="/quienes-somos"

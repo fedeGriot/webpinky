@@ -9,6 +9,7 @@ const HOVER_SLOWDOWN = 4;
 
 export function ClientsMarquee({ clients }: { clients: ClientItem[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
+  const secondSetRef = useRef<HTMLDivElement>(null);
   const offsetRef = useRef(0);
   const speedRef = useRef(0);
   const targetSpeedRef = useRef(0);
@@ -17,15 +18,26 @@ export function ClientsMarquee({ clients }: { clients: ClientItem[] }) {
 
   useEffect(() => {
     const track = trackRef.current;
-    if (!track || clients.length === 0) return;
+    const secondSet = secondSetRef.current;
+    if (!track || !secondSet || clients.length === 0) return;
 
-    // Ojo con esto: leer scrollWidth fuerza al navegador a recalcular el
+    // Ojo con esto: leer offsetLeft fuerza al navegador a recalcular el
     // layout (reflow síncrono) porque depende del tamaño real ya
     // renderizado. Hacerlo una sola vez acá (por resize) en vez de en cada
     // frame del rAF de abajo evita ese costo 60 veces por segundo, que es lo
     // que generaba el tironeo/temblor al scrollear.
+    //
+    // No usar track.scrollWidth / 2 para el punto de reinicio: con `gap`
+    // entre ítems, la mitad del ancho total NO coincide con la distancia
+    // real de un ciclo completo (scrollWidth cuenta un solo gap de "costura"
+    // entre las dos copias, pero cada copia "debería" cargar con su propio
+    // gap de cierre para empalmar). La diferencia es siempre gap/2 px, un
+    // salto pequeño pero visible cada vez que el ciclo reinicia — exactamente
+    // el bug reportado. Medir la distancia real entre el inicio de la
+    // primera copia y el inicio de la segunda copia (offsetLeft) da el
+    // período exacto, sin depender de la matemática de los gaps.
     function measure() {
-      halfWidthRef.current = track!.scrollWidth / 2;
+      halfWidthRef.current = secondSet!.offsetLeft - track!.offsetLeft;
       baseSpeedRef.current = halfWidthRef.current / CYCLE_SECONDS;
       targetSpeedRef.current = baseSpeedRef.current;
     }
@@ -72,7 +84,11 @@ export function ClientsMarquee({ clients }: { clients: ClientItem[] }) {
     >
       <div ref={trackRef} className="flex w-max items-center gap-14 py-2">
         {[...clients, ...clients].map((client, i) => (
-          <div key={`${client.id}-${i}`} className="flex h-16 w-[150px] shrink-0 items-center justify-center">
+          <div
+            key={`${client.id}-${i}`}
+            ref={i === clients.length ? secondSetRef : undefined}
+            className="flex h-16 w-[150px] shrink-0 items-center justify-center"
+          >
             {client.logoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
