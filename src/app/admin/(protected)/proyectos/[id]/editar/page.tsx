@@ -114,7 +114,14 @@ export default async function EditarProyectoPage({
             <div className="flex flex-col gap-1.5">
               <label className={labelClass}>Imagen (opcional)</label>
               <input name="image" type="file" accept="image/*" className="text-sm text-white/70" />
-              <UploadHint size="1080×1920px" format="JPG o WEBP" note="siempre se muestra vertical (9:16)" />
+              <UploadHint
+                spots={[
+                  { where: "Ficha del proyecto — mobile", size: "vertical 9:16, a pantalla completa" },
+                  { where: "Ficha del proyecto — escritorio", size: "vertical 9:16, 1 de 3 en fila" },
+                ]}
+                format="JPG o WEBP, 1080×1920px (9:16)"
+                note="mismo recorte en mobile y escritorio, solo cambia el tamaño en pantalla"
+              />
             </div>
             <SaveButton label="Agregar pieza" />
           </div>

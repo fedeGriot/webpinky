@@ -29,7 +29,14 @@ export default async function ClientesPage() {
           <div className="flex flex-col gap-1.5">
             <label className={labelClass}>Logo (opcional)</label>
             <input name="logo" type="file" accept="image/*" className="text-sm text-white/70" />
-            <UploadHint size="400×200px" format="PNG con fondo transparente" note="el logo se pinta siempre blanco sólido — un fondo no transparente lo tapa" />
+            <UploadHint
+              spots={[
+                { where: "Carrusel de \"Nuestros clientes\" en Home", size: "~150×64px" },
+                { where: "Grilla de clientes en Quiénes somos", size: "~160×64px" },
+              ]}
+              format="PNG con fondo transparente, 400×200px"
+              note="el logo se pinta siempre blanco sólido sin importar su color original — un fondo no transparente lo tapa"
+            />
           </div>
           <SaveButton label="Agregar" />
         </form>
@@ -46,7 +53,10 @@ export default async function ClientesPage() {
               <input type="hidden" name="id" value={client.id} />
               <input name="name" defaultValue={client.name} required className={`${inputClass} flex-1`} />
               <input name="order" type="number" defaultValue={client.order} className={`${inputClass} w-20`} />
-              <input name="logo" type="file" accept="image/*" className="text-xs text-white/50" />
+              <div className="flex flex-col gap-1">
+                <input name="logo" type="file" accept="image/*" className="text-xs text-white/50" />
+                <p className="text-[11px] text-white/40">PNG transparente · 400×200px</p>
+              </div>
               <SaveButton />
             </form>
             <form action={deleteClient}>

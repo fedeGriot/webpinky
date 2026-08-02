@@ -35,7 +35,11 @@ export default async function EquipoPage() {
           <div className="flex flex-col gap-1.5">
             <label className={labelClass}>Foto (opcional)</label>
             <input name="photo" type="file" accept="image/*" className="text-sm text-white/70" />
-            <UploadHint size="Mínimo 400×400px" format="JPG o WEBP" note="cuadrada, con la cara centrada — se recorta en círculo" />
+            <UploadHint
+              spots={[{ where: "Grilla de equipo en Quiénes somos", size: "96×96px, recortada en círculo" }]}
+              format="JPG o WEBP, mínimo 400×400px"
+              note="cuadrada, con la cara centrada"
+            />
           </div>
           <SaveButton label="Agregar" />
         </form>
@@ -73,6 +77,7 @@ export default async function EquipoPage() {
               <div className="flex flex-col gap-1.5">
                 <label className={labelClass}>Foto</label>
                 <input name="photo" type="file" accept="image/*" className="text-xs text-white/50" />
+                <p className="text-[11px] text-white/40">Cuadrada · mínimo 400×400px</p>
               </div>
               <SaveButton />
             </form>
