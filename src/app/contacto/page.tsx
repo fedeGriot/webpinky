@@ -26,7 +26,7 @@ export default function ContactoPage() {
     <>
       <SiteNav active="contacto" />
       <main>
-        <section className="relative overflow-hidden px-6 py-16 sm:px-14 sm:py-20">
+        <section className="relative overflow-hidden px-6 pt-16 sm:px-14 sm:pt-20">
           <BackgroundShape shape="08" className="right-[-140px] top-[-80px] h-[520px] w-[520px] opacity-10" />
           <div className="relative z-10 grid grid-cols-1 gap-14 lg:grid-cols-[1fr_1.2fr] lg:gap-20">
             {/* Presentación */}
@@ -56,7 +56,7 @@ export default function ContactoPage() {
           </div>
         </section>
 
-        <ResultsSection />
+        <ResultsSection bottomPadding />
       </main>
       <SiteFooter />
     </>

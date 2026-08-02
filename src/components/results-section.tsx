@@ -21,14 +21,21 @@ function pickRandom<T extends { order: number }>(items: T[], count: number): T[]
  * de la agencia sea consistente en cualquier página donde aparezca. Requiere
  * que la página que lo use sea `force-dynamic` (para que la selección al
  * azar se recalcule en cada visita, no solo en build).
+ *
+ * `bottomPadding`: en ¿Qué hacemos? este módulo lo sigue un CTA final que ya
+ * aporta su propio espacio antes del footer (mismo criterio que el resto del
+ * sitio: cada sección solo agrega margen/padding hacia UN lado, nunca los
+ * dos, para no duplicar el espacio con `section-gap`). En Contacto y Gracias
+ * es lo último antes del footer, así que necesita su propio padding inferior
+ * — mismo valor que usa CtaSection ahí.
  */
-export async function ResultsSection() {
+export async function ResultsSection({ bottomPadding = false }: { bottomPadding?: boolean }) {
   const allStats = await getStats("services");
   if (allStats.length === 0) return null;
   const stats = pickRandom(allStats, 3);
 
   return (
-    <section className="px-6 sm:px-14 section-gap">
+    <section className={`px-6 sm:px-14 section-gap ${bottomPadding ? "pb-24" : ""}`}>
       <Reveal>
         <p className="mb-2 text-sm font-bold uppercase tracking-wide text-white/40">Lo que generamos</p>
         <h2 className="mb-12 text-3xl font-extrabold text-white sm:text-4xl">

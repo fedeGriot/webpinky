@@ -21,7 +21,7 @@ export default function GraciasPage() {
     <>
       <SiteNav active="contacto" />
       <main>
-        <section className="relative overflow-hidden px-6 py-24 sm:px-14 sm:py-32">
+        <section className="relative overflow-hidden px-6 pt-24 sm:px-14 sm:pt-32">
           <BackgroundShape shape="08" className="right-[-140px] top-[-80px] h-[520px] w-[520px] opacity-10" />
           <div className="relative z-10 mx-auto max-w-xl text-center">
             <p className="text-sm font-bold uppercase tracking-wide text-accent">Solicitud recibida</p>
@@ -40,7 +40,7 @@ export default function GraciasPage() {
           </div>
         </section>
 
-        <ResultsSection />
+        <ResultsSection bottomPadding />
       </main>
       <SiteFooter />
     </>
