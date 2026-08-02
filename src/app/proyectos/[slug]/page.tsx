@@ -197,9 +197,9 @@ export default async function ProjectDetailPage({
           )}
 
           {project.stats.length > 0 && (
-            <Reveal className="mt-14 flex flex-wrap gap-x-8 gap-y-6 sm:flex-nowrap">
+            <Reveal className="mt-14 flex flex-col gap-6 sm:flex-row sm:flex-nowrap sm:gap-x-8 sm:gap-y-6">
               {project.stats.map((stat) => (
-                <div key={stat.id} className="basis-[45%] sm:basis-0 sm:flex-1">
+                <div key={stat.id} className="sm:basis-0 sm:flex-1">
                   <p className="text-3xl font-extrabold text-accent sm:text-4xl">{stat.value}</p>
                   <p className="mt-1 max-w-[14rem] text-sm text-ink/60">{stat.label}</p>
                 </div>

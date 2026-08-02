@@ -140,11 +140,13 @@ export default async function HomePage() {
               Ver todos los servicios →
             </Link>
           </Reveal>
-          <Reveal delay={0.1} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {services.map((service) => (
-              <ServiceCard key={service.slug} service={service} compact />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {services.map((service, i) => (
+              <Reveal key={service.slug} delay={i * 0.08}>
+                <ServiceCard service={service} compact />
+              </Reveal>
             ))}
-          </Reveal>
+          </div>
         </section>
 
         <CtaSection

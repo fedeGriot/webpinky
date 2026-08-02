@@ -123,10 +123,20 @@ export default async function QuienesSomosPage() {
 
           <Reveal
             delay={0.1}
-            className="mt-14 flex flex-wrap gap-x-8 gap-y-8 border-t border-white/10 pt-10 sm:flex-nowrap sm:divide-x sm:divide-white/10 sm:border-t-0 sm:pt-0"
+            className="mt-14 grid grid-cols-2 gap-x-8 gap-y-8 border-t border-white/10 pt-10 sm:grid-cols-4 sm:divide-x sm:divide-white/10 sm:border-t-0 sm:pt-0"
           >
+            {/* grid (no flex-nowrap + flex-1) en ambos breakpoints: con flex,
+                "flex: 1 1 0%" solo reparte el espacio en partes iguales si el
+                contenido lo permite — el min-width:auto por defecto de un
+                flex item evita que se achique más allá de su propio
+                contenido mínimo, así que el número más ancho (ej. "+550" en
+                4xl/5xl bold) terminaba empujando su columna más ancha que
+                las demás, sobre todo al rotar el celular a horizontal (ese
+                ancho cruza el breakpoint sm: y pasa a este layout). Grid con
+                columnas iguales no tiene ese problema: el ancho de columna
+                no depende del contenido. */}
             {stats.map((stat) => (
-              <div key={stat.id} className="basis-[45%] sm:basis-0 sm:flex-1 sm:px-8 sm:first:pl-0">
+              <div key={stat.id} className="sm:px-8 sm:first:pl-0">
                 <p className="text-4xl font-extrabold text-accent sm:text-5xl">{stat.value}</p>
                 <p className="mt-2 max-w-[11rem] text-sm text-white/60">
                   {stat.label} {stat.sublabel}
