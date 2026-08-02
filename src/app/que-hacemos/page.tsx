@@ -6,7 +6,8 @@ import { ServiceIcon } from "@/components/service-icon";
 import { CtaSection } from "@/components/cta-section";
 import { Reveal } from "@/components/reveal";
 import { RichTextContent } from "@/components/rich-text-content";
-import { getServices, getProcessSteps, getStats, getAboutContent } from "@/lib/data";
+import { ResultsSection } from "@/components/results-section";
+import { getServices, getProcessSteps, getAboutContent } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "¿Qué hacemos?",
@@ -17,22 +18,9 @@ export const metadata: Metadata = {
 };
 
 // Renderizado dinámico: el contenido viene del CMS y debe reflejarse sin
-// rebuild — además, acá es lo que hace posible la rotación de stats de abajo
-// (pickRandom), que necesita recalcularse en cada visita, no solo en build.
+// rebuild — además, <ResultsSection> abajo elige 3 stats al azar en cada
+// visita, y eso necesita recalcularse en cada request, no solo en build.
 export const dynamic = "force-dynamic";
-
-// El módulo "Resultados que hablan" siempre muestra 3, pero el admin puede
-// cargar más de 3 en /admin/secciones/stats — de esos, se eligen 3 al azar
-// en cada visita a la página, así van rotando entre todos los casos
-// cargados en vez de mostrar siempre los mismos.
-function pickRandom<T extends { order: number }>(items: T[], count: number): T[] {
-  const shuffled = [...items];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled.slice(0, count).sort((a, b) => a.order - b.order);
-}
 
 function withBold(text: string, phrases: string[]) {
   if (phrases.length === 0) return text;
@@ -78,13 +66,11 @@ function colorLastWordAsIs(text: string) {
 }
 
 export default async function QueHacemosPage() {
-  const [services, processSteps, allStats, about] = await Promise.all([
+  const [services, processSteps, about] = await Promise.all([
     getServices(),
     getProcessSteps(),
-    getStats("services"),
     getAboutContent(),
   ]);
-  const stats = pickRandom(allStats, 3);
 
   return (
     <>
@@ -192,26 +178,7 @@ export default async function QueHacemosPage() {
           </Reveal>
         </section>
 
-        {/* Resultados */}
-        <section className="px-6 sm:px-14 section-gap">
-          <Reveal>
-            <p className="mb-2 text-sm font-bold uppercase tracking-wide text-white/40">
-              Lo que generamos
-            </p>
-            <h2 className="mb-12 text-3xl font-extrabold text-white sm:text-4xl">
-              Resultados que <span className="text-accent">hablan.</span>
-            </h2>
-            <div className="grid grid-cols-1 gap-10 sm:grid-cols-3 sm:divide-x sm:divide-white/10">
-              {stats.map((stat) => (
-                <div key={stat.id} className="sm:px-8 sm:first:pl-0">
-                  <p className="text-4xl font-extrabold text-accent sm:text-5xl">{stat.value}</p>
-                  <p className="mt-2 font-bold text-white">{stat.label}</p>
-                  {stat.sublabel && <p className="mt-1 text-sm text-white/60">{stat.sublabel}</p>}
-                </div>
-              ))}
-            </div>
-          </Reveal>
-        </section>
+        <ResultsSection />
 
         <div className="bg-card/40 section-gap">
           <CtaSection eyebrow="¿Empezamos?" titleLine1="Contanos tu próximo" titleAccent="desafío." />

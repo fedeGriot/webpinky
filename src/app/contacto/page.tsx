@@ -3,6 +3,8 @@ import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { BackgroundShape } from "@/components/background-shape";
 import { MeetingForm } from "@/components/contacto/meeting-form";
+import { Reveal } from "@/components/reveal";
+import { ResultsSection } from "@/components/results-section";
 
 export const metadata: Metadata = {
   title: "Contacto",
@@ -28,7 +30,7 @@ export default function ContactoPage() {
           <BackgroundShape shape="08" className="right-[-140px] top-[-80px] h-[520px] w-[520px] opacity-10" />
           <div className="relative z-10 grid grid-cols-1 gap-14 lg:grid-cols-[1fr_1.2fr] lg:gap-20">
             {/* Presentación */}
-            <div>
+            <Reveal>
               <h1 className="text-4xl font-extrabold leading-[1.05] text-white sm:text-5xl">
                 Hablemos de tu{" "}
                 <span className="relative inline-block text-accent">
@@ -41,18 +43,20 @@ export default function ContactoPage() {
                 o mejorar su performance digital.{" "}
                 <span className="font-bold">Completá el formulario y coordinamos una reunión.</span>
               </p>
-            </div>
+            </Reveal>
 
             {/* Formulario */}
-            <div>
+            <Reveal delay={0.1}>
               <p className="mb-2 text-sm font-bold uppercase tracking-wide text-white/40">Solicitar reunión</p>
               <h2 className="mb-6 text-2xl font-extrabold text-white sm:text-3xl">
                 Contanos sobre tu empresa <span className="text-accent">y sus necesidades.</span>
               </h2>
               <MeetingForm />
-            </div>
+            </Reveal>
           </div>
         </section>
+
+        <ResultsSection />
       </main>
       <SiteFooter />
     </>

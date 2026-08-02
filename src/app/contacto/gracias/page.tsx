@@ -3,6 +3,7 @@ import Link from "next/link";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { BackgroundShape } from "@/components/background-shape";
+import { ResultsSection } from "@/components/results-section";
 
 export const metadata: Metadata = {
   title: "¡Gracias!",
@@ -38,6 +39,8 @@ export default function GraciasPage() {
             </Link>
           </div>
         </section>
+
+        <ResultsSection />
       </main>
       <SiteFooter />
     </>
