@@ -84,7 +84,7 @@ export type SiteSocialUrls = {
   twitterUrl: string | null;
 };
 
-/** Compartido entre SiteFooter y MobileNav para no repetir el mismo mapeo. */
+/** Compartido entre SiteFooter y SiteHeader para no repetir el mismo mapeo. */
 export function getSocialLinks(settings: SiteSocialUrls) {
   return [
     { label: "Instagram", href: settings.instagramUrl },
