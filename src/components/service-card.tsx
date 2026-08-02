@@ -24,12 +24,13 @@ export function ServiceCard({
     return (
       <Link
         href={`/que-hacemos#${service.slug}`}
-        className="group relative isolate flex items-start justify-between gap-4 overflow-hidden rounded-3xl bg-card p-6 [transform:translateZ(0)]"
+        className="flex items-start justify-between gap-4 rounded-3xl bg-card p-6 [background-image:linear-gradient(to_right,rgba(217,11,145,0.08)_50%,transparent_50%)] [background-size:200%_100%] [background-position:100%_0] transition-[background-position] duration-500 ease-out hover:[background-position:0_0] active:[background-position:0_0]"
       >
-        {/* [transform:translateZ(0)] + transform:scaleX() clásico — ver nota
-            en fill-button.tsx (fix de un bug de compositing de Chrome que
-            hacía perder el border-radius al animarse). */}
-        <span className="absolute inset-0 -z-10 origin-left [transform:scaleX(0)] bg-accent/[0.08] transition-transform duration-500 ease-out group-hover:[transform:scaleX(1)] group-active:[transform:scaleX(1)]" />
+        {/* Degradé animado en vez de span+transform — ver nota en
+            fill-button.tsx (ese enfoque se rompía en Chrome). rgba fija en
+            vez de var(--color-accent) porque acá el color final necesita
+            alpha (8%), y bg-card (background-color) sigue debajo sin
+            conflicto: son propiedades CSS distintas. */}
         <div>
           <h3 className="text-lg font-extrabold leading-tight text-white">{service.title}.</h3>
           <p className="mt-2 text-sm font-bold text-accent">{service.tagline}</p>

@@ -2,14 +2,24 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 /**
- * Botón pill con efecto de relleno: al hacer hover, una capa del color
- * oscuro actual (accent-dark) se desliza desde la izquierda y cubre todo el
- * botón, en vez de un simple cambio de color plano.
+ * Botón pill con efecto de relleno: al hacer hover, el color oscuro actual
+ * (accent-dark) se desliza desde la izquierda y cubre todo el botón, en vez
+ * de un simple cambio de color plano.
  *
- * `className` debe incluir el color base, el padding y el tamaño de texto
- * (varía según dónde se usa); este componente solo aporta la estructura del
- * efecto (relative/isolate/overflow-hidden/group) para que no haya conflictos
- * de especificidad entre clases de Tailwind.
+ * Implementación: un degradé de dos colores con un corte duro al 50% (el
+ * doble de ancho del botón) que se anima moviendo su `background-position`
+ * de derecha a izquierda — NO un `<span>` hijo con `transform` recortado por
+ * `overflow-hidden`. Esa versión anterior se rompía en Chrome: el navegador
+ * puede perder el recorte redondeado del contenedor (el botón se veía como
+ * un rectángulo de esquinas cuadradas) apenas el hijo animado se promovía a
+ * su propia capa de GPU — confirmado en video por el cliente, persistente
+ * incluso forzando una capa estable con translateZ(0). Un fondo (background)
+ * no tiene ese problema: el navegador siempre lo recorta de forma nativa y
+ * confiable al `border-radius` del propio elemento, sin capas ni hijos.
+ *
+ * `className` debe incluir el color base (ya no se usa visualmente ya que el
+ * degradé cubre todo el botón siempre, pero no molesta dejarlo), el padding
+ * y el tamaño de texto (varía según dónde se usa).
  */
 export function FillButton({
   href,
@@ -23,23 +33,8 @@ export function FillButton({
   return (
     <Link
       href={href}
-      className={`group relative isolate overflow-hidden rounded-full font-bold text-white [transform:translateZ(0)] ${className}`}
+      className={`rounded-full font-bold text-white [background-image:linear-gradient(to_right,var(--color-accent-dark)_50%,var(--color-accent)_50%)] [background-size:200%_100%] [background-position:100%_0] transition-[background-position] duration-300 ease-out hover:[background-position:0_0] active:[background-position:0_0] ${className}`}
     >
-      {/* [transform:translateZ(0)] en el propio Link: fuerza a que ESTE
-          elemento (el que tiene overflow-hidden + rounded-full) tenga su
-          propia capa de composición GPU estable desde el principio. Sin
-          esto, Chrome puede perder el recorte redondeado (el botón se ve
-          como un rectángulo de esquinas cuadradas) apenas el span de abajo
-          empieza a animarse y se promueve a su propia capa — un bug de
-          compositing conocido de "overflow-hidden + border-radius + hijo
-          con transform animado", confirmado en video por el cliente.
-
-          transform:scaleX() clásico (vía valor arbitrario) en el span, no la
-          propiedad "scale" separada que usa Tailwind v4 por defecto en
-          scale-x-*: esa propiedad es más nueva y tiene menos soporte.
-          group-active además de group-hover: en touch no hay hover real, sin
-          esto el efecto no se veía nunca al tocar el botón en mobile. */}
-      <span className="absolute inset-0 -z-10 origin-left [transform:scaleX(0)] bg-accent-dark transition-transform duration-300 ease-out group-hover:[transform:scaleX(1)] group-active:[transform:scaleX(1)]" />
       {children}
     </Link>
   );
