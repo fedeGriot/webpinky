@@ -245,10 +245,11 @@ export default async function ProjectDetailPage({
           <Reveal as="section" className="px-6 pb-24 sm:px-14 section-gap">
             <Link
               href={`/proyectos/${nextProject.slug}`}
-              className="group relative isolate flex items-center justify-between overflow-hidden rounded-3xl border border-white/10 bg-card px-8 py-10 sm:px-12 sm:py-14"
+              className="group relative isolate flex items-center justify-between overflow-hidden rounded-3xl border border-white/10 bg-card px-8 py-10 sm:px-12 sm:py-14 [transform:translateZ(0)]"
             >
-              {/* transform:scaleX() clásico, no la propiedad "scale" separada de
-                  Tailwind v4 — ver nota en fill-button.tsx. */}
+              {/* [transform:translateZ(0)] + transform:scaleX() clásico — ver
+                  nota en fill-button.tsx (fix de un bug de compositing de
+                  Chrome que hacía perder el border-radius al animarse). */}
               <span className="absolute inset-0 -z-10 origin-left [transform:scaleX(0)] bg-accent-dark transition-transform duration-300 ease-out group-hover:[transform:scaleX(1)] group-active:[transform:scaleX(1)]" />
               <div>
                 <p className="mb-2 text-sm font-bold uppercase tracking-wide text-white/40 transition group-hover:text-white/70">

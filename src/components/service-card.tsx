@@ -24,10 +24,11 @@ export function ServiceCard({
     return (
       <Link
         href={`/que-hacemos#${service.slug}`}
-        className="group relative isolate flex items-start justify-between gap-4 overflow-hidden rounded-3xl bg-card p-6"
+        className="group relative isolate flex items-start justify-between gap-4 overflow-hidden rounded-3xl bg-card p-6 [transform:translateZ(0)]"
       >
-        {/* transform:scaleX() clásico, no la propiedad "scale" separada de
-            Tailwind v4 — ver nota en fill-button.tsx. */}
+        {/* [transform:translateZ(0)] + transform:scaleX() clásico — ver nota
+            en fill-button.tsx (fix de un bug de compositing de Chrome que
+            hacía perder el border-radius al animarse). */}
         <span className="absolute inset-0 -z-10 origin-left [transform:scaleX(0)] bg-accent/[0.08] transition-transform duration-500 ease-out group-hover:[transform:scaleX(1)] group-active:[transform:scaleX(1)]" />
         <div>
           <h3 className="text-lg font-extrabold leading-tight text-white">{service.title}.</h3>
