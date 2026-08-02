@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { verifySession } from "@/lib/dal";
 import { saveUploadedFile } from "@/lib/uploads";
 import { isYouTubeUrl } from "@/lib/youtube";
+import { sanitizeRichText } from "@/lib/sanitize";
 
 // Tope defensivo: nada en este CMS necesita legítimamente un campo de texto
 // de más de 20k caracteres; esto solo frena payloads patológicos.
@@ -79,13 +80,13 @@ function projectFieldsFromForm(formData: FormData) {
     heroHeadline: str(formData, "heroHeadline"),
     accentColor: parseAccentColor(formData),
     videoUrl: parseVideoUrl(formData),
-    summary: str(formData, "summary"),
-    resultBadge: str(formData, "resultBadge"),
-    resultLabel: str(formData, "resultLabel"),
+    summary: sanitizeRichText(str(formData, "summary")),
+    resultBadge: optionalStr(formData, "resultBadge"),
+    resultLabel: optionalStr(formData, "resultLabel"),
     challengeTitle: str(formData, "challengeTitle"),
-    challengeBody: str(formData, "challengeBody"),
+    challengeBody: sanitizeRichText(str(formData, "challengeBody")),
     solutionTitle: str(formData, "solutionTitle"),
-    solutionBody: str(formData, "solutionBody"),
+    solutionBody: sanitizeRichText(str(formData, "solutionBody")),
     quoteText: optionalStr(formData, "quoteText"),
     quoteAuthor: optionalStr(formData, "quoteAuthor"),
     servicesTagsJson: JSON.stringify(linesToArray(str(formData, "servicesTags"))),
@@ -137,15 +138,38 @@ export async function deleteProject(formData: FormData) {
   redirect("/admin/proyectos");
 }
 
+// --- Reordenar (piezas y stats comparten la misma lógica: intercambiar el
+// valor "order" con el vecino de arriba/abajo, así no hace falta que el
+// admin entienda o escriba números de orden a mano) ---
+
+type Orderable = { id: string; order: number };
+
+async function swapOrder<T extends Orderable>(
+  items: T[],
+  id: string,
+  direction: "up" | "down",
+  save: (id: string, order: number) => Promise<unknown>,
+) {
+  const index = items.findIndex((item) => item.id === id);
+  if (index === -1) return;
+  const swapWith = direction === "up" ? index - 1 : index + 1;
+  if (swapWith < 0 || swapWith >= items.length) return;
+
+  const current = items[index];
+  const neighbor = items[swapWith];
+  await Promise.all([save(current.id, neighbor.order), save(neighbor.id, current.order)]);
+}
+
 // --- Stats del proyecto ---
 
 export async function createProjectStat(formData: FormData) {
   await verifySession();
   const projectId = str(formData, "projectId");
+  const maxOrder = await prisma.projectStat.aggregate({ where: { projectId }, _max: { order: true } });
   await prisma.projectStat.create({
     data: {
       projectId,
-      order: int(formData, "order"),
+      order: (maxOrder._max.order ?? -1) + 1,
       value: str(formData, "value"),
       label: str(formData, "label"),
     },
@@ -160,6 +184,17 @@ export async function deleteProjectStat(formData: FormData) {
   await revalidateProjectAndRedirect(projectId);
 }
 
+export async function moveProjectStat(formData: FormData) {
+  await verifySession();
+  const projectId = str(formData, "projectId");
+  const direction = str(formData, "direction") === "up" ? "up" : "down";
+  const stats = await prisma.projectStat.findMany({ where: { projectId }, orderBy: { order: "asc" } });
+  await swapOrder(stats, str(formData, "id"), direction, (id, order) =>
+    prisma.projectStat.update({ where: { id }, data: { order } }),
+  );
+  await revalidateProjectAndRedirect(projectId);
+}
+
 // --- Piezas del proyecto ---
 
 export async function createProjectPiece(formData: FormData) {
@@ -167,11 +202,12 @@ export async function createProjectPiece(formData: FormData) {
   const projectId = str(formData, "projectId");
   const image = formData.get("image") as File | null;
   const imageUrl = image && image.size > 0 ? await saveUploadedFile(image) : null;
+  const maxOrder = await prisma.projectPiece.aggregate({ where: { projectId }, _max: { order: true } });
 
   await prisma.projectPiece.create({
     data: {
       projectId,
-      order: int(formData, "order"),
+      order: (maxOrder._max.order ?? -1) + 1,
       type: str(formData, "type") || "pieza",
       title: str(formData, "title"),
       subtitle: optionalStr(formData, "subtitle"),
@@ -185,6 +221,17 @@ export async function deleteProjectPiece(formData: FormData) {
   await verifySession();
   const projectId = str(formData, "projectId");
   await prisma.projectPiece.delete({ where: { id: str(formData, "id") } });
+  await revalidateProjectAndRedirect(projectId);
+}
+
+export async function moveProjectPiece(formData: FormData) {
+  await verifySession();
+  const projectId = str(formData, "projectId");
+  const direction = str(formData, "direction") === "up" ? "up" : "down";
+  const pieces = await prisma.projectPiece.findMany({ where: { projectId }, orderBy: { order: "asc" } });
+  await swapOrder(pieces, str(formData, "id"), direction, (id, order) =>
+    prisma.projectPiece.update({ where: { id }, data: { order } }),
+  );
   await revalidateProjectAndRedirect(projectId);
 }
 

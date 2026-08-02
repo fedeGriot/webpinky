@@ -5,6 +5,7 @@ import { CtaSection } from "@/components/cta-section";
 import { BackgroundShape } from "@/components/background-shape";
 import { TeamAvatar } from "@/components/team-avatar";
 import { Reveal } from "@/components/reveal";
+import { RichTextContent } from "@/components/rich-text-content";
 import {
   getAboutContent,
   getStats,
@@ -182,7 +183,7 @@ export default async function QuienesSomosPage() {
                 <span className="h-2.5 w-2.5 rounded-full bg-accent" />
               </span>
               <h3 className="mb-3 text-[22px] font-extrabold text-white">Service-Centric</h3>
-              <p className="text-white">{about.serviceCentricBody}</p>
+              <RichTextContent html={about.serviceCentricBody} className="text-white" />
             </Reveal>
             <Reveal delay={0.1} className="rounded-3xl bg-card p-8">
               <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-accent/15">
@@ -191,7 +192,7 @@ export default async function QuienesSomosPage() {
               <h3 className="mb-3 text-[22px] font-extrabold text-white">
                 <span className="text-accent">Growth</span> Partner
               </h3>
-              <p className="text-white">{about.growthPartnerBody}</p>
+              <RichTextContent html={about.growthPartnerBody} className="text-white" />
             </Reveal>
           </div>
         </section>

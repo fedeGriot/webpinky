@@ -99,3 +99,19 @@ export async function getNextProject(order: number) {
   const first = await prisma.project.findFirst({ orderBy: { order: "asc" } });
   return first ? mapProject(first) : null;
 }
+
+export async function getMeetingRequests() {
+  return prisma.meetingRequest.findMany({ orderBy: { createdAt: "desc" } });
+}
+
+export async function getMeetingRequestById(id: string) {
+  return prisma.meetingRequest.findUnique({ where: { id } });
+}
+
+// select explícito: nunca traer passwordHash a una vista de admin.
+export async function getAdminUsers() {
+  return prisma.adminUser.findMany({
+    select: { id: true, email: true, createdAt: true },
+    orderBy: { createdAt: "asc" },
+  });
+}

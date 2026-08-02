@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { verifySession } from "@/lib/dal";
 import { saveUploadedFile } from "@/lib/uploads";
+import { sanitizeRichText } from "@/lib/sanitize";
 
 // Tope defensivo: nada en este CMS necesita legítimamente un campo de texto
 // de más de 20k caracteres; esto solo frena payloads patológicos.
@@ -84,12 +85,16 @@ export async function upsertHero(formData: FormData) {
 export async function upsertAbout(formData: FormData) {
   await verifySession();
   const data = {
+    // heroBody/growthBody quedan como texto plano a propósito: el sitio
+    // público resalta frases exactas ("ADN digital", "growth partner", etc.)
+    // con un helper que busca ese texto literal (withBold, en
+    // quienes-somos/page.tsx) — HTML del editor rico rompería ese matching.
     heroTitle: str(formData, "heroTitle"),
     heroBody: str(formData, "heroBody"),
     growthTitle: str(formData, "growthTitle"),
     growthBody: str(formData, "growthBody"),
-    serviceCentricBody: str(formData, "serviceCentricBody"),
-    growthPartnerBody: str(formData, "growthPartnerBody"),
+    serviceCentricBody: sanitizeRichText(str(formData, "serviceCentricBody")),
+    growthPartnerBody: sanitizeRichText(str(formData, "growthPartnerBody")),
   };
   await prisma.aboutContent.upsert({
     where: { id: "singleton" },
@@ -177,7 +182,7 @@ export async function createService(formData: FormData) {
       icon: str(formData, "icon") || "✦",
       title: str(formData, "title"),
       tagline: str(formData, "tagline"),
-      description: str(formData, "description"),
+      description: sanitizeRichText(str(formData, "description")),
       bulletsJson: JSON.stringify(linesToArray(str(formData, "bullets"))),
     },
   });
@@ -197,7 +202,7 @@ export async function updateService(formData: FormData) {
       icon: str(formData, "icon") || "✦",
       title: str(formData, "title"),
       tagline: str(formData, "tagline"),
-      description: str(formData, "description"),
+      description: sanitizeRichText(str(formData, "description")),
       bulletsJson: JSON.stringify(linesToArray(str(formData, "bullets"))),
     },
   });

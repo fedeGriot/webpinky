@@ -3,6 +3,7 @@ import { createClient, updateClient, deleteClient } from "@/lib/actions/sections
 import { SaveButton } from "@/components/admin/save-button";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { inputClass, labelClass } from "@/components/admin/form-styles";
+import { UploadHint } from "@/components/admin/upload-hint";
 
 export default async function ClientesPage() {
   const clients = await getClients();
@@ -28,6 +29,7 @@ export default async function ClientesPage() {
           <div className="flex flex-col gap-1.5">
             <label className={labelClass}>Logo (opcional)</label>
             <input name="logo" type="file" accept="image/*" className="text-sm text-white/70" />
+            <UploadHint size="400×200px" format="PNG con fondo transparente" note="el logo se pinta siempre blanco sólido — un fondo no transparente lo tapa" />
           </div>
           <SaveButton label="Agregar" />
         </form>

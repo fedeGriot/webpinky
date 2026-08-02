@@ -3,6 +3,7 @@ import { createTeamMember, updateTeamMember, deleteTeamMember } from "@/lib/acti
 import { SaveButton } from "@/components/admin/save-button";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { inputClass, labelClass } from "@/components/admin/form-styles";
+import { UploadHint } from "@/components/admin/upload-hint";
 
 export default async function EquipoPage() {
   const team = await getTeamMembers();
@@ -34,6 +35,7 @@ export default async function EquipoPage() {
           <div className="flex flex-col gap-1.5">
             <label className={labelClass}>Foto (opcional)</label>
             <input name="photo" type="file" accept="image/*" className="text-sm text-white/70" />
+            <UploadHint size="Mínimo 400×400px" format="JPG o WEBP" note="cuadrada, con la cara centrada — se recorta en círculo" />
           </div>
           <SaveButton label="Agregar" />
         </form>

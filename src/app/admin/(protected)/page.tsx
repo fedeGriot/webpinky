@@ -11,6 +11,16 @@ const CARDS = [
     title: "Proyectos",
     description: "Casos de estudio: crear, editar, reordenar y destacar proyectos.",
   },
+  {
+    href: "/admin/solicitudes",
+    title: "Solicitudes",
+    description: "Formularios de contacto completados desde el sitio.",
+  },
+  {
+    href: "/admin/usuarios",
+    title: "Usuarios",
+    description: "Quién puede entrar a este panel de administración.",
+  },
 ];
 
 export default function AdminHomePage() {

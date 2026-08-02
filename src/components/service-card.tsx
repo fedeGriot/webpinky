@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ServiceIcon } from "@/components/service-icon";
+import { RichTextContent } from "@/components/rich-text-content";
 
 export type ServiceCardData = {
   slug: string;
@@ -59,7 +60,7 @@ export function ServiceCard({
         </div>
       </div>
       <p className="text-base font-bold text-accent">{service.tagline}</p>
-      <p className="text-sm leading-relaxed text-white">{service.description}</p>
+      <RichTextContent html={service.description} className="text-sm leading-relaxed text-white" />
       <ul className="flex flex-col gap-2 text-sm text-white">
         {service.bullets.map((bullet) => (
           <li key={bullet} className="flex gap-2">

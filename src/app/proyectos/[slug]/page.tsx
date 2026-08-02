@@ -9,6 +9,8 @@ import { SITE_URL } from "@/lib/seo";
 import { Reveal } from "@/components/reveal";
 import { VideoLightboxTrigger } from "@/components/video-lightbox";
 import { getYouTubeId } from "@/lib/youtube";
+import { RichTextContent } from "@/components/rich-text-content";
+import { stripHtml } from "@/lib/rich-text";
 
 // Renderizado dinámico: el contenido viene del CMS y debe reflejarse sin rebuild.
 export const dynamic = "force-dynamic";
@@ -23,11 +25,11 @@ export async function generateMetadata({
   if (!project) return {};
   return {
     title: project.title,
-    description: project.summary,
+    description: stripHtml(project.summary),
     alternates: { canonical: `/proyectos/${slug}` },
     openGraph: {
       title: `${project.title} — Pinky`,
-      description: project.summary,
+      description: stripHtml(project.summary),
       url: `/proyectos/${slug}`,
       images: project.coverImageUrl ? [{ url: project.coverImageUrl }] : undefined,
     },
@@ -74,7 +76,7 @@ export default async function ProjectDetailPage({
     "@context": "https://schema.org",
     "@type": "CreativeWork",
     name: project.title,
-    description: project.summary,
+    description: stripHtml(project.summary),
     url: `${SITE_URL}/proyectos/${project.slug}`,
     image: project.coverImageUrl ? `${SITE_URL}${project.coverImageUrl}` : undefined,
     datePublished: `${project.year}`,
@@ -101,7 +103,7 @@ export default async function ProjectDetailPage({
             <h1 className="max-w-2xl text-4xl font-extrabold leading-[1.05] text-white sm:text-5xl">
               {renderHeroTitle(project.heroHeadline)}
             </h1>
-            <p className="mt-6 max-w-xl text-lg text-white">{project.summary}</p>
+            <RichTextContent html={project.summary} className="mt-6 max-w-xl text-lg text-white" />
           </div>
 
           <div className="flex flex-col divide-y divide-white/10 border-t border-white/10">
@@ -215,7 +217,7 @@ export default async function ProjectDetailPage({
             <h2 className="mb-6 text-3xl font-extrabold leading-tight text-white">
               {project.challengeTitle}
             </h2>
-            <p className="text-lg leading-relaxed text-white">{project.challengeBody}</p>
+            <RichTextContent html={project.challengeBody} className="text-lg leading-relaxed text-white" />
 
             {project.quoteText && (
               <blockquote
@@ -237,7 +239,7 @@ export default async function ProjectDetailPage({
             <h2 className="mb-6 text-3xl font-extrabold leading-tight text-white">
               {project.solutionTitle}
             </h2>
-            <p className="text-lg leading-relaxed text-white">{project.solutionBody}</p>
+            <RichTextContent html={project.solutionBody} className="text-lg leading-relaxed text-white" />
           </div>
         </Reveal>
 

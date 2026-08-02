@@ -7,6 +7,7 @@ import { CtaSection } from "@/components/cta-section";
 import { Reveal } from "@/components/reveal";
 import { getAllProjects } from "@/lib/data";
 import { staggerForGrid } from "@/lib/stagger";
+import { stripHtml } from "@/lib/rich-text";
 
 export const metadata: Metadata = {
   title: "Proyectos",
@@ -92,13 +93,17 @@ export default async function ProyectosPage({
 
                   <div className="mt-4 flex items-start justify-between gap-4">
                     <p className="text-xl font-bold text-white">{project.clientName}</p>
-                    <p className="shrink-0 text-lg font-extrabold text-accent">{project.resultBadge}</p>
+                    {project.resultBadge && (
+                      <p className="shrink-0 text-lg font-extrabold text-accent">{project.resultBadge}</p>
+                    )}
                   </div>
                   <div className="flex items-start justify-between gap-4">
-                    <p className="line-clamp-2 max-w-[26rem] text-sm text-white">{project.summary}</p>
-                    <p className="shrink-0 text-xs uppercase tracking-wide text-white/40">
-                      {project.resultLabel}
-                    </p>
+                    <p className="line-clamp-2 max-w-[26rem] text-sm text-white">{stripHtml(project.summary)}</p>
+                    {project.resultLabel && (
+                      <p className="shrink-0 text-xs uppercase tracking-wide text-white/40">
+                        {project.resultLabel}
+                      </p>
+                    )}
                   </div>
                 </Link>
               </Reveal>

@@ -5,6 +5,7 @@ import { BackgroundShape } from "@/components/background-shape";
 import { ServiceIcon } from "@/components/service-icon";
 import { CtaSection } from "@/components/cta-section";
 import { Reveal } from "@/components/reveal";
+import { RichTextContent } from "@/components/rich-text-content";
 import { getServices, getProcessSteps, getStats, getAboutContent } from "@/lib/data";
 
 export const metadata: Metadata = {
@@ -124,9 +125,7 @@ export default async function QueHacemosPage() {
                   <h3 className="mb-5 text-3xl font-extrabold leading-tight text-white sm:text-4xl">
                     {colorLastWord(service.title)}
                   </h3>
-                  <p className="mb-6 max-w-2xl text-lg leading-relaxed text-white">
-                    {service.description}
-                  </p>
+                  <RichTextContent html={service.description} className="mb-6 max-w-2xl text-lg leading-relaxed text-white" />
                   <ul className="divide-y divide-dashed divide-white/15 text-base text-white">
                     {service.bullets.map((bullet) => (
                       <li key={bullet} className="flex gap-3 py-3">

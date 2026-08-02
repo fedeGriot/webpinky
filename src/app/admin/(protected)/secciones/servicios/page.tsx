@@ -3,6 +3,7 @@ import { createService, updateService, deleteService } from "@/lib/actions/secti
 import { SaveButton } from "@/components/admin/save-button";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { inputClass, labelClass, textareaClass } from "@/components/admin/form-styles";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 export default async function ServiciosPage() {
   const services = await getServices();
@@ -98,7 +99,7 @@ function ServiceFields({
       </div>
       <div className="flex flex-col gap-1.5">
         <label className={labelClass}>Descripción</label>
-        <textarea name="description" defaultValue={defaultDescription} required className={textareaClass} />
+        <RichTextEditor name="description" defaultValue={defaultDescription} />
       </div>
       <div className="flex flex-col gap-1.5">
         <label className={labelClass}>Bullets (uno por línea)</label>

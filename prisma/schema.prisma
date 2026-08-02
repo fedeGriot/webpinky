@@ -146,8 +146,8 @@ model Project {
   videoUrl        String?
   accentColor     String  @default("#D90B91")
   summary         String
-  resultBadge     String
-  resultLabel     String
+  resultBadge     String?
+  resultLabel     String?
   challengeTitle  String
   challengeBody   String
   solutionTitle   String

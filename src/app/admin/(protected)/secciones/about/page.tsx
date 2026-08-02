@@ -2,6 +2,7 @@ import { getAboutContent } from "@/lib/data";
 import { upsertAbout } from "@/lib/actions/sections";
 import { SaveButton } from "@/components/admin/save-button";
 import { labelClass, inputClass, textareaClass } from "@/components/admin/form-styles";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 export default async function AboutSectionPage() {
   const about = await getAboutContent();
@@ -23,6 +24,10 @@ export default async function AboutSectionPage() {
             Párrafo introductorio
           </label>
           <textarea id="heroBody" name="heroBody" defaultValue={about?.heroBody} required className={textareaClass} />
+          <p className="text-xs text-white/40">
+            Texto plano (sin editor de formato): las frases “ADN digital” se resaltan en negrita
+            automáticamente en el sitio, y eso necesita que el texto quede sin etiquetas.
+          </p>
         </div>
         <div className="flex flex-col gap-1.5">
           <label className={labelClass} htmlFor="growthTitle">
@@ -35,30 +40,18 @@ export default async function AboutSectionPage() {
             Párrafo — growth partner
           </label>
           <textarea id="growthBody" name="growthBody" defaultValue={about?.growthBody} required className={textareaClass} />
+          <p className="text-xs text-white/40">
+            Texto plano (sin editor de formato): las frases “growth partner”, “2010” y “500
+            marcas” se resaltan en negrita automáticamente en el sitio.
+          </p>
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass} htmlFor="serviceCentricBody">
-            Bloque “Service-Centric”
-          </label>
-          <textarea
-            id="serviceCentricBody"
-            name="serviceCentricBody"
-            defaultValue={about?.serviceCentricBody}
-            required
-            className={textareaClass}
-          />
+          <label className={labelClass}>Bloque “Service-Centric”</label>
+          <RichTextEditor name="serviceCentricBody" defaultValue={about?.serviceCentricBody} />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass} htmlFor="growthPartnerBody">
-            Bloque “Growth Partner”
-          </label>
-          <textarea
-            id="growthPartnerBody"
-            name="growthPartnerBody"
-            defaultValue={about?.growthPartnerBody}
-            required
-            className={textareaClass}
-          />
+          <label className={labelClass}>Bloque “Growth Partner”</label>
+          <RichTextEditor name="growthPartnerBody" defaultValue={about?.growthPartnerBody} />
         </div>
         <div>
           <SaveButton />

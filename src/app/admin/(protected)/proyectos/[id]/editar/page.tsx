@@ -5,12 +5,16 @@ import {
   deleteProject,
   createProjectStat,
   deleteProjectStat,
+  moveProjectStat,
   createProjectPiece,
   deleteProjectPiece,
+  moveProjectPiece,
 } from "@/lib/actions/projects";
 import { ProjectFields } from "@/components/admin/project-fields";
 import { SaveButton } from "@/components/admin/save-button";
 import { DeleteButton } from "@/components/admin/delete-button";
+import { ReorderButtons } from "@/components/admin/reorder-buttons";
+import { UploadHint } from "@/components/admin/upload-hint";
 import { inputClass, labelClass } from "@/components/admin/form-styles";
 
 export default async function EditarProyectoPage({
@@ -66,17 +70,21 @@ export default async function EditarProyectoPage({
             <label className={labelClass}>Label</label>
             <input name="label" required className={inputClass} />
           </div>
-          <div className="flex flex-col gap-1.5">
-            <label className={labelClass}>Orden</label>
-            <input name="order" type="number" defaultValue={project.stats.length} className={`${inputClass} w-20`} />
-          </div>
           <SaveButton label="Agregar stat" />
         </form>
+        <p className="mb-4 -mt-2 text-xs text-white/40">Se agrega al final — reordená con las flechas de abajo.</p>
 
         <div className="flex flex-col gap-2">
-          {project.stats.map((stat) => (
-            <div key={stat.id} className="flex items-center justify-between rounded-xl border border-white/10 bg-card p-4">
-              <p className="text-white">
+          {project.stats.map((stat, i) => (
+            <div key={stat.id} className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-card p-4">
+              <ReorderButtons
+                action={moveProjectStat}
+                id={stat.id}
+                projectId={project.id}
+                disableUp={i === 0}
+                disableDown={i === project.stats.length - 1}
+              />
+              <p className="flex-1 text-white">
                 <span className="font-bold text-accent">{stat.value}</span> — {stat.label}
               </p>
               <form action={deleteProjectStat}>
@@ -115,17 +123,18 @@ export default async function EditarProyectoPage({
             <div className="flex flex-col gap-1.5">
               <label className={labelClass}>Imagen (opcional)</label>
               <input name="image" type="file" accept="image/*" className="text-sm text-white/70" />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className={labelClass}>Orden</label>
-              <input name="order" type="number" defaultValue={project.pieces.length} className={`${inputClass} w-20`} />
+              <UploadHint size="1080×1920px" format="JPG o WEBP" note="siempre se muestra vertical (9:16)" />
             </div>
             <SaveButton label="Agregar pieza" />
           </div>
         </form>
+        <p className="mb-4 text-xs text-white/40">
+          Se agrega al final — reordená con las flechas de cada pieza. Solo las primeras 3 (en
+          este orden) se muestran en la ficha pública del proyecto.
+        </p>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {project.pieces.map((piece) => (
+          {project.pieces.map((piece, i) => (
             <div key={piece.id} className="rounded-xl border border-white/10 bg-card p-4">
               {piece.imageUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -133,11 +142,20 @@ export default async function EditarProyectoPage({
               )}
               <p className="font-bold text-white">{piece.title}</p>
               {piece.subtitle && <p className="text-sm text-white/50">{piece.subtitle}</p>}
-              <form action={deleteProjectPiece} className="mt-3">
-                <input type="hidden" name="id" value={piece.id} />
-                <input type="hidden" name="projectId" value={project.id} />
-                <DeleteButton confirmMessage="¿Eliminar esta pieza?" />
-              </form>
+              <div className="mt-3 flex items-center justify-between">
+                <ReorderButtons
+                  action={moveProjectPiece}
+                  id={piece.id}
+                  projectId={project.id}
+                  disableUp={i === 0}
+                  disableDown={i === project.pieces.length - 1}
+                />
+                <form action={deleteProjectPiece}>
+                  <input type="hidden" name="id" value={piece.id} />
+                  <input type="hidden" name="projectId" value={project.id} />
+                  <DeleteButton confirmMessage="¿Eliminar esta pieza?" />
+                </form>
+              </div>
             </div>
           ))}
         </div>

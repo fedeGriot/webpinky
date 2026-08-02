@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { staggerForRow } from "@/lib/stagger";
+import { stripHtml } from "@/lib/rich-text";
 
 type CarouselProject = {
   id: string;
@@ -11,8 +12,8 @@ type CarouselProject = {
   heroHeadline: string;
   clientName: string;
   summary: string;
-  resultBadge: string;
-  resultLabel: string;
+  resultBadge?: string | null;
+  resultLabel?: string | null;
   accentColor: string;
   coverImageUrl?: string | null;
 };
@@ -173,12 +174,18 @@ export function ProjectsCarousel({ projects }: { projects: CarouselProject[] }) 
               <div className="mt-4 flex items-start justify-between gap-4">
                 <div className="min-w-0">
                   <p className="font-bold text-white">{project.clientName}</p>
-                  <p className="line-clamp-2 text-sm text-white">{project.summary}</p>
+                  <p className="line-clamp-2 text-sm text-white">{stripHtml(project.summary)}</p>
                 </div>
-                <div className="shrink-0 text-right">
-                  <p className="text-xl font-extrabold text-accent">{project.resultBadge}</p>
-                  <p className="text-xs uppercase text-white/50">{project.resultLabel}</p>
-                </div>
+                {(project.resultBadge || project.resultLabel) && (
+                  <div className="shrink-0 text-right">
+                    {project.resultBadge && (
+                      <p className="text-xl font-extrabold text-accent">{project.resultBadge}</p>
+                    )}
+                    {project.resultLabel && (
+                      <p className="text-xs uppercase text-white/50">{project.resultLabel}</p>
+                    )}
+                  </div>
+                )}
               </div>
             </Link>
           ))}

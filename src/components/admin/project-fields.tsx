@@ -1,4 +1,6 @@
 import { inputClass, labelClass, textareaClass } from "@/components/admin/form-styles";
+import { UploadHint } from "@/components/admin/upload-hint";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 export type ProjectFieldDefaults = {
   slug?: string;
@@ -13,8 +15,8 @@ export type ProjectFieldDefaults = {
   accentColor?: string;
   videoUrl?: string | null;
   summary?: string;
-  resultBadge?: string;
-  resultLabel?: string;
+  resultBadge?: string | null;
+  resultLabel?: string | null;
   challengeTitle?: string;
   challengeBody?: string;
   solutionTitle?: string;
@@ -74,17 +76,25 @@ export function ProjectFields({ defaults = {} }: { defaults?: ProjectFieldDefaul
         <input name="heroHeadline" defaultValue={defaults.heroHeadline} required className={inputClass} />
       </Field>
       <Field label="Resumen">
-        <textarea name="summary" defaultValue={defaults.summary} required className={textareaClass} />
+        <RichTextEditor name="summary" defaultValue={defaults.summary} />
       </Field>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Field label="Resultado destacado (badge)">
-          <input name="resultBadge" defaultValue={defaults.resultBadge} required className={inputClass} />
+        <Field label="Resultado destacado (badge, opcional)">
+          <input name="resultBadge" defaultValue={defaults.resultBadge ?? ""} placeholder="Ej: +18K" className={inputClass} />
         </Field>
-        <Field label="Descripción del resultado">
-          <input name="resultLabel" defaultValue={defaults.resultLabel} required className={inputClass} />
+        <Field label="Descripción del resultado (opcional)">
+          <input
+            name="resultLabel"
+            defaultValue={defaults.resultLabel ?? ""}
+            placeholder="Ej: seguidores / 3 meses"
+            className={inputClass}
+          />
         </Field>
       </div>
+      <p className="-mt-2 text-xs text-white/40">
+        Si dejás alguno vacío, no se muestra el resultado destacado para este proyecto.
+      </p>
 
       <Field label="Servicios (uno por línea)">
         <textarea
@@ -98,13 +108,13 @@ export function ProjectFields({ defaults = {} }: { defaults?: ProjectFieldDefaul
         <input name="challengeTitle" defaultValue={defaults.challengeTitle} required className={inputClass} />
       </Field>
       <Field label="Cuerpo — El desafío">
-        <textarea name="challengeBody" defaultValue={defaults.challengeBody} required className={textareaClass} />
+        <RichTextEditor name="challengeBody" defaultValue={defaults.challengeBody} />
       </Field>
       <Field label="Título — La solución">
         <input name="solutionTitle" defaultValue={defaults.solutionTitle} required className={inputClass} />
       </Field>
       <Field label="Cuerpo — La solución">
-        <textarea name="solutionBody" defaultValue={defaults.solutionBody} required className={textareaClass} />
+        <RichTextEditor name="solutionBody" defaultValue={defaults.solutionBody} />
       </Field>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -118,6 +128,11 @@ export function ProjectFields({ defaults = {} }: { defaults?: ProjectFieldDefaul
 
       <Field label="Imagen de portada (opcional)">
         <input name="coverImage" type="file" accept="image/*" className="text-sm text-white/70" />
+        <UploadHint
+          size="Mínimo 1600×1600px"
+          format="JPG o WEBP"
+          note="se recorta distinto según dónde aparece (listado, portada, carousel) — evitá que lo importante de la foto quede pegado a los bordes"
+        />
       </Field>
 
       <Field label="Link de video de YouTube (opcional)">
