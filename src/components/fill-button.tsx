@@ -22,7 +22,15 @@ export function FillButton({
 }) {
   return (
     <Link href={href} className={`group relative isolate overflow-hidden rounded-full font-bold text-white ${className}`}>
-      <span className="absolute inset-0 -z-10 origin-left scale-x-0 bg-accent-dark transition-transform duration-300 ease-out group-hover:scale-x-100" />
+      {/* transform:scaleX() clásico (vía valor arbitrario), no la propiedad
+          "scale" separada que usa Tailwind v4 por defecto en scale-x-*: esa
+          propiedad es más nueva y su combinación con overflow-hidden para
+          recortar las puntas redondeadas tiene más bugs de renderizado en
+          navegadores/webviews viejos — transform + overflow-hidden es una
+          combinación mucho más madura y sin sorpresas en todos lados.
+          group-active además de group-hover: en touch no hay hover real, sin
+          esto el efecto no se veía nunca al tocar el botón en mobile. */}
+      <span className="absolute inset-0 -z-10 origin-left [transform:scaleX(0)] bg-accent-dark transition-transform duration-300 ease-out group-hover:[transform:scaleX(1)] group-active:[transform:scaleX(1)]" />
       {children}
     </Link>
   );

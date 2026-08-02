@@ -247,7 +247,9 @@ export default async function ProjectDetailPage({
               href={`/proyectos/${nextProject.slug}`}
               className="group relative isolate flex items-center justify-between overflow-hidden rounded-3xl border border-white/10 bg-card px-8 py-10 sm:px-12 sm:py-14"
             >
-              <span className="absolute inset-0 -z-10 origin-left scale-x-0 bg-accent-dark transition-transform duration-300 ease-out group-hover:scale-x-100" />
+              {/* transform:scaleX() clásico, no la propiedad "scale" separada de
+                  Tailwind v4 — ver nota en fill-button.tsx. */}
+              <span className="absolute inset-0 -z-10 origin-left [transform:scaleX(0)] bg-accent-dark transition-transform duration-300 ease-out group-hover:[transform:scaleX(1)] group-active:[transform:scaleX(1)]" />
               <div>
                 <p className="mb-2 text-sm font-bold uppercase tracking-wide text-white/40 transition group-hover:text-white/70">
                   Siguiente proyecto

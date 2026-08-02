@@ -16,7 +16,9 @@ export function FillActionButton({
       className={`group relative isolate cursor-pointer overflow-hidden rounded-full font-bold text-white disabled:cursor-not-allowed disabled:opacity-40 ${className}`}
       {...props}
     >
-      <span className="absolute inset-0 -z-10 origin-left scale-x-0 bg-accent-dark transition-transform duration-300 ease-out group-hover:scale-x-100" />
+      {/* transform:scaleX() clásico, no la propiedad "scale" separada de
+          Tailwind v4 — ver nota en fill-button.tsx. */}
+      <span className="absolute inset-0 -z-10 origin-left [transform:scaleX(0)] bg-accent-dark transition-transform duration-300 ease-out group-hover:[transform:scaleX(1)] group-active:[transform:scaleX(1)]" />
       {children}
     </button>
   );

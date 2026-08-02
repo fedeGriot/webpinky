@@ -130,7 +130,9 @@ export function SiteHeader({
                 <span className={color}>→</span>
                 <span className={color}>{link.label}</span>
               </span>
-              <span className="mt-2 h-[2px] w-full origin-left scale-x-0 bg-accent transition-transform duration-300 ease-out group-active:scale-x-100" />
+              {/* transform:scaleX() clásico, no la propiedad "scale" que usa
+                  Tailwind v4 por defecto — ver nota en fill-button.tsx. */}
+              <span className="mt-2 h-[2px] w-full origin-left [transform:scaleX(0)] bg-accent transition-transform duration-300 ease-out group-active:[transform:scaleX(1)]" />
             </Link>
           );
         })}
