@@ -64,7 +64,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const settings = await getSiteSettings();
+  // try/catch (no force-dynamic ni nada por el estilo): el layout raíz
+  // envuelve TODA página, incluidas las que sí se pre-renderizan en build
+  // (ej. /_not-found) — en ese momento el volumen con la base de datos
+  // (/data) todavía no está montado en Railway, así que esta consulta
+  // fallaría y tiraría abajo el build entero. El contactPoint del JSON-LD
+  // es un enriquecimiento, no algo crítico: si falla, se omite sin más.
+  const settings = await getSiteSettings().catch(() => null);
 
   const organizationJsonLd = {
     "@context": "https://schema.org",
