@@ -151,7 +151,7 @@ export default async function ProjectDetailPage({
 
         {/* Lámina clara: portada + piezas + resultados */}
         <div className="rounded-b-[3rem] bg-white px-6 py-14 sm:px-14">
-          <div
+          <Reveal
             className="relative flex h-96 items-center justify-center overflow-hidden rounded-3xl sm:h-[34rem]"
             style={
               project.coverImageHeroMobileUrl || project.coverImageHeroDesktopUrl
@@ -202,7 +202,7 @@ export default async function ProjectDetailPage({
                 <VideoLightboxTrigger videoId={videoId} label={`Ver video — ${project.title}`} />
               </>
             )}
-          </div>
+          </Reveal>
 
           {project.pieces.length > 0 && (
             <Reveal as="section" className="mt-14">
