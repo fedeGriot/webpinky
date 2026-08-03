@@ -4,6 +4,12 @@ import { deleteAdminUser } from "@/lib/actions/users";
 import { CreateUserForm } from "@/components/admin/create-user-form";
 import { DeleteButton } from "@/components/admin/delete-button";
 
+// Renderizado dinámico: la sesión ya obliga a esto (verifySession lee
+// cookies en el layout), pero se declara explícito para que el build no
+// intente pre-renderizar esta página — el volumen con la base de datos
+// (/data) recién se monta en runtime en Railway, no durante el build.
+export const dynamic = "force-dynamic";
+
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("es-UY", { dateStyle: "medium" }).format(date);
 }
