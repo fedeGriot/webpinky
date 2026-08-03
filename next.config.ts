@@ -21,6 +21,11 @@ const cspHeader = `
 `;
 
 const nextConfig: NextConfig = {
+  images: {
+    // Todas las imágenes son same-origin (subidas del CMS en public/uploads,
+    // o assets estáticos en public/) — no hace falta remotePatterns.
+    formats: ["image/avif", "image/webp"],
+  },
   async headers() {
     return [
       {

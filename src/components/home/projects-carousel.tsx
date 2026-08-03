@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRef, useState } from "react";
 import { staggerForRow } from "@/lib/stagger";
 import { stripHtml } from "@/lib/rich-text";
@@ -154,11 +155,13 @@ export function ProjectsCarousel({ projects }: { projects: CarouselProject[] }) 
                 }
               >
                 {project.coverImageCarouselUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={project.coverImageCarouselUrl}
                     alt={project.clientName}
-                    className="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                    fill
+                    sizes="(max-width: 640px) 82vw, 380px"
+                    priority={i === 0}
+                    className="object-cover transition duration-300 group-hover:scale-105"
                   />
                 ) : (
                   <div

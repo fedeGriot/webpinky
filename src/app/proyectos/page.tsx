@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
@@ -74,11 +75,13 @@ export default async function ProyectosPage({
                     }
                   >
                     {project.coverImageListingUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <Image
                         src={project.coverImageListingUrl}
                         alt={project.clientName}
-                        className="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                        fill
+                        sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 30vw"
+                        priority={i < 3}
+                        className="object-cover transition duration-300 group-hover:scale-105"
                       />
                     ) : (
                       <div
