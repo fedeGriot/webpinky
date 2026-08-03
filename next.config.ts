@@ -21,6 +21,10 @@ const cspHeader = `
 `;
 
 const nextConfig: NextConfig = {
+  // Por defecto Next.js manda "X-Powered-By: Next.js" en cada respuesta —
+  // no es una falla explotable por sí sola, pero es fingerprinting gratis
+  // de la tecnología del backend que no cuesta nada evitar.
+  poweredByHeader: false,
   images: {
     // Todas las imágenes son same-origin (subidas del CMS en public/uploads,
     // o assets estáticos en public/) — no hace falta remotePatterns.
@@ -36,7 +40,7 @@ const nextConfig: NextConfig = {
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
-          { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
+          { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
         ],
       },
     ];

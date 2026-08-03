@@ -7,6 +7,11 @@ import { getSiteSettings } from "@/lib/data";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 const RATE_LIMIT_MAX = 3;
+// Límite mucho más alto que el del aviso por mail — no debería frenar nunca a
+// una persona real completando el formulario varias veces, solo a un script
+// en loop. Este SÍ se chequea antes de guardar (a diferencia del de abajo,
+// que solo throttlea el mail), porque el guardado no tenía ningún límite.
+const SAVE_RATE_LIMIT_MAX = 20;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const EMAIL_TIMEOUT_MS = 10_000;
 
@@ -170,6 +175,14 @@ export async function submitMeetingRequest(input: MeetingRequestInput): Promise<
     }
     const data = parsed.data;
 
+    // A diferencia del rate limit de más abajo (que solo throttlea el aviso
+    // por mail), este SÍ bloquea el guardado — sin él, el endpoint público
+    // aceptaba cualquier volumen de solicitudes sin límite alguno.
+    const ip = await getClientIp();
+    if (!rateLimit(`meeting-request-save:${ip}`, SAVE_RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS)) {
+      return { ok: false, error: "Demasiadas solicitudes. Probá de nuevo más tarde." };
+    }
+
     // Guardar el lead es lo primero y lo único de lo que depende la
     // respuesta de éxito al usuario. Todo lo que pasa después (mail de
     // notificación) es best-effort: si Resend está caído, la cuota se
@@ -198,10 +211,10 @@ export async function submitMeetingRequest(input: MeetingRequestInput): Promise<
       return { ok: false, error: "No pudimos procesar tu solicitud. Probá de nuevo o escribinos por mail." };
     }
 
-    // El rate limit throttlea solo el AVISO por mail (para no inundar la
-    // bandeja del equipo con reenvíos rápidos), nunca el guardado del lead —
-    // ese ya se hizo arriba sin condiciones.
-    const ip = await getClientIp();
+    // Este segundo rate limit (más estricto, mismo `ip` ya obtenido arriba)
+    // throttlea solo el AVISO por mail, para no inundar la bandeja del
+    // equipo con reenvíos rápidos — el guardado del lead ya quedó protegido
+    // por su propio límite (más alto) antes del try/catch de arriba.
     if (!rateLimit(`meeting-request:${ip}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS)) {
       console.warn(`Solicitud ${requestId} guardada; sin aviso por mail por rate limit (ip=${ip}).`);
       return { ok: true };

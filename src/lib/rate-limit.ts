@@ -40,6 +40,15 @@ export function rateLimit(key: string, limit: number, windowMs: number): boolean
 export async function getClientIp(): Promise<string> {
   const h = await headers();
   const forwardedFor = h.get("x-forwarded-for");
-  if (forwardedFor) return forwardedFor.split(",")[0].trim();
+  if (forwardedFor) {
+    // El proxy de confianza más cercano (Railway) AGREGA su IP detectada al
+    // final de la cadena — no la reemplaza. Tomar la primera entrada (como
+    // hacía esto antes) devuelve el valor que el propio cliente mandó en su
+    // request, que puede falsear a piacere para eludir el rate limit por IP
+    // (ej. login) probando un valor distinto en cada intento. La última
+    // entrada es la única que no controla el cliente.
+    const parts = forwardedFor.split(",").map((part) => part.trim());
+    return parts[parts.length - 1] || "unknown";
+  }
   return h.get("x-real-ip") ?? "unknown";
 }
