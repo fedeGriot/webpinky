@@ -23,7 +23,11 @@ export async function generateMetadata({
   const { slug } = await params;
   const project = await getProjectBySlug(slug);
   if (!project) return {};
-  const ogImage = project.coverImageHeroUrl ?? project.coverImageListingUrl ?? project.coverImageCarouselUrl;
+  const ogImage =
+    project.coverImageHeroDesktopUrl ??
+    project.coverImageHeroMobileUrl ??
+    project.coverImageListingUrl ??
+    project.coverImageCarouselUrl;
   return {
     title: project.title,
     description: stripHtml(project.summary),
@@ -76,7 +80,11 @@ export default async function ProjectDetailPage({
     { label: "Año", value: String(project.year) },
   ];
 
-  const jsonLdImage = project.coverImageHeroUrl ?? project.coverImageListingUrl ?? project.coverImageCarouselUrl;
+  const jsonLdImage =
+    project.coverImageHeroDesktopUrl ??
+    project.coverImageHeroMobileUrl ??
+    project.coverImageListingUrl ??
+    project.coverImageCarouselUrl;
   const caseStudyJsonLd = {
     "@context": "https://schema.org",
     "@type": "CreativeWork",
@@ -139,18 +147,30 @@ export default async function ProjectDetailPage({
           <div
             className="relative flex h-96 items-center justify-center overflow-hidden rounded-3xl sm:h-[34rem]"
             style={
-              project.coverImageHeroUrl
+              project.coverImageHeroMobileUrl || project.coverImageHeroDesktopUrl
                 ? undefined
                 : { background: `linear-gradient(160deg, ${project.accentColor}, ${project.accentColor}99)` }
             }
           >
-            {project.coverImageHeroUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={project.coverImageHeroUrl}
-                alt={project.title}
-                className="absolute inset-0 h-full w-full object-cover"
-              />
+            {project.coverImageHeroMobileUrl || project.coverImageHeroDesktopUrl ? (
+              <>
+                {(project.coverImageHeroMobileUrl ?? project.coverImageHeroDesktopUrl) && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={project.coverImageHeroMobileUrl ?? project.coverImageHeroDesktopUrl ?? undefined}
+                    alt={project.title}
+                    className="absolute inset-0 h-full w-full object-cover sm:hidden"
+                  />
+                )}
+                {(project.coverImageHeroDesktopUrl ?? project.coverImageHeroMobileUrl) && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={project.coverImageHeroDesktopUrl ?? project.coverImageHeroMobileUrl ?? undefined}
+                    alt={project.title}
+                    className="absolute inset-0 hidden h-full w-full object-cover sm:block"
+                  />
+                )}
+              </>
             ) : (
               <>
                 <div

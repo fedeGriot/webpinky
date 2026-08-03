@@ -104,21 +104,23 @@ async function saveIfProvided(formData: FormData, key: string) {
   return file && file.size > 0 ? await saveUploadedFile(file) : null;
 }
 
+async function saveCoverImages(formData: FormData) {
+  const [coverImageListingUrl, coverImageHeroMobileUrl, coverImageHeroDesktopUrl, coverImageCarouselUrl] =
+    await Promise.all([
+      saveIfProvided(formData, "coverImageListing"),
+      saveIfProvided(formData, "coverImageHeroMobile"),
+      saveIfProvided(formData, "coverImageHeroDesktop"),
+      saveIfProvided(formData, "coverImageCarousel"),
+    ]);
+  return { coverImageListingUrl, coverImageHeroMobileUrl, coverImageHeroDesktopUrl, coverImageCarouselUrl };
+}
+
 export async function createProject(formData: FormData) {
   await verifySession();
-  const [coverImageListingUrl, coverImageHeroUrl, coverImageCarouselUrl] = await Promise.all([
-    saveIfProvided(formData, "coverImageListing"),
-    saveIfProvided(formData, "coverImageHero"),
-    saveIfProvided(formData, "coverImageCarousel"),
-  ]);
+  const coverImages = await saveCoverImages(formData);
 
   const project = await prisma.project.create({
-    data: {
-      ...projectFieldsFromForm(formData),
-      coverImageListingUrl,
-      coverImageHeroUrl,
-      coverImageCarouselUrl,
-    },
+    data: { ...projectFieldsFromForm(formData), ...coverImages },
   });
 
   revalidateProjectPaths(project.slug);
@@ -128,19 +130,22 @@ export async function createProject(formData: FormData) {
 export async function updateProject(formData: FormData) {
   await verifySession();
   const id = str(formData, "id");
-  const [coverImageListingUrl, coverImageHeroUrl, coverImageCarouselUrl] = await Promise.all([
-    saveIfProvided(formData, "coverImageListing"),
-    saveIfProvided(formData, "coverImageHero"),
-    saveIfProvided(formData, "coverImageCarousel"),
-  ]);
+  const coverImages = await saveCoverImages(formData);
 
   const project = await prisma.project.update({
     where: { id },
     data: {
       ...projectFieldsFromForm(formData),
-      ...(coverImageListingUrl !== null ? { coverImageListingUrl } : {}),
-      ...(coverImageHeroUrl !== null ? { coverImageHeroUrl } : {}),
-      ...(coverImageCarouselUrl !== null ? { coverImageCarouselUrl } : {}),
+      ...(coverImages.coverImageListingUrl !== null ? { coverImageListingUrl: coverImages.coverImageListingUrl } : {}),
+      ...(coverImages.coverImageHeroMobileUrl !== null
+        ? { coverImageHeroMobileUrl: coverImages.coverImageHeroMobileUrl }
+        : {}),
+      ...(coverImages.coverImageHeroDesktopUrl !== null
+        ? { coverImageHeroDesktopUrl: coverImages.coverImageHeroDesktopUrl }
+        : {}),
+      ...(coverImages.coverImageCarouselUrl !== null
+        ? { coverImageCarouselUrl: coverImages.coverImageCarouselUrl }
+        : {}),
     },
   });
 
@@ -233,6 +238,25 @@ export async function createProjectPiece(formData: FormData) {
       subtitle: optionalStr(formData, "subtitle"),
       imageUrl,
       imageDesktopUrl,
+    },
+  });
+  await revalidateProjectAndRedirect(projectId);
+}
+
+export async function updateProjectPieceImages(formData: FormData) {
+  await verifySession();
+  const id = str(formData, "id");
+  const projectId = str(formData, "projectId");
+  const [imageUrl, imageDesktopUrl] = await Promise.all([
+    saveIfProvided(formData, "image"),
+    saveIfProvided(formData, "imageDesktop"),
+  ]);
+
+  await prisma.projectPiece.update({
+    where: { id },
+    data: {
+      ...(imageUrl !== null ? { imageUrl } : {}),
+      ...(imageDesktopUrl !== null ? { imageDesktopUrl } : {}),
     },
   });
   await revalidateProjectAndRedirect(projectId);

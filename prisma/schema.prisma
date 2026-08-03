@@ -134,31 +134,32 @@ model Stat {
 }
 
 model Project {
-  id                    String  @id @default(cuid())
-  slug                  String  @unique
-  title                 String
-  clientName            String
-  industry              String
-  year                  Int
-  featured              Boolean @default(false)
-  order                 Int     @default(0)
-  category              String
-  heroHeadline          String
-  coverImageListingUrl  String?
-  coverImageHeroUrl     String?
-  coverImageCarouselUrl String?
-  videoUrl              String?
-  accentColor           String  @default("#D90B91")
-  summary               String
-  resultBadge           String?
-  resultLabel           String?
-  challengeTitle        String
-  challengeBody         String
-  solutionTitle         String
-  solutionBody          String
-  quoteText             String?
-  quoteAuthor           String?
-  servicesTagsJson      String
+  id                       String  @id @default(cuid())
+  slug                     String  @unique
+  title                    String
+  clientName               String
+  industry                 String
+  year                     Int
+  featured                 Boolean @default(false)
+  order                    Int     @default(0)
+  category                 String
+  heroHeadline             String
+  coverImageListingUrl     String?
+  coverImageHeroMobileUrl  String?
+  coverImageHeroDesktopUrl String?
+  coverImageCarouselUrl    String?
+  videoUrl                 String?
+  accentColor              String  @default("#D90B91")
+  summary                  String
+  resultBadge              String?
+  resultLabel              String?
+  challengeTitle           String
+  challengeBody            String
+  solutionTitle            String
+  solutionBody             String
+  quoteText                String?
+  quoteAuthor              String?
+  servicesTagsJson         String
 
   stats  ProjectStat[]
   pieces ProjectPiece[]

@@ -7,6 +7,7 @@ import {
   deleteProjectStat,
   moveProjectStat,
   createProjectPiece,
+  updateProjectPieceImages,
   deleteProjectPiece,
   moveProjectPiece,
 } from "@/lib/actions/projects";
@@ -127,16 +128,21 @@ export default async function EditarProyectoPage({
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {project.pieces.map((piece, i) => (
             <div key={piece.id} className="rounded-xl border border-white/10 bg-card p-4">
-              {(piece.imageUrl ?? piece.imageDesktopUrl) && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={piece.imageUrl ?? piece.imageDesktopUrl ?? undefined}
-                  alt={piece.title}
-                  className="mb-3 h-28 w-full rounded-lg object-cover"
-                />
-              )}
               <p className="font-bold text-white">{piece.title}</p>
               {piece.subtitle && <p className="text-sm text-white/50">{piece.subtitle}</p>}
+
+              <form action={updateProjectPieceImages} className="mt-3 flex flex-col gap-2">
+                <input type="hidden" name="id" value={piece.id} />
+                <input type="hidden" name="projectId" value={project.id} />
+                <div className="grid grid-cols-2 gap-3">
+                  <UploadBox name="image" title="Mobile" size="330×580px" currentUrl={piece.imageUrl} />
+                  <UploadBox name="imageDesktop" title="Escritorio" size="380×670px" currentUrl={piece.imageDesktopUrl} />
+                </div>
+                <div>
+                  <SaveButton label="Guardar imágenes" />
+                </div>
+              </form>
+
               <div className="mt-3 flex items-center justify-between">
                 <ReorderButtons
                   action={moveProjectPiece}

@@ -15,7 +15,8 @@ export type ProjectFieldDefaults = {
   accentColor?: string;
   videoUrl?: string | null;
   coverImageListingUrl?: string | null;
-  coverImageHeroUrl?: string | null;
+  coverImageHeroMobileUrl?: string | null;
+  coverImageHeroDesktopUrl?: string | null;
   coverImageCarouselUrl?: string | null;
   summary?: string;
   resultBadge?: string | null;
@@ -79,8 +80,8 @@ export function ProjectFields({ defaults = {} }: { defaults?: ProjectFieldDefaul
         <input name="heroHeadline" defaultValue={defaults.heroHeadline} required className={inputClass} />
       </Field>
 
-      <Field label="Imagen de portada (opcional) — subí una por cada lugar donde aparece">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <Field label="Imagen de portada (opcional) — subí una por cada lugar/tamaño donde aparece">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <UploadBox
             name="coverImageListing"
             title="Listado de proyectos"
@@ -88,10 +89,16 @@ export function ProjectFields({ defaults = {} }: { defaults?: ProjectFieldDefaul
             currentUrl={defaults.coverImageListingUrl}
           />
           <UploadBox
-            name="coverImageHero"
-            title="Ficha del proyecto"
-            size="Mobile 330×390px · Escritorio 1160×540px"
-            currentUrl={defaults.coverImageHeroUrl}
+            name="coverImageHeroMobile"
+            title="Ficha del proyecto — Mobile"
+            size="330×390px"
+            currentUrl={defaults.coverImageHeroMobileUrl}
+          />
+          <UploadBox
+            name="coverImageHeroDesktop"
+            title="Ficha del proyecto — Escritorio"
+            size="1160×540px"
+            currentUrl={defaults.coverImageHeroDesktopUrl}
           />
           <UploadBox
             name="coverImageCarousel"
