@@ -139,7 +139,7 @@ export default async function QueHacemosPage() {
                     ))}
                   </ul>
                 </div>
-                <div className="flex items-center justify-center">
+                <div className="hidden items-center justify-center sm:flex">
                   <ServiceIcon
                     iconUrl={service.iconUrl}
                     iconAccentUrl={service.iconAccentUrl}
