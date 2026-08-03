@@ -14,7 +14,7 @@ import { ProjectFields } from "@/components/admin/project-fields";
 import { SaveButton } from "@/components/admin/save-button";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { ReorderButtons } from "@/components/admin/reorder-buttons";
-import { UploadHint } from "@/components/admin/upload-hint";
+import { UploadBox } from "@/components/admin/upload-box";
 import { inputClass, labelClass } from "@/components/admin/form-styles";
 
 export default async function EditarProyectoPage({
@@ -110,16 +110,12 @@ export default async function EditarProyectoPage({
             <label className={labelClass}>Subtítulo (opcional)</label>
             <input name="subtitle" className={inputClass} />
           </div>
-          <div className="flex flex-wrap items-end gap-3">
-            <div className="flex flex-col gap-1.5">
-              <label className={labelClass}>Imagen (opcional)</label>
-              <input name="image" type="file" accept="image/*" className="text-sm text-white/70" />
-              <UploadHint
-                sizes={[{ mobile: "330×580px", desktop: "380×670px" }]}
-                format="JPG o WEBP"
-                note="vertical (9:16) en los dos casos"
-              />
-            </div>
+          <div className="grid max-w-xs grid-cols-2 gap-3">
+            <UploadBox name="image" title="Mobile" size="330×580px" />
+            <UploadBox name="imageDesktop" title="Escritorio" size="380×670px" />
+          </div>
+          <p className="-mt-1 text-xs text-white/40">Imágenes opcionales — vertical (9:16) en los dos casos, JPG o WEBP.</p>
+          <div>
             <SaveButton label="Agregar pieza" />
           </div>
         </form>
@@ -131,9 +127,13 @@ export default async function EditarProyectoPage({
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {project.pieces.map((piece, i) => (
             <div key={piece.id} className="rounded-xl border border-white/10 bg-card p-4">
-              {piece.imageUrl && (
+              {(piece.imageUrl ?? piece.imageDesktopUrl) && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={piece.imageUrl} alt={piece.title} className="mb-3 h-28 w-full rounded-lg object-cover" />
+                <img
+                  src={piece.imageUrl ?? piece.imageDesktopUrl ?? undefined}
+                  alt={piece.title}
+                  className="mb-3 h-28 w-full rounded-lg object-cover"
+                />
               )}
               <p className="font-bold text-white">{piece.title}</p>
               {piece.subtitle && <p className="text-sm text-white/50">{piece.subtitle}</p>}

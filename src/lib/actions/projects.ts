@@ -99,13 +99,26 @@ function revalidateProjectPaths(slug?: string) {
   if (slug) revalidatePath(`/proyectos/${slug}`);
 }
 
+async function saveIfProvided(formData: FormData, key: string) {
+  const file = formData.get(key) as File | null;
+  return file && file.size > 0 ? await saveUploadedFile(file) : null;
+}
+
 export async function createProject(formData: FormData) {
   await verifySession();
-  const cover = formData.get("coverImage") as File | null;
-  const coverImageUrl = cover && cover.size > 0 ? await saveUploadedFile(cover) : null;
+  const [coverImageListingUrl, coverImageHeroUrl, coverImageCarouselUrl] = await Promise.all([
+    saveIfProvided(formData, "coverImageListing"),
+    saveIfProvided(formData, "coverImageHero"),
+    saveIfProvided(formData, "coverImageCarousel"),
+  ]);
 
   const project = await prisma.project.create({
-    data: { ...projectFieldsFromForm(formData), coverImageUrl },
+    data: {
+      ...projectFieldsFromForm(formData),
+      coverImageListingUrl,
+      coverImageHeroUrl,
+      coverImageCarouselUrl,
+    },
   });
 
   revalidateProjectPaths(project.slug);
@@ -115,14 +128,19 @@ export async function createProject(formData: FormData) {
 export async function updateProject(formData: FormData) {
   await verifySession();
   const id = str(formData, "id");
-  const cover = formData.get("coverImage") as File | null;
-  const coverImageUrl = cover && cover.size > 0 ? await saveUploadedFile(cover) : undefined;
+  const [coverImageListingUrl, coverImageHeroUrl, coverImageCarouselUrl] = await Promise.all([
+    saveIfProvided(formData, "coverImageListing"),
+    saveIfProvided(formData, "coverImageHero"),
+    saveIfProvided(formData, "coverImageCarousel"),
+  ]);
 
   const project = await prisma.project.update({
     where: { id },
     data: {
       ...projectFieldsFromForm(formData),
-      ...(coverImageUrl !== undefined ? { coverImageUrl } : {}),
+      ...(coverImageListingUrl !== null ? { coverImageListingUrl } : {}),
+      ...(coverImageHeroUrl !== null ? { coverImageHeroUrl } : {}),
+      ...(coverImageCarouselUrl !== null ? { coverImageCarouselUrl } : {}),
     },
   });
 
@@ -200,8 +218,10 @@ export async function moveProjectStat(formData: FormData) {
 export async function createProjectPiece(formData: FormData) {
   await verifySession();
   const projectId = str(formData, "projectId");
-  const image = formData.get("image") as File | null;
-  const imageUrl = image && image.size > 0 ? await saveUploadedFile(image) : null;
+  const [imageUrl, imageDesktopUrl] = await Promise.all([
+    saveIfProvided(formData, "image"),
+    saveIfProvided(formData, "imageDesktop"),
+  ]);
   const maxOrder = await prisma.projectPiece.aggregate({ where: { projectId }, _max: { order: true } });
 
   await prisma.projectPiece.create({
@@ -212,6 +232,7 @@ export async function createProjectPiece(formData: FormData) {
       title: str(formData, "title"),
       subtitle: optionalStr(formData, "subtitle"),
       imageUrl,
+      imageDesktopUrl,
     },
   });
   await revalidateProjectAndRedirect(projectId);

@@ -22,51 +22,51 @@ model AdminUser {
 
 /// Configuración global del sitio (contacto, redes) — fila única.
 model SiteSettings {
-  id             String @id @default("singleton")
-  email          String
-  phone1         String
-  phone2         String?
-  address        String
-  instagramUrl   String?
-  linkedinUrl    String?
-  youtubeUrl     String?
-  twitterUrl     String?
-  foundedYear    Int    @default(2010)
+  id           String  @id @default("singleton")
+  email        String
+  phone1       String
+  phone2       String?
+  address      String
+  instagramUrl String?
+  linkedinUrl  String?
+  youtubeUrl   String?
+  twitterUrl   String?
+  foundedYear  Int     @default(2010)
 
   updatedAt DateTime @updatedAt
 }
 
 /// Copy editable del hero de Home — fila única.
 model HeroContent {
-  id                 String @id @default("singleton")
-  titleLine1         String
-  titleAccent        String
-  rotatingWordsJson  String
-  subtitle           String
-  ctaPrimaryLabel    String
-  ctaSecondaryLabel  String
+  id                String @id @default("singleton")
+  titleLine1        String
+  titleAccent       String
+  rotatingWordsJson String
+  subtitle          String
+  ctaPrimaryLabel   String
+  ctaSecondaryLabel String
 
   updatedAt DateTime @updatedAt
 }
 
 /// Textos largos de la página "Quiénes somos" — fila única.
 model AboutContent {
-  id                String @id @default("singleton")
-  heroTitle         String
-  heroBody          String
-  growthTitle       String
-  growthBody        String
+  id                 String @id @default("singleton")
+  heroTitle          String
+  heroBody           String
+  growthTitle        String
+  growthBody         String
   serviceCentricBody String
-  growthPartnerBody String
+  growthPartnerBody  String
 
   updatedAt DateTime @updatedAt
 }
 
 model Client {
-  id      String @id @default(cuid())
+  id      String  @id @default(cuid())
   name    String
   logoUrl String?
-  order   Int    @default(0)
+  order   Int     @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -122,9 +122,9 @@ model TeamMember {
 
 /// Stats reutilizables, agrupados por contexto (about | services | home).
 model Stat {
-  id       String @id @default(cuid())
+  id       String  @id @default(cuid())
   context  String
-  order    Int    @default(0)
+  order    Int     @default(0)
   value    String
   label    String
   sublabel String?
@@ -134,29 +134,31 @@ model Stat {
 }
 
 model Project {
-  id              String  @id @default(cuid())
-  slug            String  @unique
-  title           String
-  clientName      String
-  industry        String
-  year            Int
-  featured        Boolean @default(false)
-  order           Int     @default(0)
-  category        String
-  heroHeadline    String
-  coverImageUrl   String?
-  videoUrl        String?
-  accentColor     String  @default("#D90B91")
-  summary         String
-  resultBadge     String?
-  resultLabel     String?
-  challengeTitle  String
-  challengeBody   String
-  solutionTitle   String
-  solutionBody    String
-  quoteText       String?
-  quoteAuthor     String?
-  servicesTagsJson String
+  id                    String  @id @default(cuid())
+  slug                  String  @unique
+  title                 String
+  clientName            String
+  industry              String
+  year                  Int
+  featured              Boolean @default(false)
+  order                 Int     @default(0)
+  category              String
+  heroHeadline          String
+  coverImageListingUrl  String?
+  coverImageHeroUrl     String?
+  coverImageCarouselUrl String?
+  videoUrl              String?
+  accentColor           String  @default("#D90B91")
+  summary               String
+  resultBadge           String?
+  resultLabel           String?
+  challengeTitle        String
+  challengeBody         String
+  solutionTitle         String
+  solutionBody          String
+  quoteText             String?
+  quoteAuthor           String?
+  servicesTagsJson      String
 
   stats  ProjectStat[]
   pieces ProjectPiece[]
@@ -176,13 +178,14 @@ model ProjectStat {
 }
 
 model ProjectPiece {
-  id        String  @id @default(cuid())
-  projectId String
-  order     Int     @default(0)
-  type      String
-  title     String
-  subtitle  String?
-  imageUrl  String?
+  id              String  @id @default(cuid())
+  projectId       String
+  order           Int     @default(0)
+  type            String
+  title           String
+  subtitle        String?
+  imageUrl        String?
+  imageDesktopUrl String?
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }

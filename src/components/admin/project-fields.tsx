@@ -1,5 +1,5 @@
 import { inputClass, labelClass, textareaClass } from "@/components/admin/form-styles";
-import { UploadHint } from "@/components/admin/upload-hint";
+import { UploadBox } from "@/components/admin/upload-box";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 export type ProjectFieldDefaults = {
@@ -14,7 +14,9 @@ export type ProjectFieldDefaults = {
   heroHeadline?: string;
   accentColor?: string;
   videoUrl?: string | null;
-  coverImageUrl?: string | null;
+  coverImageListingUrl?: string | null;
+  coverImageHeroUrl?: string | null;
+  coverImageCarouselUrl?: string | null;
   summary?: string;
   resultBadge?: string | null;
   resultLabel?: string | null;
@@ -77,30 +79,30 @@ export function ProjectFields({ defaults = {} }: { defaults?: ProjectFieldDefaul
         <input name="heroHeadline" defaultValue={defaults.heroHeadline} required className={inputClass} />
       </Field>
 
-      <Field label="Imagen de portada (opcional)">
-        <div className="flex items-center gap-4">
-          {defaults.coverImageUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={defaults.coverImageUrl}
-              alt="Portada actual"
-              className="h-16 w-16 shrink-0 rounded-lg object-cover"
-            />
-          )}
-          <div className="flex-1">
-            <input name="coverImage" type="file" accept="image/*" className="text-sm text-white/70" />
-            <p className="mt-1 text-xs text-white/40">
-              {defaults.coverImageUrl
-                ? "Subí un archivo para reemplazar la imagen actual, o dejalo vacío para conservarla."
-                : "Todavía no tiene imagen de portada cargada."}
-            </p>
-            <UploadHint
-              sizes={[{ mobile: "1600×1600px" }]}
-              format="JPG o WEBP"
-              note="mínimo — se recorta distinto según dónde se muestra en el sitio, subí la foto bien resuelta y con lo importante centrado"
-            />
-          </div>
+      <Field label="Imagen de portada (opcional) — subí una por cada lugar donde aparece">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <UploadBox
+            name="coverImageListing"
+            title="Listado de proyectos"
+            size="400×500px"
+            currentUrl={defaults.coverImageListingUrl}
+          />
+          <UploadBox
+            name="coverImageHero"
+            title="Ficha del proyecto"
+            size="Mobile 330×390px · Escritorio 1160×540px"
+            currentUrl={defaults.coverImageHeroUrl}
+          />
+          <UploadBox
+            name="coverImageCarousel"
+            title="Carrusel de Home"
+            size="380×680px"
+            currentUrl={defaults.coverImageCarouselUrl}
+          />
         </div>
+        <p className="mt-2 text-xs text-white/40">
+          JPG o WEBP, hasta 8MB. Si dejás una casilla vacía se conserva la imagen actual de ese lugar.
+        </p>
       </Field>
 
       <Field label="Resumen">

@@ -15,7 +15,7 @@ type CarouselProject = {
   resultBadge?: string | null;
   resultLabel?: string | null;
   accentColor: string;
-  coverImageUrl?: string | null;
+  coverImageCarouselUrl?: string | null;
 };
 
 export function ProjectsCarousel({ projects }: { projects: CarouselProject[] }) {
@@ -148,15 +148,15 @@ export function ProjectsCarousel({ projects }: { projects: CarouselProject[] }) 
               <div
                 className="relative aspect-[9/16] overflow-hidden rounded-3xl"
                 style={
-                  project.coverImageUrl
+                  project.coverImageCarouselUrl
                     ? undefined
                     : { background: `linear-gradient(150deg, ${project.accentColor}, ${project.accentColor}99)` }
                 }
               >
-                {project.coverImageUrl ? (
+                {project.coverImageCarouselUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={project.coverImageUrl}
+                    src={project.coverImageCarouselUrl}
                     alt={project.clientName}
                     className="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-105"
                   />

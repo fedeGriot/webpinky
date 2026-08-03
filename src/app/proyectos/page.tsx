@@ -68,15 +68,15 @@ export default async function ProyectosPage({
                   <div
                     className="relative aspect-[4/5] overflow-hidden rounded-2xl"
                     style={
-                      project.coverImageUrl
+                      project.coverImageListingUrl
                         ? undefined
                         : { background: `linear-gradient(150deg, ${project.accentColor}, ${project.accentColor}99)` }
                     }
                   >
-                    {project.coverImageUrl ? (
+                    {project.coverImageListingUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
-                        src={project.coverImageUrl}
+                        src={project.coverImageListingUrl}
                         alt={project.clientName}
                         className="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-105"
                       />

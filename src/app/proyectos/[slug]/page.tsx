@@ -23,6 +23,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const project = await getProjectBySlug(slug);
   if (!project) return {};
+  const ogImage = project.coverImageHeroUrl ?? project.coverImageListingUrl ?? project.coverImageCarouselUrl;
   return {
     title: project.title,
     description: stripHtml(project.summary),
@@ -31,7 +32,7 @@ export async function generateMetadata({
       title: `${project.title} — Pinky`,
       description: stripHtml(project.summary),
       url: `/proyectos/${slug}`,
-      images: project.coverImageUrl ? [{ url: project.coverImageUrl }] : undefined,
+      images: ogImage ? [{ url: ogImage }] : undefined,
     },
   };
 }
@@ -75,13 +76,14 @@ export default async function ProjectDetailPage({
     { label: "Año", value: String(project.year) },
   ];
 
+  const jsonLdImage = project.coverImageHeroUrl ?? project.coverImageListingUrl ?? project.coverImageCarouselUrl;
   const caseStudyJsonLd = {
     "@context": "https://schema.org",
     "@type": "CreativeWork",
     name: project.title,
     description: stripHtml(project.summary),
     url: `${SITE_URL}/proyectos/${project.slug}`,
-    image: project.coverImageUrl ? `${SITE_URL}${project.coverImageUrl}` : undefined,
+    image: jsonLdImage ? `${SITE_URL}${jsonLdImage}` : undefined,
     datePublished: `${project.year}`,
     creator: { "@type": "Organization", name: "Pinky. The Fit Agency" },
     about: project.clientName,
@@ -137,15 +139,15 @@ export default async function ProjectDetailPage({
           <div
             className="relative flex h-96 items-center justify-center overflow-hidden rounded-3xl sm:h-[34rem]"
             style={
-              project.coverImageUrl
+              project.coverImageHeroUrl
                 ? undefined
                 : { background: `linear-gradient(160deg, ${project.accentColor}, ${project.accentColor}99)` }
             }
           >
-            {project.coverImageUrl ? (
+            {project.coverImageHeroUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={project.coverImageUrl}
+                src={project.coverImageHeroUrl}
                 alt={project.title}
                 className="absolute inset-0 h-full w-full object-cover"
               />
@@ -182,17 +184,25 @@ export default async function ProjectDetailPage({
                     key={piece.id}
                     className="relative aspect-[9/16] overflow-hidden rounded-2xl"
                     style={
-                      !piece.imageUrl
+                      !piece.imageUrl && !piece.imageDesktopUrl
                         ? { background: `linear-gradient(160deg, ${project.accentColor}, ${project.accentColor}99)` }
                         : undefined
                     }
                   >
-                    {piece.imageUrl && (
+                    {(piece.imageUrl ?? piece.imageDesktopUrl) && (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
-                        src={piece.imageUrl}
+                        src={piece.imageUrl ?? piece.imageDesktopUrl ?? undefined}
                         alt={piece.title}
-                        className="absolute inset-0 h-full w-full object-cover"
+                        className="absolute inset-0 h-full w-full object-cover sm:hidden"
+                      />
+                    )}
+                    {(piece.imageDesktopUrl ?? piece.imageUrl) && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={piece.imageDesktopUrl ?? piece.imageUrl ?? undefined}
+                        alt={piece.title}
+                        className="absolute inset-0 hidden h-full w-full object-cover sm:block"
                       />
                     )}
                   </div>
