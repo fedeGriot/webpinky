@@ -95,13 +95,9 @@ export function ProjectFields({ defaults = {} }: { defaults?: ProjectFieldDefaul
                 : "Todavía no tiene imagen de portada cargada."}
             </p>
             <UploadHint
-              sizes={[
-                { label: "Listado de proyectos", mobile: "350×440px", desktop: "400×500px" },
-                { label: "Ficha del proyecto", mobile: "330×390px", desktop: "1160×540px" },
-                { label: "Carrusel de Home", mobile: "310×550px", desktop: "380×680px" },
-              ]}
+              sizes={[{ mobile: "1600×1600px" }]}
               format="JPG o WEBP"
-              note="lo importante de la foto centrado — se recorta distinto en cada lugar"
+              note="mínimo — se recorta distinto según dónde se muestra en el sitio, subí la foto bien resuelta y con lo importante centrado"
             />
           </div>
         </div>
