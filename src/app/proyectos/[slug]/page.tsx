@@ -250,24 +250,26 @@ export default async function ProjectDetailPage({
           <Reveal as="section" className="px-6 pb-24 sm:px-14 section-gap">
             {/* Navegación simple entre proyectos: dos links de texto, uno a
                 cada lado, en vez de la tarjeta pesada de antes. El texto es
-                Cliente + Headline del proyecto al que apunta, siempre en una
-                sola línea (se recorta con "..." si no entra). La animación
-                al pasar el mouse queda solo en la flecha (no en todo el
-                bloque) para que se sienta como un gesto chico, no un botón. */}
-            <div className="flex items-center justify-between gap-4 border-t border-white/10 pt-10">
+                Cliente + Headline del proyecto al que apunta, completo (sin
+                recortar) — el Cliente en el color de acento para que se
+                distinga del resto. La animación al pasar el mouse queda
+                solo en la flecha (no en todo el bloque) para que se sienta
+                como un gesto chico, no un botón. */}
+            <div className="flex items-start justify-between gap-4 border-t border-white/10 pt-10">
               {previousProject ? (
                 <Link
                   href={`/proyectos/${previousProject.slug}`}
-                  className="group flex max-w-[45%] items-center gap-3 text-lg font-normal text-white/70 transition hover:text-white sm:max-w-sm sm:text-2xl"
+                  className="group flex max-w-[45%] items-start gap-3 text-lg font-normal sm:max-w-sm sm:text-2xl"
                 >
                   <span
                     aria-hidden
-                    className="inline-block shrink-0 transition-transform duration-300 ease-out group-hover:-translate-x-1.5"
+                    className="mt-1 inline-block shrink-0 transition-transform duration-300 ease-out group-hover:-translate-x-1.5 sm:mt-1.5"
                   >
                     ←
                   </span>
-                  <span className="min-w-0 truncate">
-                    {previousProject.clientName} — {previousProject.heroHeadline}
+                  <span className="text-white/70 transition group-hover:text-white">
+                    <span className="text-accent">{previousProject.clientName}</span> —{" "}
+                    {previousProject.heroHeadline}
                   </span>
                 </Link>
               ) : (
@@ -276,14 +278,14 @@ export default async function ProjectDetailPage({
               {nextProject ? (
                 <Link
                   href={`/proyectos/${nextProject.slug}`}
-                  className="group flex max-w-[45%] items-center justify-end gap-3 text-right text-lg font-normal text-white/70 transition hover:text-white sm:max-w-sm sm:text-2xl"
+                  className="group flex max-w-[45%] items-start justify-end gap-3 text-right text-lg font-normal sm:max-w-sm sm:text-2xl"
                 >
-                  <span className="min-w-0 truncate">
-                    {nextProject.clientName} — {nextProject.heroHeadline}
+                  <span className="text-white/70 transition group-hover:text-white">
+                    <span className="text-accent">{nextProject.clientName}</span> — {nextProject.heroHeadline}
                   </span>
                   <span
                     aria-hidden
-                    className="inline-block shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1.5"
+                    className="mt-1 inline-block shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1.5 sm:mt-1.5"
                   >
                     →
                   </span>
