@@ -249,23 +249,27 @@ export default async function ProjectDetailPage({
         {(previousProject || nextProject) && (
           <Reveal as="section" className="px-6 pb-24 sm:px-14 section-gap">
             {/* Navegación simple entre proyectos: dos links de texto, uno a
-                cada lado, en vez de la tarjeta pesada de antes. La animación
-                al pasar el mouse queda solo en la flecha (no en todo el
-                bloque) para que se sienta como un gesto chico, no un botón. */}
-            <div className="flex items-center justify-between gap-4 border-t border-white/10 pt-10">
+                cada lado, en vez de la tarjeta pesada de antes. Debajo del
+                rótulo (Anterior/Siguiente) va el nombre real del próximo
+                proyecto, no un texto genérico. La animación al pasar el
+                mouse queda solo en la flecha (no en todo el bloque) para
+                que se sienta como un gesto chico, no un botón. */}
+            <div className="flex items-start justify-between gap-4 border-t border-white/10 pt-10">
               {previousProject ? (
                 <Link
                   href={`/proyectos/${previousProject.slug}`}
-                  className="group flex items-center gap-3 text-lg font-normal text-white/70 transition hover:text-white sm:text-2xl"
+                  className="group flex max-w-[45%] flex-col gap-2 sm:max-w-xs"
                 >
-                  <span
-                    aria-hidden
-                    className="inline-block transition-transform duration-300 ease-out group-hover:-translate-x-1.5"
-                  >
-                    ←
+                  <span className="text-xs font-bold uppercase tracking-wide text-white/40">Anterior</span>
+                  <span className="flex items-center gap-3 text-lg font-normal text-white/70 transition group-hover:text-white sm:text-2xl">
+                    <span
+                      aria-hidden
+                      className="inline-block shrink-0 transition-transform duration-300 ease-out group-hover:-translate-x-1.5"
+                    >
+                      ←
+                    </span>
+                    <span className="line-clamp-2">{previousProject.title}</span>
                   </span>
-                  <span className="sm:hidden">Anterior</span>
-                  <span className="hidden sm:inline">Proyecto anterior</span>
                 </Link>
               ) : (
                 <span />
@@ -273,15 +277,17 @@ export default async function ProjectDetailPage({
               {nextProject ? (
                 <Link
                   href={`/proyectos/${nextProject.slug}`}
-                  className="group flex items-center gap-3 text-lg font-normal text-white/70 transition hover:text-white sm:text-2xl"
+                  className="group flex max-w-[45%] flex-col items-end gap-2 text-right sm:max-w-xs"
                 >
-                  <span className="sm:hidden">Siguiente</span>
-                  <span className="hidden sm:inline">Siguiente proyecto</span>
-                  <span
-                    aria-hidden
-                    className="inline-block transition-transform duration-300 ease-out group-hover:translate-x-1.5"
-                  >
-                    →
+                  <span className="text-xs font-bold uppercase tracking-wide text-white/40">Siguiente</span>
+                  <span className="flex items-center gap-3 text-lg font-normal text-white/70 transition group-hover:text-white sm:text-2xl">
+                    <span className="line-clamp-2">{nextProject.title}</span>
+                    <span
+                      aria-hidden
+                      className="inline-block shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1.5"
+                    >
+                      →
+                    </span>
                   </span>
                 </Link>
               ) : (
