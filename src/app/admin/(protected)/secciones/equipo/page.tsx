@@ -36,9 +36,9 @@ export default async function EquipoPage() {
             <label className={labelClass}>Foto (opcional)</label>
             <input name="photo" type="file" accept="image/*" className="text-sm text-white/70" />
             <UploadHint
-              spots={[{ where: "Grilla de equipo en Quiénes somos", size: "96×96px, recortada en círculo" }]}
-              format="JPG o WEBP, mínimo 400×400px"
-              note="cuadrada, con la cara centrada"
+              sizes={[{ mobile: "400×400px" }]}
+              format="JPG o WEBP"
+              note="cuadrada, con la cara centrada — se recorta en círculo"
             />
           </div>
           <SaveButton label="Agregar" />

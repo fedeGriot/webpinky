@@ -100,6 +100,16 @@ export async function getNextProject(order: number) {
   return first ? mapProject(first) : null;
 }
 
+export async function getPreviousProject(order: number) {
+  const previous = await prisma.project.findFirst({
+    where: { order: { lt: order } },
+    orderBy: { order: "desc" },
+  });
+  if (previous) return mapProject(previous);
+  const last = await prisma.project.findFirst({ orderBy: { order: "desc" } });
+  return last ? mapProject(last) : null;
+}
+
 export async function getMeetingRequests() {
   return prisma.meetingRequest.findMany({ orderBy: { createdAt: "desc" } });
 }

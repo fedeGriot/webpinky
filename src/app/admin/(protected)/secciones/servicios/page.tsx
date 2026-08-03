@@ -2,6 +2,7 @@ import { getServices } from "@/lib/data";
 import { createService, updateService, deleteService } from "@/lib/actions/sections";
 import { SaveButton } from "@/components/admin/save-button";
 import { DeleteButton } from "@/components/admin/delete-button";
+import { UploadHint } from "@/components/admin/upload-hint";
 import { inputClass, labelClass, textareaClass } from "@/components/admin/form-styles";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
@@ -36,6 +37,8 @@ export default async function ServiciosPage() {
             <ServiceFields
               defaultOrder={service.order}
               defaultIcon={service.icon}
+              defaultIconUrl={service.iconUrl}
+              defaultIconAccentUrl={service.iconAccentUrl}
               defaultSlug={service.slug}
               defaultTitle={service.title}
               defaultTagline={service.tagline}
@@ -59,6 +62,8 @@ export default async function ServiciosPage() {
 function ServiceFields({
   defaultOrder,
   defaultIcon = "✦",
+  defaultIconUrl = null,
+  defaultIconAccentUrl = null,
   defaultSlug = "",
   defaultTitle = "",
   defaultTagline = "",
@@ -67,6 +72,8 @@ function ServiceFields({
 }: {
   defaultOrder: number;
   defaultIcon?: string;
+  defaultIconUrl?: string | null;
+  defaultIconAccentUrl?: string | null;
   defaultSlug?: string;
   defaultTitle?: string;
   defaultTagline?: string;
@@ -77,7 +84,7 @@ function ServiceFields({
     <>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Ícono</label>
+          <label className={labelClass}>Ícono (emoji de respaldo)</label>
           <input name="icon" defaultValue={defaultIcon} className={inputClass} />
         </div>
         <div className="col-span-2 flex flex-col gap-1.5">
@@ -89,6 +96,44 @@ function ServiceFields({
           <input name="order" type="number" defaultValue={defaultOrder} className={inputClass} />
         </div>
       </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="flex flex-col gap-1.5">
+          <label className={labelClass}>Ilustración (opcional)</label>
+          <div className="flex items-center gap-3">
+            {defaultIconUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={defaultIconUrl} alt="" className="h-12 w-12 shrink-0 rounded-lg bg-white/5 object-contain p-1" />
+            )}
+            <input name="iconImage" type="file" accept="image/*" className="flex-1 text-sm text-white/70" />
+          </div>
+          <UploadHint
+            sizes={[{ mobile: "500×500px" }]}
+            format="PNG con fondo transparente"
+            note="tarjetas de servicio en Home y en la lista de ¿Qué hacemos?. Si no se carga, se muestra el emoji de respaldo."
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className={labelClass}>Ilustración — versión acento (opcional)</label>
+          <div className="flex items-center gap-3">
+            {defaultIconAccentUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={defaultIconAccentUrl}
+                alt=""
+                className="h-12 w-12 shrink-0 rounded-lg bg-white/5 object-contain p-1"
+              />
+            )}
+            <input name="iconAccentImage" type="file" accept="image/*" className="flex-1 text-sm text-white/70" />
+          </div>
+          <UploadHint
+            sizes={[{ mobile: "500×500px" }]}
+            format="PNG con fondo transparente"
+            note="versión más grande en el detalle de cada servicio en ¿Qué hacemos?. Si no se carga, se muestra el emoji de respaldo."
+          />
+        </div>
+      </div>
+
       <div className="flex flex-col gap-1.5">
         <label className={labelClass}>Título</label>
         <input name="title" defaultValue={defaultTitle} required className={inputClass} />

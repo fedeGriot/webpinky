@@ -175,11 +175,17 @@ export async function deleteClient(formData: FormData) {
 
 export async function createService(formData: FormData) {
   await verifySession();
+  const icon = formData.get("iconImage") as File | null;
+  const iconAccent = formData.get("iconAccentImage") as File | null;
+  const iconUrl = icon && icon.size > 0 ? await saveUploadedFile(icon) : null;
+  const iconAccentUrl = iconAccent && iconAccent.size > 0 ? await saveUploadedFile(iconAccent) : null;
   await prisma.service.create({
     data: {
       slug: str(formData, "slug"),
       order: int(formData, "order"),
       icon: str(formData, "icon") || "✦",
+      iconUrl,
+      iconAccentUrl,
       title: str(formData, "title"),
       tagline: str(formData, "tagline"),
       description: sanitizeRichText(str(formData, "description")),
@@ -194,12 +200,18 @@ export async function createService(formData: FormData) {
 export async function updateService(formData: FormData) {
   await verifySession();
   const id = str(formData, "id");
+  const icon = formData.get("iconImage") as File | null;
+  const iconAccent = formData.get("iconAccentImage") as File | null;
+  const iconUrl = icon && icon.size > 0 ? await saveUploadedFile(icon) : undefined;
+  const iconAccentUrl = iconAccent && iconAccent.size > 0 ? await saveUploadedFile(iconAccent) : undefined;
   await prisma.service.update({
     where: { id },
     data: {
       slug: str(formData, "slug"),
       order: int(formData, "order"),
       icon: str(formData, "icon") || "✦",
+      ...(iconUrl !== undefined ? { iconUrl } : {}),
+      ...(iconAccentUrl !== undefined ? { iconAccentUrl } : {}),
       title: str(formData, "title"),
       tagline: str(formData, "tagline"),
       description: sanitizeRichText(str(formData, "description")),

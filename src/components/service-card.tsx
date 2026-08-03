@@ -6,6 +6,8 @@ export type ServiceCardData = {
   slug: string;
   order: number;
   icon: string;
+  iconUrl?: string | null;
+  iconAccentUrl?: string | null;
   title: string;
   tagline: string;
   description: string;
@@ -37,7 +39,12 @@ export function ServiceCard({
           <p className="mt-2 text-sm font-bold text-accent">{service.tagline}</p>
         </div>
         <div className="flex h-20 w-20 shrink-0 items-center justify-center">
-          <ServiceIcon slug={service.slug} fallback={service.icon} className="h-[76px] w-[76px]" />
+          <ServiceIcon
+            iconUrl={service.iconUrl}
+            iconAccentUrl={service.iconAccentUrl}
+            fallback={service.icon}
+            className="h-[76px] w-[76px]"
+          />
         </div>
       </Link>
     );
@@ -56,7 +63,12 @@ export function ServiceCard({
           <h3 className="text-2xl font-extrabold leading-tight text-white">{service.title}.</h3>
         </div>
         <div className="flex h-24 w-24 shrink-0 items-center justify-center">
-          <ServiceIcon slug={service.slug} fallback={service.icon} className="h-20 w-20" />
+          <ServiceIcon
+            iconUrl={service.iconUrl}
+            iconAccentUrl={service.iconAccentUrl}
+            fallback={service.icon}
+            className="h-20 w-20"
+          />
         </div>
       </div>
       <p className="text-base font-bold text-accent">{service.tagline}</p>

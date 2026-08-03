@@ -73,14 +73,16 @@ model Client {
 }
 
 model Service {
-  id          String @id @default(cuid())
-  slug        String @unique
-  order       Int    @default(0)
-  icon        String @default("✦")
-  title       String
-  tagline     String
-  description String
-  bulletsJson String
+  id            String  @id @default(cuid())
+  slug          String  @unique
+  order         Int     @default(0)
+  icon          String  @default("✦")
+  iconUrl       String?
+  iconAccentUrl String?
+  title         String
+  tagline       String
+  description   String
+  bulletsJson   String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

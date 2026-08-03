@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
-import { getProjectBySlug, getNextProject } from "@/lib/data";
+import { getProjectBySlug, getNextProject, getPreviousProject } from "@/lib/data";
 import { JsonLd } from "@/components/json-ld";
 import { SITE_URL } from "@/lib/seo";
 import { Reveal } from "@/components/reveal";
@@ -63,7 +63,10 @@ export default async function ProjectDetailPage({
   const project = await getProjectBySlug(slug);
   if (!project) notFound();
 
-  const nextProject = await getNextProject(project.order);
+  const [previousProject, nextProject] = await Promise.all([
+    getPreviousProject(project.order),
+    getNextProject(project.order),
+  ]);
   const videoId = project.videoUrl ? getYouTubeId(project.videoUrl) : null;
 
   const ficha = [
@@ -243,30 +246,48 @@ export default async function ProjectDetailPage({
           </div>
         </Reveal>
 
-        {nextProject && (
+        {(previousProject || nextProject) && (
           <Reveal as="section" className="px-6 pb-24 sm:px-14 section-gap">
-            <Link
-              href={`/proyectos/${nextProject.slug}`}
-              className="group flex items-center justify-between rounded-3xl border border-white/10 bg-card px-8 py-10 sm:px-12 sm:py-14 [background-image:linear-gradient(to_right,var(--color-accent-dark)_50%,transparent_50%)] [background-size:200%_100%] [background-position:100%_0] transition-[background-position] duration-300 ease-out hover:[background-position:0_0] active:[background-position:0_0]"
-            >
-              {/* Degradé animado en vez de span+transform — ver nota en
-                  fill-button.tsx (ese enfoque se rompía en Chrome). Se
-                  mantiene "group" (sin isolate/overflow-hidden, ya no hacen
-                  falta) porque el texto de abajo sigue usando
-                  group-hover para cambiar de color. */}
-              <div>
-                <p className="mb-2 text-sm font-bold uppercase tracking-wide text-white/40 transition group-hover:text-white/70">
-                  Siguiente proyecto
-                </p>
-                <p className="text-3xl font-extrabold text-white sm:text-4xl">
-                  {nextProject.clientName}{" "}
-                  <span className="text-accent transition group-hover:text-white">{nextProject.title}.</span>
-                </p>
-              </div>
-              <span className="shrink-0 text-3xl text-accent transition group-hover:translate-x-1 group-hover:text-white">
-                →
-              </span>
-            </Link>
+            {/* Navegación simple entre proyectos: dos links de texto, uno a
+                cada lado, en vez de la tarjeta pesada de antes. La animación
+                al pasar el mouse queda solo en la flecha (no en todo el
+                bloque) para que se sienta como un gesto chico, no un botón. */}
+            <div className="flex items-center justify-between gap-4 border-t border-white/10 pt-10">
+              {previousProject ? (
+                <Link
+                  href={`/proyectos/${previousProject.slug}`}
+                  className="group flex items-center gap-3 text-lg font-normal text-white/70 transition hover:text-white sm:text-2xl"
+                >
+                  <span
+                    aria-hidden
+                    className="inline-block transition-transform duration-300 ease-out group-hover:-translate-x-1.5"
+                  >
+                    ←
+                  </span>
+                  <span className="sm:hidden">Anterior</span>
+                  <span className="hidden sm:inline">Proyecto anterior</span>
+                </Link>
+              ) : (
+                <span />
+              )}
+              {nextProject ? (
+                <Link
+                  href={`/proyectos/${nextProject.slug}`}
+                  className="group flex items-center gap-3 text-lg font-normal text-white/70 transition hover:text-white sm:text-2xl"
+                >
+                  <span className="sm:hidden">Siguiente</span>
+                  <span className="hidden sm:inline">Siguiente proyecto</span>
+                  <span
+                    aria-hidden
+                    className="inline-block transition-transform duration-300 ease-out group-hover:translate-x-1.5"
+                  >
+                    →
+                  </span>
+                </Link>
+              ) : (
+                <span />
+              )}
+            </div>
           </Reveal>
         )}
       </main>

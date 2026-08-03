@@ -30,12 +30,9 @@ export default async function ClientesPage() {
             <label className={labelClass}>Logo (opcional)</label>
             <input name="logo" type="file" accept="image/*" className="text-sm text-white/70" />
             <UploadHint
-              spots={[
-                { where: "Carrusel de \"Nuestros clientes\" en Home", size: "~150×64px" },
-                { where: "Grilla de clientes en Quiénes somos", size: "~160×64px" },
-              ]}
-              format="PNG con fondo transparente, 400×200px"
-              note="el logo se pinta siempre blanco sólido sin importar su color original — un fondo no transparente lo tapa"
+              sizes={[{ mobile: "400×200px" }]}
+              format="PNG con fondo transparente"
+              note="se pinta siempre blanco sólido sin importar su color original — un fondo no transparente lo tapa"
             />
           </div>
           <SaveButton label="Agregar" />

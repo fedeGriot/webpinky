@@ -139,7 +139,8 @@ export default async function QueHacemosPage() {
                 </div>
                 <div className="flex items-center justify-center">
                   <ServiceIcon
-                    slug={service.slug}
+                    iconUrl={service.iconUrl}
+                    iconAccentUrl={service.iconAccentUrl}
                     fallback={service.icon}
                     variant="accent"
                     className="h-[169px] w-[169px] sm:h-[251px] sm:w-[251px]"

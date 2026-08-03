@@ -148,7 +148,7 @@ export function MeetingForm() {
   }
 
   return (
-    <div className="rounded-3xl border border-white/10 bg-card p-6 sm:p-10">
+    <div className="rounded-3xl bg-card p-6 sm:p-10">
       {/* Honeypot anti-spam: type="hidden" en vez de ocultarlo con CSS. Con
           type="text" (aunque quede fuera de pantalla) algunos navegadores lo
           rellenaban igual al autocompletar el resto del formulario, tratando

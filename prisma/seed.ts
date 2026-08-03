@@ -204,6 +204,11 @@ async function main() {
         slug: s.slug,
         order: i,
         icon: s.icon,
+        // Ilustraciones ya existentes como archivos estáticos — ver la nota
+        // en la migración add_service_icon_urls sobre por qué estos 6
+        // servicios puntuales tienen icono real en vez de emoji.
+        iconUrl: `/icons/services/${s.slug}.png`,
+        iconAccentUrl: `/icons/services-accent/${s.slug}.png`,
         title: s.title,
         tagline: s.tagline,
         description: s.description,
