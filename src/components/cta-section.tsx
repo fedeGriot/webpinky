@@ -1,5 +1,6 @@
 import { Reveal } from "@/components/reveal";
 import { FillButton } from "@/components/fill-button";
+import { SectionEyebrow } from "@/components/section-eyebrow";
 
 export function CtaSection({
   eyebrow,
@@ -18,7 +19,7 @@ export function CtaSection({
       className={`relative overflow-hidden px-6 text-center sm:px-14 ${spacingClassName}`}
     >
       <Reveal>
-        <p className="mb-4 text-sm font-bold uppercase tracking-wide text-white/40">{eyebrow}</p>
+        <SectionEyebrow className="mb-4">{eyebrow}</SectionEyebrow>
         <h2 className="mx-auto max-w-3xl text-4xl font-extrabold leading-tight text-white sm:text-6xl">
           {titleLine1} <span className="text-accent">{titleAccent}</span>
         </h2>

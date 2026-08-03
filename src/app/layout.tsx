@@ -4,6 +4,7 @@ import "./globals.css";
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
 import { SmoothScroll } from "@/components/smooth-scroll";
+import { getSiteSettings } from "@/lib/data";
 
 // Fuentes auto-hospedadas (descargadas de Google Fonts) en vez de next/font/google:
 // evita que el servidor de dev/build dependa de red para compilar el layout raíz.
@@ -52,40 +53,52 @@ export const metadata: Metadata = {
     url: SITE_URL,
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
   },
 };
 
-const organizationJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "AdvertisingAgency",
-  name: "Pinky. The Fit Agency",
-  url: SITE_URL,
-  logo: `${SITE_URL}/logo/pinky-agency-white.png`,
-  description: SITE_DESCRIPTION,
-  foundingDate: "2010",
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: "Gabriel Pereira 2828",
-    addressLocality: "Montevideo",
-    addressCountry: "UY",
-  },
-  sameAs: [
-    "https://www.instagram.com/pinkyuy/",
-    "https://www.linkedin.com/company/pinkyuy/",
-    "https://www.youtube.com/user/pinkyComUy",
-  ],
-};
-
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getSiteSettings();
+
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "AdvertisingAgency",
+    name: "Pinky. The Fit Agency",
+    url: SITE_URL,
+    logo: `${SITE_URL}/logo/pinky-agency-white.png`,
+    description: SITE_DESCRIPTION,
+    foundingDate: "2010",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "Gabriel Pereira 2828",
+      addressLocality: "Montevideo",
+      addressCountry: "UY",
+    },
+    sameAs: [
+      "https://www.instagram.com/pinkyuy/",
+      "https://www.linkedin.com/company/pinkyuy/",
+      "https://www.youtube.com/user/pinkyComUy",
+    ],
+    ...(settings
+      ? {
+          contactPoint: {
+            "@type": "ContactPoint",
+            telephone: settings.phone1,
+            email: settings.email,
+            contactType: "customer service",
+          },
+        }
+      : {}),
+  };
+
   return (
-    <html lang="es" className={`${poppins.variable} ${caveat.variable} h-full antialiased`}>
+    <html lang="es-UY" className={`${poppins.variable} ${caveat.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-ink text-white">
         <JsonLd data={organizationJsonLd} />
         <SmoothScroll />

@@ -10,6 +10,8 @@ import { ServiceCard } from "@/components/service-card";
 import { CtaSection } from "@/components/cta-section";
 import { Reveal } from "@/components/reveal";
 import { FillButton } from "@/components/fill-button";
+import { SectionEyebrow } from "@/components/section-eyebrow";
+import { SectionHeading } from "@/components/section-heading";
 import {
   getHeroContent,
   getClients,
@@ -72,9 +74,9 @@ export default async function HomePage() {
             a tener su propio nivel de apilamiento por encima del blob. */}
         <section id="clientes" className="relative z-10 px-6 pt-16 sm:px-14">
           <Reveal className="mb-8 flex flex-wrap items-end justify-between gap-4">
-            <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
+            <SectionHeading>
               Nuestros <span className="text-accent">clientes</span>
-            </h2>
+            </SectionHeading>
             <p className="text-sm text-white/50">
               +500 marcas · +15 años construyendo relaciones a largo plazo.
             </p>
@@ -102,12 +104,10 @@ export default async function HomePage() {
               entre sí. */}
           <Reveal className="mb-10 flex flex-col items-start gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="mb-3 text-sm font-bold uppercase tracking-wide text-white/40">
-                Trabajos Seleccionados
-              </p>
-              <h2 className="text-3xl font-extrabold leading-tight text-white sm:text-4xl">
+              <SectionEyebrow className="mb-3">Trabajos Seleccionados</SectionEyebrow>
+              <SectionHeading className="leading-tight">
                 Casos que nos <span className="text-accent">enorgullecen</span>
-              </h2>
+              </SectionHeading>
             </div>
             <Link
               href="/proyectos"
@@ -123,15 +123,13 @@ export default async function HomePage() {
         <section className="px-6 sm:px-14 section-gap">
           <Reveal className="mb-10 flex flex-col items-start gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="mb-3 text-sm font-bold uppercase tracking-wide text-white/40">
-                Servicios
-              </p>
-              <h2 className="text-3xl font-extrabold leading-tight text-white sm:text-4xl">
+              <SectionEyebrow className="mb-3">Servicios</SectionEyebrow>
+              <SectionHeading className="leading-tight">
                 ¿Qué <span className="relative inline-block text-accent">
                   hacemos?
                   <span className="absolute -bottom-1 left-0 right-0 -z-10 h-2.5 -rotate-1 rounded-full bg-accent/90" />
                 </span>
-              </h2>
+              </SectionHeading>
             </div>
             <Link
               href="/que-hacemos"

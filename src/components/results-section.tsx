@@ -1,5 +1,7 @@
 import { getStats } from "@/lib/data";
 import { Reveal } from "@/components/reveal";
+import { SectionEyebrow } from "@/components/section-eyebrow";
+import { SectionHeading } from "@/components/section-heading";
 
 // El módulo "Resultados que hablan" siempre muestra 3, pero el admin puede
 // cargar más de 3 en /admin/secciones/stats — de esos, se eligen 3 al azar
@@ -37,10 +39,10 @@ export async function ResultsSection({ bottomPadding = false }: { bottomPadding?
   return (
     <section className={`px-6 sm:px-14 section-gap ${bottomPadding ? "pb-24" : ""}`}>
       <Reveal>
-        <p className="mb-2 text-sm font-bold uppercase tracking-wide text-white/40">Lo que generamos</p>
-        <h2 className="mb-12 text-3xl font-extrabold text-white sm:text-4xl">
+        <SectionEyebrow className="mb-2">Lo que generamos</SectionEyebrow>
+        <SectionHeading className="mb-12">
           Resultados que <span className="text-accent">hablan.</span>
-        </h2>
+        </SectionHeading>
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-3 sm:divide-x sm:divide-white/10">
           {stats.map((stat) => (
             <div key={stat.id} className="sm:px-8 sm:first:pl-0">

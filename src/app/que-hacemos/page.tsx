@@ -109,9 +109,11 @@ export default async function QueHacemosPage() {
 
         {/* Servicios en detalle */}
         <section className="px-6 sm:px-14">
+          <h2 className="sr-only">Servicios en detalle</h2>
           <div className="divide-y divide-white/10">
             {services.map((service, i) => (
               <Reveal
+                as="article"
                 key={service.slug}
                 id={service.slug}
                 delay={Math.min(i * 0.05, 0.2)}
@@ -162,20 +164,20 @@ export default async function QueHacemosPage() {
                 Simple en apariencia, <span className="text-accent">riguroso en la ejecución.</span>
               </span>
             </h2>
-            <div className="grid grid-cols-1 gap-6 text-left sm:grid-cols-2 lg:grid-cols-4">
+            <ol className="grid grid-cols-1 gap-6 text-left sm:grid-cols-2 lg:grid-cols-4">
               {processSteps.map((step, i) => {
                 const { tag, headline } = splitStep(step.title);
                 return (
-                  <div key={step.id} className="rounded-2xl bg-card p-6">
+                  <li key={step.id} className="rounded-2xl bg-card p-6">
                     <span className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-xs font-bold text-white">
                       {String(i + 1).padStart(2, "0")} — {tag}
                     </span>
                     <h3 className="mb-2 text-2xl font-bold text-white">{colorLastWordAsIs(headline)}</h3>
                     <p className="text-sm text-white">{step.description}</p>
-                  </div>
+                  </li>
                 );
               })}
-            </div>
+            </ol>
           </Reveal>
         </section>
 

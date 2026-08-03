@@ -1,17 +1,25 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
 
 const TAGS = {
   div: motion.div,
   section: motion.section,
+  article: motion.article,
+  li: motion.li,
 } as const;
 
 /**
  * Fade + leve desplazamiento hacia arriba cuando el bloque entra en pantalla.
- * `once: true` para que no se repita al volver a scrollear; respeta
- * prefers-reduced-motion vía la regla global en globals.css.
+ * `once: true` para que no se repita al volver a scrollear.
+ *
+ * La regla global de prefers-reduced-motion en globals.css fuerza duraciones
+ * CSS casi nulas, pero Framer Motion interpola estos valores directamente en
+ * JS (no pasa por `transition`/`animation` de CSS), así que esa regla no
+ * alcanza a esta animación — se chequea `useReducedMotion()` acá para
+ * mostrar el contenido directo, sin fade ni desplazamiento, cuando el
+ * usuario lo prefiere.
  */
 export function Reveal({
   children,
@@ -27,6 +35,16 @@ export function Reveal({
   id?: string;
 }) {
   const Component = TAGS[as];
+  const prefersReducedMotion = useReducedMotion();
+
+  if (prefersReducedMotion) {
+    return (
+      <Component id={id} className={className}>
+        {children}
+      </Component>
+    );
+  }
+
   return (
     <Component
       id={id}

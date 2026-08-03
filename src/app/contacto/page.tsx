@@ -5,6 +5,7 @@ import { BackgroundShape } from "@/components/background-shape";
 import { MeetingForm } from "@/components/contacto/meeting-form";
 import { Reveal } from "@/components/reveal";
 import { ResultsSection } from "@/components/results-section";
+import { SectionEyebrow } from "@/components/section-eyebrow";
 
 export const metadata: Metadata = {
   title: "Contacto",
@@ -47,7 +48,7 @@ export default function ContactoPage() {
 
             {/* Formulario */}
             <Reveal delay={0.1}>
-              <p className="mb-2 text-sm font-bold uppercase tracking-wide text-white/40">Solicitar reunión</p>
+              <SectionEyebrow className="mb-2">Solicitar reunión</SectionEyebrow>
               <h2 className="mb-6 text-2xl font-extrabold text-white sm:text-3xl">
                 Contanos sobre tu empresa <span className="text-accent">y sus necesidades.</span>
               </h2>

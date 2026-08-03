@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteNav } from "@/components/site-nav";
@@ -11,6 +12,7 @@ import { VideoLightboxTrigger } from "@/components/video-lightbox";
 import { getYouTubeId } from "@/lib/youtube";
 import { RichTextContent } from "@/components/rich-text-content";
 import { stripHtml } from "@/lib/rich-text";
+import { SectionHeading } from "@/components/section-heading";
 
 // Renderizado dinámico: el contenido viene del CMS y debe reflejarse sin rebuild.
 export const dynamic = "force-dynamic";
@@ -23,11 +25,6 @@ export async function generateMetadata({
   const { slug } = await params;
   const project = await getProjectBySlug(slug);
   if (!project) return {};
-  const ogImage =
-    project.coverImageHeroDesktopUrl ??
-    project.coverImageHeroMobileUrl ??
-    project.coverImageListingUrl ??
-    project.coverImageCarouselUrl;
   return {
     title: project.title,
     description: stripHtml(project.summary),
@@ -36,7 +33,6 @@ export async function generateMetadata({
       title: `${project.title} — Pinky`,
       description: stripHtml(project.summary),
       url: `/proyectos/${slug}`,
-      images: ogImage ? [{ url: ogImage }] : undefined,
     },
   };
 }
@@ -92,14 +88,25 @@ export default async function ProjectDetailPage({
     description: stripHtml(project.summary),
     url: `${SITE_URL}/proyectos/${project.slug}`,
     image: jsonLdImage ? `${SITE_URL}${jsonLdImage}` : undefined,
-    datePublished: `${project.year}`,
+    datePublished: `${project.year}-01-01`,
     creator: { "@type": "Organization", name: "Pinky. The Fit Agency" },
-    about: project.clientName,
+    about: { "@type": "Thing", name: project.clientName },
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Inicio", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Proyectos", item: `${SITE_URL}/proyectos` },
+      { "@type": "ListItem", position: 3, name: project.clientName, item: `${SITE_URL}/proyectos/${project.slug}` },
+    ],
   };
 
   return (
     <>
       <JsonLd data={caseStudyJsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
       <SiteNav active="proyectos" />
       <main>
         <section className="px-6 pt-8 sm:px-14">
@@ -119,16 +126,16 @@ export default async function ProjectDetailPage({
             <RichTextContent html={project.summary} className="mt-6 max-w-xl text-lg text-white" />
           </div>
 
-          <div className="flex flex-col divide-y divide-white/10 border-t border-white/10">
+          <dl className="flex flex-col divide-y divide-white/10 border-t border-white/10">
             {ficha.map((row) => (
               <div key={row.label} className="py-3">
-                <p className="text-xs font-bold uppercase tracking-wide text-white/40">{row.label}</p>
-                <p className="mt-1 font-semibold text-white">{row.value}</p>
+                <dt className="text-xs font-bold uppercase tracking-wide text-white/40">{row.label}</dt>
+                <dd className="mt-1 font-semibold text-white">{row.value}</dd>
               </div>
             ))}
             <div className="py-3">
-              <p className="mb-2 text-xs font-bold uppercase tracking-wide text-white/40">Servicios</p>
-              <div className="flex flex-wrap gap-2">
+              <dt className="mb-2 text-xs font-bold uppercase tracking-wide text-white/40">Servicios</dt>
+              <dd className="flex flex-wrap gap-2">
                 {project.servicesTags.map((tag) => (
                   <span
                     key={tag}
@@ -137,9 +144,9 @@ export default async function ProjectDetailPage({
                     {tag}
                   </span>
                 ))}
-              </div>
+              </dd>
             </div>
-          </div>
+          </dl>
         </section>
 
         {/* Lámina clara: portada + piezas + resultados */}
@@ -155,19 +162,23 @@ export default async function ProjectDetailPage({
             {project.coverImageHeroMobileUrl || project.coverImageHeroDesktopUrl ? (
               <>
                 {(project.coverImageHeroMobileUrl ?? project.coverImageHeroDesktopUrl) && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={project.coverImageHeroMobileUrl ?? project.coverImageHeroDesktopUrl ?? undefined}
+                  <Image
+                    src={project.coverImageHeroMobileUrl ?? project.coverImageHeroDesktopUrl ?? ""}
                     alt={project.title}
-                    className="absolute inset-0 h-full w-full object-cover sm:hidden"
+                    fill
+                    sizes="100vw"
+                    priority
+                    className="object-cover sm:hidden"
                   />
                 )}
                 {(project.coverImageHeroDesktopUrl ?? project.coverImageHeroMobileUrl) && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={project.coverImageHeroDesktopUrl ?? project.coverImageHeroMobileUrl ?? undefined}
+                  <Image
+                    src={project.coverImageHeroDesktopUrl ?? project.coverImageHeroMobileUrl ?? ""}
                     alt={project.title}
-                    className="absolute inset-0 hidden h-full w-full object-cover sm:block"
+                    fill
+                    sizes="100vw"
+                    priority
+                    className="hidden object-cover sm:block"
                   />
                 )}
               </>
@@ -194,10 +205,10 @@ export default async function ProjectDetailPage({
           </div>
 
           {project.pieces.length > 0 && (
-            <Reveal className="mt-14">
-              <h2 className="mb-10 text-3xl font-extrabold text-ink sm:text-4xl">
+            <Reveal as="section" className="mt-14">
+              <SectionHeading tone="ink" className="mb-10">
                 Piezas del <span className="text-accent">proyecto.</span>
-              </h2>
+              </SectionHeading>
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
                 {project.pieces.slice(0, 3).map((piece) => (
                   <div

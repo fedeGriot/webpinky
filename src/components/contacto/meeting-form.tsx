@@ -63,6 +63,7 @@ function ChoiceCards({
         <button
           key={option}
           type="button"
+          aria-pressed={value === option}
           onClick={() => onChange(option)}
           className={`cursor-pointer rounded-2xl border px-5 py-3 text-left text-sm font-semibold transition ${
             value === option
@@ -90,12 +91,13 @@ function Field({ label, optional, children }: { label: string; optional?: boolea
 
 // Nunca usar <label> acá: envuelve varios <button>, y un <label> con más de un
 // elemento "labelable" hace que el navegador resalte el primero al pasar el mouse.
+// <fieldset>/<legend> asocia la pregunta con el grupo de botones sin ese problema.
 function FieldGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex flex-col gap-2 text-left">
-      <p className="text-base font-bold text-accent">{label}</p>
+    <fieldset className="flex flex-col gap-2 text-left">
+      <legend className="text-base font-bold text-accent">{label}</legend>
       {children}
-    </div>
+    </fieldset>
   );
 }
 

@@ -6,6 +6,8 @@ import { BackgroundShape } from "@/components/background-shape";
 import { TeamAvatar } from "@/components/team-avatar";
 import { Reveal } from "@/components/reveal";
 import { RichTextContent } from "@/components/rich-text-content";
+import { SectionEyebrow } from "@/components/section-eyebrow";
+import { SectionHeading } from "@/components/section-heading";
 import {
   getAboutContent,
   getStats,
@@ -114,9 +116,9 @@ export default async function QuienesSomosPage() {
         {/* Growth + stats */}
         <section className="relative z-10 px-6 sm:px-14 section-gap">
           <Reveal className="grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-y-8 sm:gap-x-[150px]">
-            <h2 className="text-3xl font-extrabold leading-tight text-white sm:text-4xl">
+            <SectionHeading className="leading-tight">
               {highlightPhrase(about.growthTitle, "junto a")}
-            </h2>
+            </SectionHeading>
             <p className="leading-relaxed text-white">
               {withBold(about.growthBody, ["growth partner", "2010", "500 marcas"])}
             </p>
@@ -150,10 +152,10 @@ export default async function QuienesSomosPage() {
         {/* Premios */}
         <section className="px-6 text-center sm:px-14 section-gap">
           <Reveal>
-            <p className="mb-2 text-sm font-bold uppercase tracking-wide text-white/40">Premios</p>
-            <h2 className="mb-12 text-3xl font-extrabold text-white sm:text-4xl">
+            <SectionEyebrow className="mb-2">Premios</SectionEyebrow>
+            <SectionHeading className="mb-12">
               Trabajo reconocido en la <span className="text-accent">industria.</span>
-            </h2>
+            </SectionHeading>
             <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-10">
               {AWARDS.map((award) => (
                 <div key={award.name} className="flex h-24 w-40 items-center justify-center">
@@ -172,10 +174,10 @@ export default async function QuienesSomosPage() {
         {/* Cómo trabajamos */}
         <section className="bg-card/40 px-6 py-20 text-center sm:px-14 section-gap">
           <Reveal>
-            <p className="mb-2 text-sm font-bold uppercase tracking-wide text-white/40">¿Cómo trabajamos?</p>
-            <h2 className="mb-12 text-3xl font-extrabold text-white sm:text-4xl">
+            <SectionEyebrow className="mb-2">¿Cómo trabajamos?</SectionEyebrow>
+            <SectionHeading className="mb-12">
               Sin discursos <span className="text-accent">vacíos</span>
-            </h2>
+            </SectionHeading>
           </Reveal>
           <div className="grid grid-cols-1 gap-6 text-left sm:grid-cols-2">
             <Reveal className="rounded-3xl bg-card p-8">
@@ -200,18 +202,19 @@ export default async function QuienesSomosPage() {
         {/* Valores */}
         <section className="px-6 sm:px-14 section-gap">
           <Reveal className="grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-16">
-            <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
+            <SectionHeading>
               Cosas en las que <span className="text-accent">creemos.</span>
-            </h2>
+            </SectionHeading>
             <p className="text-white">
               No son slogans ni frases de manual. Son los principios que guían cada decisión que
               tomamos con las marcas que confían en nosotros.
             </p>
           </Reveal>
 
-          <div className="mt-12 divide-y divide-white/10 border-t border-white/10">
+          <ol className="mt-12 divide-y divide-white/10 border-t border-white/10">
             {values.map((value, i) => (
               <Reveal
+                as="li"
                 key={value.id}
                 delay={Math.min(i * 0.08, 0.32)}
                 className="grid grid-cols-1 gap-3 py-7 sm:grid-cols-[280px_1fr] sm:gap-10"
@@ -223,16 +226,16 @@ export default async function QuienesSomosPage() {
                 <p className="text-sm leading-relaxed text-white">{value.description}</p>
               </Reveal>
             ))}
-          </div>
+          </ol>
         </section>
 
         {/* Equipo */}
         <section className="px-6 text-center sm:px-14 section-gap">
           <Reveal>
-            <p className="mb-2 text-sm font-bold uppercase tracking-wide text-white/40">El equipo</p>
-            <h2 className="mb-4 text-3xl font-extrabold text-white sm:text-4xl">
+            <SectionEyebrow className="mb-2">El equipo</SectionEyebrow>
+            <SectionHeading className="mb-4">
               Las personas detrás de <span className="text-accent">Pinky.</span>
-            </h2>
+            </SectionHeading>
             <p className="mx-auto mb-12 max-w-xl text-white">
               Un equipo multidisciplinario que combina estrategia, creatividad, tecnología y pasión
               por las marcas que acompañamos. {team.length} personas, un solo propósito.
@@ -260,10 +263,10 @@ export default async function QuienesSomosPage() {
         <div className="bg-card/40 section-gap">
           <section className="px-6 py-20 text-center sm:px-14">
             <Reveal>
-              <p className="mb-2 text-sm font-bold uppercase tracking-wide text-white/40">Clientes</p>
-              <h2 className="mb-4 text-3xl font-extrabold text-white sm:text-4xl">
+              <SectionEyebrow className="mb-2">Clientes</SectionEyebrow>
+              <SectionHeading className="mb-4">
                 Marcas que confían en <span className="text-accent">nosotros.</span>
-              </h2>
+              </SectionHeading>
               <p className="mx-auto mb-12 max-w-xl text-white">
                 Desde retail y moda hasta tecnología y servicios financieros. Más de 500 marcas
                 construyen su crecimiento con nosotros.
