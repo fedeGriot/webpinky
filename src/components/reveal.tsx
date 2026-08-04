@@ -1,25 +1,30 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 
+const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
+
 const TAGS = {
-  div: motion.div,
-  section: motion.section,
-  article: motion.article,
-  li: motion.li,
+  div: "div",
+  section: "section",
+  article: "article",
+  li: "li",
 } as const;
 
 /**
  * Fade + leve desplazamiento hacia arriba cuando el bloque entra en pantalla.
- * `once: true` para que no se repita al volver a scrollear.
+ * `once: true` (se desconecta el observer apenas dispara una vez) para que
+ * no se repita al volver a scrollear.
  *
- * La regla global de prefers-reduced-motion en globals.css fuerza duraciones
- * CSS casi nulas, pero Framer Motion interpola estos valores directamente en
- * JS (no pasa por `transition`/`animation` de CSS), así que esa regla no
- * alcanza a esta animación — se chequea `useReducedMotion()` acá para
- * mostrar el contenido directo, sin fade ni desplazamiento, cuando el
- * usuario lo prefiere.
+ * IntersectionObserver nativo en vez de `whileInView` de Framer Motion: la
+ * versión anterior (basada en Framer) se quedaba permanentemente en su
+ * estado `initial` (invisible) para cualquier bloque que requiriera scroll
+ * para entrar en pantalla, en producción. No se pudo aislar con certeza si
+ * la causa era Framer, una carrera con la hidratación de Next.js, o el
+ * smooth-scroll de Lenis — así que en vez de perseguir esa causa exacta, se
+ * sacó la dependencia del manejo interno de `whileInView` por completo.
+ * Este observer es mínimo y se controla enteramente acá.
  */
 export function Reveal({
   children,
@@ -37,25 +42,44 @@ export function Reveal({
   id?: string;
 }) {
   const Component = TAGS[as];
-  const prefersReducedMotion = useReducedMotion();
+  const elRef = useRef<HTMLElement | null>(null);
+  const [visible, setVisible] = useState(false);
 
-  if (prefersReducedMotion) {
-    return (
-      <Component id={id} className={className} style={style}>
-        {children}
-      </Component>
+  useEffect(() => {
+    const el = elRef.current;
+    if (!el) return;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setVisible(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "-80px" },
     );
-  }
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <Component
+      ref={(node: HTMLElement | null) => {
+        elRef.current = node;
+      }}
       id={id}
       className={className}
-      style={style}
-      initial={{ opacity: 0, y: 28 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
+      style={{
+        ...style,
+        opacity: visible ? 1 : 0,
+        translate: visible ? "0 0" : "0 28px",
+        transition: `opacity 0.6s ${EASE} ${delay}s, translate 0.6s ${EASE} ${delay}s`,
+      }}
     >
       {children}
     </Component>

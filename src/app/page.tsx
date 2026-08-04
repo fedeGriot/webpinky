@@ -88,9 +88,9 @@ export default async function HomePage() {
               quedar unos px más ancho que el viewport real cuando hay
               scrollbar visible y generar scroll horizontal — este enfoque no
               toca unidades de viewport, así que no corre ese riesgo. */}
-          <div className="-mx-6 sm:-mx-14">
+          <Reveal className="-mx-6 sm:-mx-14">
             <ClientsMarquee clients={clients} />
-          </div>
+          </Reveal>
         </section>
 
         {/* Proyectos destacados */}
