@@ -3,7 +3,14 @@ import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import crypto from "crypto";
 
-const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
+// RAILWAY_VOLUME_MOUNT_PATH apunta al volumen persistente (/data en prod).
+// Antes esto escribía en public/uploads: esa carpeta vive dentro de la imagen
+// del contenedor, no en el volumen, así que cada deploy (una imagen nueva)
+// la descartaba por completo — los archivos subidos no sobrevivían al
+// siguiente deploy. En local, sin volumen, cae a ./data/uploads (fuera de
+// public/ a propósito, para que el único camino de lectura sea el route
+// handler de abajo, igual que en producción).
+export const UPLOAD_DIR = path.join(process.env.RAILWAY_VOLUME_MOUNT_PATH ?? path.join(process.cwd(), "data"), "uploads");
 const MAX_SIZE_BYTES = 8 * 1024 * 1024;
 
 // SVG queda deliberadamente afuera: es XML y puede contener <script>, que el
@@ -17,6 +24,21 @@ const EXT_BY_TYPE: Record<string, string> = {
   "image/webp": "webp",
   "image/gif": "gif",
 };
+
+const MIME_BY_EXT: Record<string, string> = Object.fromEntries(
+  Object.entries(EXT_BY_TYPE).map(([mime, ext]) => [ext, mime]),
+);
+
+// Nombre generado siempre como <uuid>.<ext> (ver saveUploadedFile). El route
+// handler que sirve estos archivos valida contra esto antes de tocar el
+// filesystem, para no construir una ruta a partir de un parámetro arbitrario.
+const FILENAME_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.(png|jpe?g|webp|gif)$/i;
+
+export function mimeTypeForUploadedFilename(filename: string): string | null {
+  if (!FILENAME_RE.test(filename)) return null;
+  const ext = filename.slice(filename.lastIndexOf(".") + 1).toLowerCase();
+  return MIME_BY_EXT[ext === "jpeg" ? "jpg" : ext] ?? null;
+}
 
 /**
  * Identifica el tipo real de una imagen a partir de sus primeros bytes
@@ -44,9 +66,10 @@ function sniffImageType(buffer: Buffer): string | null {
 }
 
 /**
- * Guarda un archivo subido en public/uploads y devuelve su URL pública.
- * Aislado en un módulo propio para poder cambiar a S3/Cloudinary/Vercel Blob
- * más adelante sin tocar las server actions que lo llaman.
+ * Guarda un archivo subido en UPLOAD_DIR y devuelve su URL pública (servida
+ * por src/app/uploads/[filename]/route.ts). Aislado en un módulo propio para
+ * poder cambiar a S3/Cloudinary/Vercel Blob más adelante sin tocar las
+ * server actions que lo llaman.
  */
 export async function saveUploadedFile(file: File): Promise<string | null> {
   if (!file || file.size === 0) return null;
