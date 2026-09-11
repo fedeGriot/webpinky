@@ -25,6 +25,19 @@ const nextConfig: NextConfig = {
   // no es una falla explotable por sí sola, pero es fingerprinting gratis
   // de la tecnología del backend que no cuesta nada evitar.
   poweredByHeader: false,
+  experimental: {
+    serverActions: {
+      // Next.js limita el body de cada Server Action a 1MB por defecto, sin
+      // relación con el tope de 8MB por archivo que ya valida saveUploadedFile
+      // (src/lib/uploads.ts) — con esto en 1MB, cualquier imagen real (foto de
+      // celular, etc.) fallaba antes de llegar a esa validación, con un 413
+      // silencioso en producción. El form de portada de un proyecto puede
+      // mandar hasta 4 imágenes juntas en un solo submit (Listado, Ficha
+      // Mobile, Ficha Desktop, Carrusel), así que el límite tiene que cubrir
+      // ese peor caso: 4 × 8MB.
+      bodySizeLimit: "32mb",
+    },
+  },
   images: {
     // Todas las imágenes son same-origin (subidas del CMS en public/uploads,
     // o assets estáticos en public/) — no hace falta remotePatterns.
