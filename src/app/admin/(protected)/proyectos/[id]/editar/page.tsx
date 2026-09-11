@@ -118,8 +118,8 @@ export default async function EditarProyectoPage({
             <input name="subtitle" className={inputClass} />
           </div>
           <div className="grid max-w-xs grid-cols-2 gap-3">
-            <UploadBox name="image" title="Mobile" size="330×580px" />
-            <UploadBox name="imageDesktop" title="Escritorio" size="380×670px" />
+            <UploadBox name="image" title="Mobile" size="760×1350px" />
+            <UploadBox name="imageDesktop" title="Escritorio" size="1180×2100px" />
           </div>
           <p className="-mt-1 text-xs text-white/40">Imágenes opcionales — vertical (9:16) en los dos casos, JPG o WEBP.</p>
           <div>
@@ -141,8 +141,8 @@ export default async function EditarProyectoPage({
                 <input type="hidden" name="id" value={piece.id} />
                 <input type="hidden" name="projectId" value={project.id} />
                 <div className="grid grid-cols-2 gap-3">
-                  <UploadBox name="image" title="Mobile" size="330×580px" currentUrl={piece.imageUrl} />
-                  <UploadBox name="imageDesktop" title="Escritorio" size="380×670px" currentUrl={piece.imageDesktopUrl} />
+                  <UploadBox name="image" title="Mobile" size="760×1350px" currentUrl={piece.imageUrl} />
+                  <UploadBox name="imageDesktop" title="Escritorio" size="1180×2100px" currentUrl={piece.imageDesktopUrl} />
                 </div>
                 <div>
                   <SaveButton label="Guardar imágenes" />

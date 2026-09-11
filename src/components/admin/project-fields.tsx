@@ -85,25 +85,25 @@ export function ProjectFields({ defaults = {} }: { defaults?: ProjectFieldDefaul
           <UploadBox
             name="coverImageListing"
             title="Listado de proyectos"
-            size="400×500px"
+            size="1150×1440px"
             currentUrl={defaults.coverImageListingUrl}
           />
           <UploadBox
             name="coverImageHeroMobile"
             title="Ficha del proyecto — Mobile"
-            size="330×390px"
+            size="760×770px"
             currentUrl={defaults.coverImageHeroMobileUrl}
           />
           <UploadBox
             name="coverImageHeroDesktop"
             title="Ficha del proyecto — Escritorio"
-            size="1160×540px"
+            size="3600×1090px"
             currentUrl={defaults.coverImageHeroDesktopUrl}
           />
           <UploadBox
             name="coverImageCarousel"
             title="Carrusel de Home"
-            size="380×680px"
+            size="760×1350px"
             currentUrl={defaults.coverImageCarouselUrl}
           />
         </div>
