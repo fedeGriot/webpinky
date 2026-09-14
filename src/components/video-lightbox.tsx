@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 /** Botón de play que, al hacer click, abre el video de YouTube en una capa a
  * pantalla completa sobre el resto del sitio (con el mismo estilo visual:
@@ -36,39 +37,45 @@ export function VideoLightboxTrigger({ videoId, label }: { videoId: string; labe
         </span>
       </button>
 
-      {open && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/95 p-4 sm:p-10"
-          onClick={() => setOpen(false)}
-        >
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            aria-label="Cerrar video"
-            className="absolute right-5 top-5 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-white/20 text-white transition hover:border-accent hover:text-accent"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
-              <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
-            </svg>
-          </button>
-
+      {open &&
+        // Portal a document.body: cualquier ancestro con transform/translate/
+        // filter (ej. Reveal, una vez revelado) crea un containing block para
+        // los descendientes position:fixed, y este diálogo dejaría de cubrir
+        // la pantalla completa si quedara anidado adentro de uno.
+        createPortal(
           <div
-            className="aspect-video w-full max-w-5xl overflow-hidden rounded-2xl bg-black shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/95 p-4 sm:p-10"
+            onClick={() => setOpen(false)}
           >
-            <iframe
-              key={videoId}
-              src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`}
-              title={label}
-              allow="autoplay; encrypted-media; picture-in-picture"
-              allowFullScreen
-              className="h-full w-full"
-            />
-          </div>
-        </div>
-      )}
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-label="Cerrar video"
+              className="absolute right-5 top-5 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-white/20 text-white transition hover:border-accent hover:text-accent"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
+                <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
+              </svg>
+            </button>
+
+            <div
+              className="aspect-video w-full max-w-5xl overflow-hidden rounded-2xl bg-black shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <iframe
+                key={videoId}
+                src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`}
+                title={label}
+                allow="autoplay; encrypted-media; picture-in-picture"
+                allowFullScreen
+                className="h-full w-full"
+              />
+            </div>
+          </div>,
+          document.body,
+        )}
     </>
   );
 }

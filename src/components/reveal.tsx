@@ -77,7 +77,13 @@ export function Reveal({
       style={{
         ...style,
         opacity: visible ? 1 : 0,
-        translate: visible ? "0 0" : "0 28px",
+        // "none", no "0 0": cualquier valor de translate/transform distinto de
+        // "none" crea un containing block para descendientes position:fixed
+        // (mismo comportamiento que transform). Con "0 0" quedaba aplicado
+        // para siempre después del reveal, y cualquier fixed inset-0 anidado
+        // adentro (ej. el lightbox de video) terminaba encerrado dentro de
+        // este bloque en vez de cubrir la pantalla completa.
+        translate: visible ? "none" : "0 28px",
         transition: `opacity 0.6s ${EASE} ${delay}s, translate 0.6s ${EASE} ${delay}s`,
       }}
     >
