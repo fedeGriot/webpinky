@@ -75,7 +75,6 @@ function projectFieldsFromForm(formData: FormData) {
     industry: str(formData, "industry"),
     year: parseYear(formData),
     featured: formData.get("featured") === "on",
-    order: int(formData, "order"),
     category: str(formData, "category"),
     heroHeadline: str(formData, "heroHeadline"),
     accentColor: parseAccentColor(formData),
@@ -118,9 +117,12 @@ async function saveCoverImages(formData: FormData) {
 export async function createProject(formData: FormData) {
   await verifySession();
   const coverImages = await saveCoverImages(formData);
+  // Se agrega siempre al final — el orden ya no se escribe a mano (ver
+  // moveProject), así que nunca puede chocar con el de otro proyecto.
+  const maxOrder = await prisma.project.aggregate({ _max: { order: true } });
 
   const project = await prisma.project.create({
-    data: { ...projectFieldsFromForm(formData), ...coverImages },
+    data: { ...projectFieldsFromForm(formData), order: (maxOrder._max.order ?? -1) + 1, ...coverImages },
   });
 
   revalidateProjectPaths(project.slug);
@@ -181,6 +183,17 @@ async function swapOrder<T extends Orderable>(
   const current = items[index];
   const neighbor = items[swapWith];
   await Promise.all([save(current.id, neighbor.order), save(neighbor.id, current.order)]);
+}
+
+export async function moveProject(formData: FormData) {
+  await verifySession();
+  const direction = str(formData, "direction") === "up" ? "up" : "down";
+  const projects = await prisma.project.findMany({ orderBy: { order: "asc" } });
+  await swapOrder(projects, str(formData, "id"), direction, (id, order) =>
+    prisma.project.update({ where: { id }, data: { order } }),
+  );
+  revalidateProjectPaths();
+  revalidatePath("/admin/proyectos");
 }
 
 // --- Stats del proyecto ---

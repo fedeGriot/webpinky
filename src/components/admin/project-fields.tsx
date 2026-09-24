@@ -9,7 +9,6 @@ export type ProjectFieldDefaults = {
   industry?: string;
   year?: number;
   featured?: boolean;
-  order?: number;
   category?: string;
   heroHeadline?: string;
   accentColor?: string;
@@ -57,9 +56,6 @@ export function ProjectFields({ defaults = {} }: { defaults?: ProjectFieldDefaul
         </Field>
         <Field label="Categoría">
           <input name="category" defaultValue={defaults.category} required className={inputClass} />
-        </Field>
-        <Field label="Orden (posición)">
-          <input name="order" type="number" defaultValue={defaults.order ?? 0} className={inputClass} />
         </Field>
         <Field label="Color de acento">
           <input

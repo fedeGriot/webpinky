@@ -2,8 +2,11 @@ type ReorderAction = (formData: FormData) => void | Promise<void>;
 
 /**
  * Dos flechas para mover un ítem un lugar arriba/abajo dentro de su lista
- * (piezas, stats) intercambiando su "order" con el vecino — así el admin no
- * tiene que escribir ni entender números de orden a mano.
+ * (proyectos, piezas, stats) intercambiando su "order" con el vecino — así
+ * el admin no tiene que escribir ni entender números de orden a mano.
+ * `projectId` es opcional: solo hace falta para listas anidadas dentro de un
+ * proyecto (piezas, stats); una lista de nivel superior como Proyectos no
+ * tiene ese scope.
  */
 export function ReorderButtons({
   action,
@@ -14,7 +17,7 @@ export function ReorderButtons({
 }: {
   action: ReorderAction;
   id: string;
-  projectId: string;
+  projectId?: string;
   disableUp?: boolean;
   disableDown?: boolean;
 }) {
@@ -22,7 +25,7 @@ export function ReorderButtons({
     <div className="flex gap-1">
       <form action={action}>
         <input type="hidden" name="id" value={id} />
-        <input type="hidden" name="projectId" value={projectId} />
+        {projectId && <input type="hidden" name="projectId" value={projectId} />}
         <input type="hidden" name="direction" value="up" />
         <button
           type="submit"
@@ -35,7 +38,7 @@ export function ReorderButtons({
       </form>
       <form action={action}>
         <input type="hidden" name="id" value={id} />
-        <input type="hidden" name="projectId" value={projectId} />
+        {projectId && <input type="hidden" name="projectId" value={projectId} />}
         <input type="hidden" name="direction" value="down" />
         <button
           type="submit"
