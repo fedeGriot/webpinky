@@ -36,6 +36,36 @@ body {
   font-family: var(--font-sans), sans-serif;
 }
 
+/* Barra de scroll propia solo en desktop (mouse/trackpad): en táctiles la
+   barra nativa es un overlay que aparece al scrollear y conviene dejarla. */
+@media (hover: hover) and (pointer: fine) {
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background-color: var(--background);
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: rgb(255 255 255 / 0.2);
+    background-clip: padding-box;
+    border: 2px solid transparent;
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-accent);
+  }
+
+  /* Solo Firefox: en Chrome/Edge, scrollbar-color pisa a las reglas
+     ::-webkit-scrollbar de arriba (y con ellas el ancho y el hover). */
+  @supports not selector(::-webkit-scrollbar) {
+    html {
+      scrollbar-color: rgb(255 255 255 / 0.2) var(--background);
+      scrollbar-width: thin;
+    }
+  }
+}
+
 /* Espaciado uniforme entre módulos de página (reemplaza a las líneas grises
    separadoras que se quitaron): cada sección/bloque nuevo de una página usa
    esta clase para separarse siempre la misma distancia del anterior. Se deja
