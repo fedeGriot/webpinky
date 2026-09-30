@@ -56,6 +56,14 @@ const nextConfig: NextConfig = {
           { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
         ],
       },
+      {
+        // El subdominio de Railway nunca debe indexarse: el canonical es
+        // pinky.com.uy (NEXT_PUBLIC_SITE_URL) y, si Google indexara las dos
+        // copias, competirían entre sí como contenido duplicado.
+        source: "/(.*)",
+        has: [{ type: "host", value: ".*\\.up\\.railway\\.app" }],
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
     ];
   },
 };
