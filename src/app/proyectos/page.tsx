@@ -95,7 +95,7 @@ export default async function ProyectosPage({
                   </div>
 
                   <div className="mt-4 flex items-start justify-between gap-4">
-                    <p className="text-xl font-bold text-white">{project.clientName}</p>
+                    <h2 className="text-xl font-bold text-white">{project.clientName}</h2>
                     {project.resultBadge && (
                       <p className="shrink-0 text-lg font-extrabold text-accent">{project.resultBadge}</p>
                     )}

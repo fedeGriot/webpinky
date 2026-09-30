@@ -45,7 +45,7 @@ export default async function HomePage() {
           <BackgroundShape shape="01" className="right-[-180px] top-[-40px] h-[680px] w-[680px] opacity-50" />
           <div className="relative z-10 max-w-4xl">
             <h1 className="text-[15vw] font-extrabold leading-[0.96] tracking-[-0.03em] text-white sm:text-[80px] lg:text-[96px]">
-              <span className="block">{hero?.titleLine1}</span>
+              <span className="block">{hero?.titleLine1}</span>{" "}
               <span className="relative inline-block">
                 {hero?.titleAccent}
                 <span className="absolute -bottom-1 -left-1.5 -right-2 -z-10 h-2.5 -rotate-1 rounded-full bg-accent/90" />

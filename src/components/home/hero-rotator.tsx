@@ -24,7 +24,7 @@ export function HeroRotator({ words }: { words: string[] }) {
             transform: i === index ? "translateY(0)" : "translateY(20px)",
           }}
         >
-          <span className="relative inline-block">{word}</span>
+          <span className="relative inline-block">{word}</span>{" "}
         </span>
       ))}
     </span>
