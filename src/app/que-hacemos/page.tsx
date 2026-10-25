@@ -3,6 +3,8 @@ import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { BackgroundShape } from "@/components/background-shape";
 import { ServiceIcon } from "@/components/service-icon";
+import { ServiceAnimation } from "@/components/service-animation";
+import { getServiceAnimation } from "@/lib/service-animations";
 import { CtaSection } from "@/components/cta-section";
 import { Reveal } from "@/components/reveal";
 import { RichTextContent } from "@/components/rich-text-content";
@@ -62,6 +64,22 @@ function colorLastWordAsIs(text: string) {
       {words.length ? " " : ""}
       <span className="text-accent">{last}</span>
     </>
+  );
+}
+
+function ServiceGraphic({ service }: { service: Awaited<ReturnType<typeof getServices>>[number] }) {
+  const animation = getServiceAnimation(service.slug);
+  if (animation) {
+    return <ServiceAnimation {...animation} className="aspect-[720/568] w-full" />;
+  }
+  return (
+    <ServiceIcon
+      iconUrl={service.iconUrl}
+      iconAccentUrl={service.iconAccentUrl}
+      fallback={service.icon}
+      variant="accent"
+      className="h-[169px] w-[169px] sm:h-[251px] sm:w-[251px]"
+    />
   );
 }
 
@@ -140,13 +158,7 @@ export default async function QueHacemosPage() {
                   </ul>
                 </div>
                 <div className="hidden items-center justify-center sm:flex">
-                  <ServiceIcon
-                    iconUrl={service.iconUrl}
-                    iconAccentUrl={service.iconAccentUrl}
-                    fallback={service.icon}
-                    variant="accent"
-                    className="h-[169px] w-[169px] sm:h-[251px] sm:w-[251px]"
-                  />
+                  <ServiceGraphic service={service} />
                 </div>
               </Reveal>
             ))}
