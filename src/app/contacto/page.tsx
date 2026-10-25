@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { BackgroundShape } from "@/components/background-shape";
+import { DecorativeVideo } from "@/components/decorative-video";
 import { MeetingForm } from "@/components/contacto/meeting-form";
 import { Reveal } from "@/components/reveal";
 import { ResultsSection } from "@/components/results-section";
@@ -28,7 +29,7 @@ export default function ContactoPage() {
       <SiteNav active="contacto" />
       <main>
         <section className="relative overflow-hidden px-6 pt-16 sm:px-14 sm:pt-20">
-          <BackgroundShape shape="08" className="right-[-140px] top-[-80px] h-[520px] w-[520px] opacity-10" />
+          <BackgroundShape className="right-[-140px] top-[-80px] h-[520px] w-[520px] opacity-10" />
           <div className="relative z-10 grid grid-cols-1 gap-14 lg:grid-cols-[1fr_1.2fr] lg:gap-20">
             {/* Presentación */}
             <Reveal>
@@ -44,6 +45,13 @@ export default function ContactoPage() {
                 o mejorar su performance digital.{" "}
                 <span className="font-bold">Completá el formulario y coordinamos una reunión.</span>
               </p>
+              {/* Solo desktop: en mobile el formulario va justo debajo de este
+                  texto, y la animación lo empujaría ~300px hacia abajo. */}
+              <DecorativeVideo
+                src="/videos/contacto/personaje.mp4"
+                poster="/videos/contacto/personaje.jpg"
+                className="mt-12 hidden aspect-[720/568] w-full max-w-md lg:block"
+              />
             </Reveal>
 
             {/* Formulario */}

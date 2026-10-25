@@ -36,7 +36,7 @@ export default async function ProyectosPage({
       <main>
         {/* Hero */}
         <section className="relative px-6 pb-12 pt-16 sm:px-14 sm:pt-20">
-          <BackgroundShape shape="09" className="right-[-120px] top-[-60px] h-[560px] w-[560px] opacity-10" />
+          <BackgroundShape className="right-[-120px] top-[-60px] h-[560px] w-[560px] opacity-10" />
           <div className="relative z-10">
             <h1 className="relative inline-block text-5xl font-extrabold leading-[1.05] text-white sm:text-7xl">
               {cliente ? cliente : "Proyectos"}

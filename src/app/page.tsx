@@ -42,7 +42,7 @@ export default async function HomePage() {
       <main>
         {/* Hero */}
         <section className="relative px-6 pb-20 pt-20 sm:px-14 sm:pt-24">
-          <BackgroundShape shape="01" className="right-[-180px] top-[-40px] h-[680px] w-[680px] opacity-50" />
+          <BackgroundShape className="right-[-180px] top-[-40px] h-[680px] w-[680px] opacity-50" />
           <div className="relative z-10 max-w-4xl">
             <h1 className="text-[15vw] font-extrabold leading-[0.96] tracking-[-0.03em] text-white sm:text-[80px] lg:text-[96px]">
               <span className="block">{hero?.titleLine1}</span>{" "}

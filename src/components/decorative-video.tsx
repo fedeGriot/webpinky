@@ -10,11 +10,22 @@ const EDGE_FADE =
   "linear-gradient(to right, transparent, #000 6%, #000 94%, transparent), linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent)";
 
 /**
- * Animación decorativa de un servicio. Solo carga y reproduce mientras está
- * en pantalla (preload="none" + IntersectionObserver), para no bajar los seis
- * videos al entrar a la página. Con prefers-reduced-motion queda el póster.
+ * Video decorativo en loop (personajes, manchas del hero). Solo carga y
+ * reproduce mientras está en pantalla (preload="none" + IntersectionObserver),
+ * para no bajar todos los videos al entrar a la página. Con
+ * prefers-reduced-motion queda el póster.
  */
-export function ServiceAnimation({ src, poster, className = "" }: { src: string; poster: string; className?: string }) {
+export function DecorativeVideo({
+  src,
+  poster,
+  className = "",
+  fadeEdges = true,
+}: {
+  src: string;
+  poster: string;
+  className?: string;
+  fadeEdges?: boolean;
+}) {
   const ref = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -49,7 +60,7 @@ export function ServiceAnimation({ src, poster, className = "" }: { src: string;
       preload="none"
       aria-hidden="true"
       className={className}
-      style={{ maskImage: EDGE_FADE, maskComposite: "intersect", WebkitMaskComposite: "source-in" }}
+      style={fadeEdges ? { maskImage: EDGE_FADE, maskComposite: "intersect", WebkitMaskComposite: "source-in" } : undefined}
     />
   );
 }

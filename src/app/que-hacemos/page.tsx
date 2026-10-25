@@ -3,7 +3,7 @@ import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { BackgroundShape } from "@/components/background-shape";
 import { ServiceIcon } from "@/components/service-icon";
-import { ServiceAnimation } from "@/components/service-animation";
+import { DecorativeVideo } from "@/components/decorative-video";
 import { getServiceAnimation } from "@/lib/service-animations";
 import { CtaSection } from "@/components/cta-section";
 import { Reveal } from "@/components/reveal";
@@ -70,7 +70,7 @@ function colorLastWordAsIs(text: string) {
 function ServiceGraphic({ service }: { service: Awaited<ReturnType<typeof getServices>>[number] }) {
   const animation = getServiceAnimation(service.slug);
   if (animation) {
-    return <ServiceAnimation {...animation} className="aspect-[720/568] w-full" />;
+    return <DecorativeVideo {...animation} className="aspect-[720/568] w-full" />;
   }
   return (
     <ServiceIcon
@@ -96,7 +96,7 @@ export default async function QueHacemosPage() {
       <main>
         {/* Hero */}
         <section className="relative px-6 pt-16 sm:px-14 sm:pt-20">
-          <BackgroundShape shape="02" className="right-[-140px] top-[-60px] h-[600px] w-[600px] opacity-50" />
+          <BackgroundShape className="right-[-140px] top-[-60px] h-[600px] w-[600px] opacity-50" />
           <div className="relative z-10 max-w-2xl">
             <h1 className="text-4xl font-extrabold leading-[1.05] text-white sm:text-6xl">
               Todo lo que tu marca necesita,{" "}

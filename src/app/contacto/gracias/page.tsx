@@ -22,7 +22,7 @@ export default function GraciasPage() {
       <SiteNav active="contacto" />
       <main>
         <section className="relative overflow-hidden px-6 pt-24 sm:px-14 sm:pt-32">
-          <BackgroundShape shape="08" className="right-[-140px] top-[-80px] h-[520px] w-[520px] opacity-10" />
+          <BackgroundShape className="right-[-140px] top-[-80px] h-[520px] w-[520px] opacity-10" />
           <div className="relative z-10 mx-auto max-w-xl text-center">
             <p className="text-sm font-bold uppercase tracking-wide text-accent">Solicitud recibida</p>
             <h1 className="mt-3 text-4xl font-extrabold leading-[1.05] text-white sm:text-5xl">

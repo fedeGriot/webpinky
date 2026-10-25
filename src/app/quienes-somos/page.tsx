@@ -102,7 +102,7 @@ export default async function QuienesSomosPage() {
       <main>
         {/* Hero */}
         <section className="relative px-6 pb-7 pt-16 sm:px-14 sm:pt-20">
-          <BackgroundShape shape="03" className="right-[-140px] top-[-40px] h-[600px] w-[600px] opacity-50" />
+          <BackgroundShape className="right-[-140px] top-[-40px] h-[600px] w-[600px] opacity-50" />
           <div className="relative z-10 max-w-2xl">
             <h1 className="text-4xl font-extrabold leading-[1.05] text-white sm:text-6xl">
               {renderHeroTitle(about.heroTitle)}
