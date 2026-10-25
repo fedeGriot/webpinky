@@ -17,11 +17,15 @@ const EDGE_FADE =
  */
 export function DecorativeVideo({
   src,
+  webmSrc,
   poster,
   className = "",
   fadeEdges = true,
 }: {
+  /** MP4 (H.264): lo reproduce cualquier navegador. */
   src: string;
+  /** VP9 opcional, más liviano a igual calidad; si está, se prefiere sobre el MP4. */
+  webmSrc?: string;
   poster: string;
   className?: string;
   fadeEdges?: boolean;
@@ -52,7 +56,7 @@ export function DecorativeVideo({
   return (
     <video
       ref={ref}
-      src={src}
+      src={webmSrc ? undefined : src}
       poster={poster}
       muted
       loop
@@ -61,6 +65,13 @@ export function DecorativeVideo({
       aria-hidden="true"
       className={className}
       style={fadeEdges ? { maskImage: EDGE_FADE, maskComposite: "intersect", WebkitMaskComposite: "source-in" } : undefined}
-    />
+    >
+      {webmSrc && (
+        <>
+          <source src={webmSrc} type="video/webm" />
+          <source src={src} type="video/mp4" />
+        </>
+      )}
+    </video>
   );
 }
