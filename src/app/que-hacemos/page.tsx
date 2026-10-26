@@ -70,7 +70,7 @@ function colorLastWordAsIs(text: string) {
 function ServiceGraphic({ service }: { service: Awaited<ReturnType<typeof getServices>>[number] }) {
   const animation = getServiceAnimation(service.slug);
   if (animation) {
-    return <DecorativeVideo {...animation} className="aspect-[720/568] w-full" />;
+    return <DecorativeVideo {...animation} isolated className="aspect-[960/756] w-full" />;
   }
   return (
     <ServiceIcon
@@ -135,9 +135,9 @@ export default async function QueHacemosPage() {
                 key={service.slug}
                 id={service.slug}
                 delay={Math.min(i * 0.05, 0.2)}
-                className="grid grid-cols-1 gap-6 py-16 sm:grid-cols-[48px_1fr_360px] sm:items-center sm:gap-10"
+                className="grid grid-cols-1 gap-6 py-16 lg:grid-cols-[48px_1fr_360px] lg:items-center lg:gap-10"
               >
-                <p className="text-2xl font-extrabold text-accent sm:self-start">
+                <p className="text-2xl font-extrabold text-accent lg:self-start">
                   {String(i + 1).padStart(2, "0")}
                 </p>
                 <div>
@@ -157,7 +157,9 @@ export default async function QueHacemosPage() {
                     ))}
                   </ul>
                 </div>
-                <div className="hidden items-center justify-center sm:flex">
+                {/* Mobile/tablet: arriba del servicio, apilado. Desde lg, tercera
+                    columna (en sm-md las 3 columnas dejaban el texto en ~220px). */}
+                <div className="order-first mx-auto flex w-full max-w-sm items-center justify-center lg:order-none lg:max-w-none">
                   <ServiceGraphic service={service} />
                 </div>
               </Reveal>

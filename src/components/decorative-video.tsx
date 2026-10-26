@@ -2,33 +2,39 @@
 
 import { useEffect, useRef } from "react";
 
-// Fondo del video (~#2d2347, con ruido de compresión) vs. fondo del sitio
-// (#2b2247): casi iguales pero no idénticos, así que los bordes se funden con
-// un desvanecido en vez de cortar en seco. 6% queda por fuera del personaje
-// (el recorte deja ~3-5% de margen); solo afecta los puntos del blob.
-const EDGE_FADE =
-  "linear-gradient(to right, transparent, #000 6%, #000 94%, transparent), linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent)";
-
 /**
  * Video decorativo en loop (personajes, manchas del hero). Solo carga y
  * reproduce mientras está en pantalla (preload="none" + IntersectionObserver),
  * para no bajar todos los videos al entrar a la página. Con
  * prefers-reduced-motion queda el póster.
+ *
+ * Todos los videos se codificaron con el fondo oscurecido por debajo del de
+ * la página (ver scripts de encode); con mix-blend-mode: lighten, todo lo que
+ * no es dibujo muestra el fondo real del sitio, sin recuadro, en cualquier
+ * pantalla y gestión de color.
  */
 export function DecorativeVideo({
   src,
   webmSrc,
   poster,
   className = "",
-  fadeEdges = true,
+  isolated = false,
 }: {
   /** MP4 (H.264): lo reproduce cualquier navegador. */
   src: string;
-  /** VP9 opcional, más liviano a igual calidad; si está, se prefiere sobre el MP4. */
+  /** VP9, más liviano a igual calidad; si está, se prefiere sobre el MP4. */
   webmSrc?: string;
   poster: string;
   className?: string;
-  fadeEdges?: boolean;
+  /**
+   * El blend se resuelve contra lo que hay detrás dentro del mismo stacking
+   * context: si un ancestro crea uno (z-index, opacity < 1, transform...), el
+   * fondo es transparente y se ve el rectángulo oscuro del video. Con
+   * isolated, el video va en un contenedor propio con fondo bg-ink, así el
+   * resultado no depende de dónde esté ubicado. Solo para videos que no se
+   * superponen con otro contenido (personajes): ese fondo es sólido.
+   */
+  isolated?: boolean;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
 
@@ -40,8 +46,8 @@ export function DecorativeVideo({
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          // play() rechaza si el navegador bloquea el autoplay; el póster ya
-          // cubre ese caso, no hace falta hacer nada.
+          // play() rechaza si el navegador bloquea el autoplay (ej. modo de
+          // bajo consumo en iPhone); el póster ya cubre ese caso.
           video.play().catch(() => {});
         } else {
           video.pause();
@@ -53,7 +59,7 @@ export function DecorativeVideo({
     return () => observer.disconnect();
   }, []);
 
-  return (
+  const video = (
     <video
       ref={ref}
       src={webmSrc ? undefined : src}
@@ -63,8 +69,7 @@ export function DecorativeVideo({
       playsInline
       preload="none"
       aria-hidden="true"
-      className={className}
-      style={fadeEdges ? { maskImage: EDGE_FADE, maskComposite: "intersect", WebkitMaskComposite: "source-in" } : undefined}
+      className={`mix-blend-lighten ${isolated ? "h-full w-full object-contain" : className}`}
     >
       {webmSrc && (
         <>
@@ -74,4 +79,6 @@ export function DecorativeVideo({
       )}
     </video>
   );
+
+  return isolated ? <div className={`isolate bg-ink ${className}`}>{video}</div> : video;
 }

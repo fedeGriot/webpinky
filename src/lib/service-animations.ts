@@ -12,5 +12,6 @@ const SLUGS = [
 
 export function getServiceAnimation(slug: string) {
   if (!(SLUGS as readonly string[]).includes(slug)) return null;
-  return { src: `/videos/servicios/${slug}.mp4`, poster: `/videos/servicios/${slug}.jpg` };
+  const base = `/videos/servicios/${slug}`;
+  return { src: `${base}.mp4`, poster: `${base}.jpg` };
 }

@@ -45,12 +45,13 @@ export default function ContactoPage() {
                 o mejorar su performance digital.{" "}
                 <span className="font-bold">Completá el formulario y coordinamos una reunión.</span>
               </p>
-              {/* Solo desktop: en mobile el formulario va justo debajo de este
-                  texto, y la animación lo empujaría ~300px hacia abajo. */}
+              {/* Desktop: debajo del texto. En mobile/tablet va después del
+                  formulario (abajo) para no empujarlo ~300px hacia abajo. */}
               <DecorativeVideo
                 src="/videos/contacto/personaje.mp4"
                 poster="/videos/contacto/personaje.jpg"
-                className="mt-12 hidden aspect-[720/568] w-full max-w-md lg:block"
+                isolated
+                className="mt-12 hidden aspect-[960/756] w-full max-w-md lg:block"
               />
             </Reveal>
 
@@ -62,6 +63,15 @@ export default function ContactoPage() {
               </h2>
               <MeetingForm />
             </Reveal>
+
+            {/* El de cada tamaño que queda con display:none nunca entra en
+                pantalla, así que no se descarga: baja un solo video. */}
+            <DecorativeVideo
+              src="/videos/contacto/personaje.mp4"
+              poster="/videos/contacto/personaje.jpg"
+              isolated
+              className="mx-auto aspect-[960/756] w-full max-w-sm lg:hidden"
+            />
           </div>
         </section>
 

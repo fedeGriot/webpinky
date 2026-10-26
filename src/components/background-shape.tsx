@@ -23,8 +23,7 @@ export function BackgroundShape({ className = "" }: { className?: string }) {
       src={`/videos/manchas/mancha-${n}.mp4`}
       webmSrc={`/videos/manchas/mancha-${n}.webm`}
       poster={`/videos/manchas/mancha-${n}.jpg`}
-      fadeEdges={false}
-      className={`shape-drift pointer-events-none absolute select-none object-contain mix-blend-lighten ${className}`}
+      className={`shape-drift pointer-events-none absolute select-none object-contain ${className}`}
     />
   );
 }
