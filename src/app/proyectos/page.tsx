@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PAGE_DESCRIPTIONS } from "@/lib/seo";
 import Image from "next/image";
 import Link from "next/link";
 import { SiteNav } from "@/components/site-nav";
@@ -12,10 +13,9 @@ import { stripHtml } from "@/lib/rich-text";
 
 export const metadata: Metadata = {
   title: "Proyectos",
-  description:
-    "Casos de éxito de Pinky: estrategia, creatividad y performance aplicados a marcas reales en Uruguay y la región.",
+  description: PAGE_DESCRIPTIONS.proyectos,
   alternates: { canonical: "/proyectos" },
-  openGraph: { title: "Proyectos — Pinky", url: "/proyectos" },
+  openGraph: { title: "Proyectos — Pinky", url: "/proyectos", description: PAGE_DESCRIPTIONS.proyectos },
 };
 
 // Renderizado dinámico: el contenido viene del CMS y debe reflejarse sin rebuild.
@@ -36,7 +36,7 @@ export default async function ProyectosPage({
       <main>
         {/* Hero */}
         <section className="relative px-6 pb-12 pt-16 sm:px-14 sm:pt-20">
-          <BackgroundShape className="right-[-120px] top-[-60px] h-[560px] w-[560px] opacity-10" />
+          <BackgroundShape subtle className="right-[-120px] top-[-60px] h-[560px] w-[560px] opacity-10" />
           <div className="relative z-10">
             <h1 className="relative inline-block text-5xl font-extrabold leading-[1.05] text-white sm:text-7xl">
               {cliente ? cliente : "Proyectos"}
@@ -80,7 +80,8 @@ export default async function ProyectosPage({
                         alt={project.clientName}
                         fill
                         sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 30vw"
-                        priority={i < 3}
+                        loading={i < 3 ? "eager" : "lazy"}
+                        fetchPriority={i === 0 ? "high" : "auto"}
                         className="object-cover transition duration-300 group-hover:scale-105"
                       />
                     ) : (

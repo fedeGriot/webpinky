@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PAGE_DESCRIPTIONS } from "@/lib/seo";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { BackgroundShape } from "@/components/background-shape";
@@ -13,10 +14,9 @@ import { getServices, getProcessSteps, getAboutContent } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "¿Qué hacemos?",
-  description:
-    "Estrategia, creatividad, performance, branding, producción audiovisual y tecnología: todos los servicios de Pinky bajo un mismo techo para hacer crecer tu marca.",
+  description: PAGE_DESCRIPTIONS.queHacemos,
   alternates: { canonical: "/que-hacemos" },
-  openGraph: { title: "¿Qué hacemos? — Pinky", url: "/que-hacemos" },
+  openGraph: { title: "¿Qué hacemos? — Pinky", url: "/que-hacemos", description: PAGE_DESCRIPTIONS.queHacemos },
 };
 
 // Renderizado dinámico: el contenido viene del CMS y debe reflejarse sin

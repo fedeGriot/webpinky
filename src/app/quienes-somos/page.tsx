@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { PAGE_DESCRIPTIONS } from "@/lib/seo";
+import Image from "next/image";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { CtaSection } from "@/components/cta-section";
@@ -18,10 +20,9 @@ import {
 
 export const metadata: Metadata = {
   title: "¿Quiénes somos?",
-  description:
-    "Desde 2010 acompañamos a más de 500 marcas a crecer. Conocé nuestra historia, cómo trabajamos, nuestro equipo y los clientes que confían en Pinky.",
+  description: PAGE_DESCRIPTIONS.quienesSomos,
   alternates: { canonical: "/quienes-somos" },
-  openGraph: { title: "¿Quiénes somos? — Pinky", url: "/quienes-somos" },
+  openGraph: { title: "¿Quiénes somos? — Pinky", url: "/quienes-somos", description: PAGE_DESCRIPTIONS.quienesSomos },
 };
 
 // mono: true convierte el logo a blanco sólido (brightness-0 invert), igual
@@ -158,12 +159,13 @@ export default async function QuienesSomosPage() {
             </SectionHeading>
             <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-10">
               {AWARDS.map((award) => (
-                <div key={award.name} className="flex h-24 w-40 items-center justify-center">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                <div key={award.name} className="relative h-24 w-40">
+                  <Image
                     src={award.logoUrl}
                     alt={award.name}
-                    className={`max-h-full max-w-full object-contain ${award.mono ? "brightness-0 invert" : ""}`}
+                    fill
+                    sizes="160px"
+                    className={`object-contain ${award.mono ? "brightness-0 invert" : ""}`}
                   />
                 </div>
               ))}
@@ -279,13 +281,14 @@ export default async function QuienesSomosPage() {
                   delay={Math.min(i * 0.025, 0.45)}
                   className="flex w-[calc((100%-48px)/2)] justify-center sm:w-[calc((100%-96px)/3)] lg:w-[calc((100%-144px)/4)]"
                 >
-                  <div className="flex h-16 w-[160px] items-center justify-center">
+                  <div className="relative flex h-16 w-[160px] items-center justify-center">
                     {client.logoUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <Image
                         src={client.logoUrl}
                         alt={client.name}
-                        className="h-full w-full object-contain brightness-0 invert opacity-70 transition hover:opacity-100"
+                        fill
+                        sizes="160px"
+                        className="object-contain brightness-0 invert opacity-70 transition hover:opacity-100"
                       />
                     ) : (
                       <span className="text-center text-sm font-extrabold uppercase tracking-tight text-white/60">

@@ -1,6 +1,7 @@
 import { inputClass, labelClass, textareaClass } from "@/components/admin/form-styles";
 import { UploadBox } from "@/components/admin/upload-box";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
+import { SeoDescriptionField } from "@/components/admin/seo-description-field";
 
 export type ProjectFieldDefaults = {
   slug?: string;
@@ -18,6 +19,7 @@ export type ProjectFieldDefaults = {
   coverImageHeroDesktopUrl?: string | null;
   coverImageCarouselUrl?: string | null;
   summary?: string;
+  seoDescription?: string | null;
   resultBadge?: string | null;
   resultLabel?: string | null;
   challengeTitle?: string;
@@ -111,6 +113,8 @@ export function ProjectFields({ defaults = {} }: { defaults?: ProjectFieldDefaul
       <Field label="Resumen">
         <RichTextEditor name="summary" defaultValue={defaults.summary} />
       </Field>
+
+      <SeoDescriptionField defaultValue={defaults.seoDescription} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label="Resultado destacado (badge, opcional)">

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PAGE_DESCRIPTIONS } from "@/lib/seo";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { BackgroundShape } from "@/components/background-shape";
@@ -10,10 +11,9 @@ import { SectionEyebrow } from "@/components/section-eyebrow";
 
 export const metadata: Metadata = {
   title: "Contacto",
-  description:
-    "Contanos qué necesita tu marca y coordinamos una reunión. Trabajamos con empresas que buscan escalar ventas y mejorar su performance digital.",
+  description: PAGE_DESCRIPTIONS.contacto,
   alternates: { canonical: "/contacto" },
-  openGraph: { title: "Contacto — Pinky", url: "/contacto" },
+  openGraph: { title: "Contacto — Pinky", url: "/contacto", description: PAGE_DESCRIPTIONS.contacto },
 };
 
 // SiteNav/SiteFooter consultan la base (getSiteSettings). Sin esto, Next
@@ -23,13 +23,15 @@ export const metadata: Metadata = {
 // del sitio (ver README).
 export const dynamic = "force-dynamic";
 
+const CONTACT_VIDEO = [{ src: "/videos/contacto/personaje.mp4", type: "video/mp4" }];
+
 export default function ContactoPage() {
   return (
     <>
       <SiteNav active="contacto" />
       <main>
         <section className="relative overflow-hidden px-6 pt-16 sm:px-14 sm:pt-20">
-          <BackgroundShape className="right-[-140px] top-[-80px] h-[520px] w-[520px] opacity-10" />
+          <BackgroundShape subtle className="right-[-140px] top-[-80px] h-[520px] w-[520px] opacity-10" />
           <div className="relative z-10 grid grid-cols-1 gap-14 lg:grid-cols-[1fr_1.2fr] lg:gap-20">
             {/* Presentación */}
             <Reveal>
@@ -48,8 +50,8 @@ export default function ContactoPage() {
               {/* Desktop: debajo del texto. En mobile/tablet va después del
                   formulario (abajo) para no empujarlo ~300px hacia abajo. */}
               <DecorativeVideo
-                src="/videos/contacto/personaje.mp4"
-                poster="/videos/contacto/personaje.jpg"
+                sources={CONTACT_VIDEO}
+                poster="/videos/contacto/personaje.webp"
                 isolated
                 className="mt-12 hidden aspect-[960/756] w-full max-w-md lg:block"
               />
@@ -67,8 +69,8 @@ export default function ContactoPage() {
             {/* El de cada tamaño que queda con display:none nunca entra en
                 pantalla, así que no se descarga: baja un solo video. */}
             <DecorativeVideo
-              src="/videos/contacto/personaje.mp4"
-              poster="/videos/contacto/personaje.jpg"
+              sources={CONTACT_VIDEO}
+              poster="/videos/contacto/personaje.webp"
               isolated
               className="mx-auto aspect-[960/756] w-full max-w-sm lg:hidden"
             />

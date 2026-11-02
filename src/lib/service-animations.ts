@@ -13,5 +13,6 @@ const SLUGS = [
 export function getServiceAnimation(slug: string) {
   if (!(SLUGS as readonly string[]).includes(slug)) return null;
   const base = `/videos/servicios/${slug}`;
-  return { src: `${base}.mp4`, poster: `${base}.jpg` };
+  // Solo MP4: con line art, VP9 a calidad equivalente pesaba más que H.264.
+  return { sources: [{ src: `${base}.mp4`, type: "video/mp4" }], poster: `${base}.webp` };
 }

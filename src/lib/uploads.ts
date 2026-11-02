@@ -2,6 +2,7 @@ import "server-only";
 import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import crypto from "crypto";
+import sharp from "sharp";
 
 // RAILWAY_VOLUME_MOUNT_PATH apunta al volumen persistente (/data en prod).
 // Antes esto escribía en public/uploads: esa carpeta vive dentro de la imagen
@@ -89,9 +90,25 @@ export async function saveUploadedFile(file: File): Promise<string | null> {
 
   await mkdir(UPLOAD_DIR, { recursive: true });
 
-  const ext = EXT_BY_TYPE[realType];
+  const { data, ext } = await optimize(buffer, realType);
   const filename = `${crypto.randomUUID()}.${ext}`;
-  await writeFile(path.join(UPLOAD_DIR, filename), buffer);
+  await writeFile(path.join(UPLOAD_DIR, filename), data);
 
   return `/uploads/${filename}`;
+}
+
+// 3840px: el mayor tamaño pedido en el admin es la portada de escritorio
+// (3600px de ancho para retina). WebP calidad 90 es visualmente sin pérdida y
+// mantiene transparencia (logos); las piezas subidas como PNG pesaban 1–6 MB.
+// Los GIF se guardan tal cual: re-codificarlos puede romper la animación.
+const MAX_DIMENSION = 3840;
+
+async function optimize(buffer: Buffer, type: string): Promise<{ data: Buffer; ext: string }> {
+  if (type === "image/gif") return { data: buffer, ext: EXT_BY_TYPE[type] };
+  const data = await sharp(buffer)
+    .rotate() // aplica la orientación EXIF (fotos de celular) antes de descartar metadata
+    .resize({ width: MAX_DIMENSION, height: MAX_DIMENSION, fit: "inside", withoutEnlargement: true })
+    .webp({ quality: 90, effort: 5 })
+    .toBuffer();
+  return { data, ext: "webp" };
 }

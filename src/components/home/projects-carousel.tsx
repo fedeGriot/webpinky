@@ -160,7 +160,6 @@ export function ProjectsCarousel({ projects }: { projects: CarouselProject[] }) 
                     alt={project.clientName}
                     fill
                     sizes="(max-width: 640px) 82vw, 380px"
-                    priority={i === 0}
                     className="object-cover transition duration-300 group-hover:scale-105"
                   />
                 ) : (

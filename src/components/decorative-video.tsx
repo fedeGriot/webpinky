@@ -2,28 +2,42 @@
 
 import { useEffect, useRef } from "react";
 
+export type VideoSource = { src: string; type: string };
+
 /**
- * Video decorativo en loop (personajes, manchas del hero). Solo carga y
- * reproduce mientras está en pantalla (preload="none" + IntersectionObserver),
- * para no bajar todos los videos al entrar a la página. Con
- * prefers-reduced-motion queda el póster.
+ * Video decorativo en loop (personajes, manchas del hero).
+ *
+ * Carga (auditoría SEO: los videos no tienen que competir con el contenido
+ * principal):
+ * - El póster (WebP liviano, primer cuadro del video) va en el HTML y se ve
+ *   desde el primer pintado. No se puede hacer aparecer el video recién al
+ *   final: el navegador lo toma como el elemento más grande en pantalla y el
+ *   LCP se registra recién cuando aparece. Con el póster queda registrado
+ *   temprano, y el paso al video es imperceptible (es el mismo cuadro).
+ * - El video no baja nada hasta el evento `load` de la página; recién ahí se
+ *   empieza a observar si está en pantalla. El src se asigna al entrar en
+ *   pantalla (primer formato reproducible; versión chica si corresponde).
+ * - Con prefers-reduced-motion, o si el navegador bloquea el autoplay (ej.
+ *   modo de bajo consumo en iPhone), queda el póster quieto.
  *
  * Todos los videos se codificaron con el fondo oscurecido por debajo del de
- * la página (ver scripts de encode); con mix-blend-mode: lighten, todo lo que
- * no es dibujo muestra el fondo real del sitio, sin recuadro, en cualquier
- * pantalla y gestión de color.
+ * la página; con mix-blend-mode: lighten, lo que no es dibujo muestra el
+ * fondo real del sitio, sin recuadro.
  */
 export function DecorativeVideo({
-  src,
-  webmSrc,
+  sources,
+  smallSources,
+  preferSmall = false,
   poster,
   className = "",
   isolated = false,
 }: {
-  /** MP4 (H.264): lo reproduce cualquier navegador. */
-  src: string;
-  /** VP9, más liviano a igual calidad; si está, se prefiere sobre el MP4. */
-  webmSrc?: string;
+  /** En orden de preferencia; se usa el primero que el navegador soporte. */
+  sources: VideoSource[];
+  /** Versión de menor resolución: en pantallas angostas o si preferSmall. */
+  smallSources?: VideoSource[];
+  /** Usar siempre la versión chica (ej. manchas casi transparentes). */
+  preferSmall?: boolean;
   poster: string;
   className?: string;
   /**
@@ -43,41 +57,50 @@ export function DecorativeVideo({
     if (!video) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          // play() rechaza si el navegador bloquea el autoplay (ej. modo de
-          // bajo consumo en iPhone); el póster ya cubre ese caso.
-          video.play().catch(() => {});
-        } else {
-          video.pause();
-        }
-      },
-      { rootMargin: "200px 0px" },
-    );
-    observer.observe(video);
-    return () => observer.disconnect();
-  }, []);
+    let observer: IntersectionObserver | undefined;
+    const start = () => {
+      const useSmall = smallSources && (preferSmall || window.innerWidth < 768);
+      const candidates = useSmall ? smallSources : sources;
+      const playable = candidates.find((s) => video.canPlayType(s.type) !== "");
+      if (!playable) return;
+
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            // El src recién al entrar en pantalla: una instancia oculta con
+            // display:none (ej. la de mobile en desktop) nunca pide nada,
+            // ni siquiera en Safari, que a veces ignora preload="none".
+            if (!video.src) video.src = playable.src;
+            video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
+        },
+        { rootMargin: "200px 0px" },
+      );
+      observer.observe(video);
+    };
+
+    if (document.readyState === "complete") start();
+    else window.addEventListener("load", start, { once: true });
+
+    return () => {
+      window.removeEventListener("load", start);
+      observer?.disconnect();
+    };
+  }, [sources, smallSources, preferSmall]);
 
   const video = (
     <video
       ref={ref}
-      src={webmSrc ? undefined : src}
-      poster={poster}
       muted
       loop
       playsInline
       preload="none"
+      poster={poster}
       aria-hidden="true"
       className={`mix-blend-lighten ${isolated ? "h-full w-full object-contain" : className}`}
-    >
-      {webmSrc && (
-        <>
-          <source src={webmSrc} type="video/webm" />
-          <source src={src} type="video/mp4" />
-        </>
-      )}
-    </video>
+    />
   );
 
   return isolated ? <div className={`isolate bg-ink ${className}`}>{video}</div> : video;

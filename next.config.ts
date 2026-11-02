@@ -37,11 +37,22 @@ const nextConfig: NextConfig = {
       // ese peor caso: 4 × 8MB.
       bodySizeLimit: "32mb",
     },
+    // El CSS (Tailwind, ~9 KB gzip) va en un <style> dentro del HTML en vez
+    // de un <link> aparte: elimina el único recurso que bloqueaba el render
+    // (auditoría SEO, PageSpeed mobile).
+    inlineCss: true,
   },
   images: {
-    // Todas las imágenes son same-origin (subidas del CMS en public/uploads,
-    // o assets estáticos en public/) — no hace falta remotePatterns.
+    // Todas las imágenes son same-origin (subidas del CMS en /uploads, o
+    // assets estáticos en public/) — no hace falta remotePatterns.
     formats: ["image/avif", "image/webp"],
+    // 75 (default) para fotos; 90 para piezas/gráficos con texto o bordes
+    // finos, donde 75 deja artefactos visibles.
+    qualities: [75, 90],
+    // Los nombres de /uploads son UUID (el contenido de una URL no cambia) y
+    // los assets de public/ cambian solo con un deploy: 31 días evita
+    // re-optimizar con sharp cada 4 h (default).
+    minimumCacheTTL: 2678400,
   },
   async headers() {
     return [

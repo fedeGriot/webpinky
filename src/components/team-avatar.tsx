@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const PALETTE = [
   "#D90B91",
   "#E89B52",
@@ -22,11 +24,14 @@ export function TeamAvatar({
 }) {
   if (photoUrl) {
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
+      // 96px en pantalla: next/image sirve 96/192px (1x/2x) en AVIF/WebP en
+      // vez del PNG original (200–460 KB cada foto).
+      <Image
         src={photoUrl}
         alt={title ?? initial}
         title={title}
+        width={96}
+        height={96}
         className="h-24 w-24 rounded-full object-cover shadow-lg shadow-black/30"
       />
     );

@@ -151,6 +151,8 @@ model Project {
   videoUrl                 String?
   accentColor              String  @default("#D90B91")
   summary                  String
+  /// Meta description escrita a mano (SEO). Vacío = se arma sola desde summary.
+  seoDescription           String?
   resultBadge              String?
   resultLabel              String?
   challengeTitle           String

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PAGE_DESCRIPTIONS } from "@/lib/seo";
 import Link from "next/link";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
@@ -22,6 +23,7 @@ import {
 // Sin título propio: la Home hereda el título/descripción por defecto del
 // layout raíz (que ya son el nombre y la descripción del sitio).
 export const metadata: Metadata = {
+  description: PAGE_DESCRIPTIONS.home,
   alternates: { canonical: "/" },
 };
 

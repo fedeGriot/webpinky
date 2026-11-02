@@ -80,6 +80,7 @@ function projectFieldsFromForm(formData: FormData) {
     accentColor: parseAccentColor(formData),
     videoUrl: parseVideoUrl(formData),
     summary: sanitizeRichText(str(formData, "summary")),
+    seoDescription: optionalStr(formData, "seoDescription"),
     resultBadge: optionalStr(formData, "resultBadge"),
     resultLabel: optionalStr(formData, "resultLabel"),
     challengeTitle: str(formData, "challengeTitle"),

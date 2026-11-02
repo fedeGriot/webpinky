@@ -14,7 +14,6 @@
   --color-cream: #f4d83c;
 
   --font-sans: var(--font-poppins);
-  --font-script: var(--font-caveat);
   --font-serif: Georgia, "Times New Roman", serif;
 }
 
@@ -129,6 +128,20 @@ body {
 .group:active .fill-hover-mask {
   -webkit-mask-position: 0 100%;
   mask-position: 0 100%;
+}
+
+/* Entrada de los bloques <Reveal> que ya están en pantalla al cargar: corre
+   con el primer pintado, sin esperar al JS (ver reveal.tsx). "backwards":
+   solo aplica el estado inicial durante el delay; al terminar no deja nada
+   puesto (ni translate, que encerraría a los position:fixed anidados). */
+@keyframes reveal-intro {
+  from {
+    opacity: 0;
+    translate: 0 28px;
+  }
+}
+.reveal-intro {
+  animation: reveal-intro 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0s) backwards;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef } from "react";
 
 type ClientItem = { id: string; name: string; logoUrl: string | null };
@@ -87,14 +88,15 @@ export function ClientsMarquee({ clients }: { clients: ClientItem[] }) {
           <div
             key={`${client.id}-${i}`}
             ref={i === clients.length ? secondSetRef : undefined}
-            className="flex h-16 w-[150px] shrink-0 items-center justify-center"
+            className="relative flex h-16 w-[150px] shrink-0 items-center justify-center"
           >
             {client.logoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={client.logoUrl}
                 alt={client.name}
-                className="h-full w-full object-contain brightness-0 invert opacity-70 transition hover:opacity-100"
+                fill
+                sizes="150px"
+                className="object-contain brightness-0 invert opacity-70 transition hover:opacity-100"
               />
             ) : (
               <span className="whitespace-nowrap text-lg font-extrabold uppercase tracking-tight text-white/70">

@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export function ServiceIcon({
   iconUrl,
   iconAccentUrl,
@@ -15,8 +17,8 @@ export function ServiceIcon({
   if (!url) {
     return <span className="text-2xl">{fallback ?? "✦"}</span>;
   }
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={url} alt="" className={`${className} object-contain`} />
-  );
+  // width/height = el mayor tamaño en que se muestra (251px en ¿Qué hacemos?);
+  // el tamaño real lo da className. next/image sirve 1x/2x de eso en vez del
+  // PNG original de 500px (~120–140 KB).
+  return <Image src={url} alt="" width={256} height={256} className={`${className} object-contain`} />;
 }

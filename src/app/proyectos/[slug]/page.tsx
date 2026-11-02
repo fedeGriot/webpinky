@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { getProjectBySlug, getNextProject, getPreviousProject } from "@/lib/data";
 import { JsonLd } from "@/components/json-ld";
-import { SITE_URL } from "@/lib/seo";
+import { SITE_URL, PROJECT_DESCRIPTION_CTAS } from "@/lib/seo";
+import { buildMetaDescription } from "@/lib/serp-length";
 import { Reveal } from "@/components/reveal";
 import { VideoLightboxTrigger } from "@/components/video-lightbox";
 import { getYouTubeId } from "@/lib/youtube";
@@ -25,13 +26,15 @@ export async function generateMetadata({
   const { slug } = await params;
   const project = await getProjectBySlug(slug);
   if (!project) return {};
+  const description =
+    project.seoDescription?.trim() || buildMetaDescription(stripHtml(project.summary), PROJECT_DESCRIPTION_CTAS);
   return {
     title: project.title,
-    description: stripHtml(project.summary),
+    description,
     alternates: { canonical: `/proyectos/${slug}` },
     openGraph: {
       title: `${project.title} — Pinky`,
-      description: stripHtml(project.summary),
+      description,
       url: `/proyectos/${slug}`,
     },
   };
@@ -52,6 +55,28 @@ function renderHeroTitle(title: string) {
         <span className="absolute -bottom-1 -left-1 -right-2 -z-10 h-2 -rotate-1 rounded-full bg-accent/90" />
       </span>
     </>
+  );
+}
+
+/**
+ * Portada del hero con una imagen por breakpoint (<picture> + getImageProps).
+ * Antes eran dos <Image priority> y una se ocultaba con CSS: las imágenes
+ * prioritarias se descargan aunque estén ocultas, así que bajaban las dos
+ * justo en el momento que mide el LCP. Con <picture> el navegador baja una.
+ */
+function HeroCover({ mobileSrc, desktopSrc, alt }: { mobileSrc: string; desktopSrc: string; alt: string }) {
+  const common = { alt, fill: true, fetchPriority: "high" as const, loading: "eager" as const };
+  const {
+    props: { srcSet: desktop },
+  } = getImageProps({ ...common, src: desktopSrc, sizes: "calc(100vw - 112px)" });
+  const {
+    props: { srcSet: mobile, ...rest },
+  } = getImageProps({ ...common, src: mobileSrc, sizes: "calc(100vw - 48px)" });
+  return (
+    <picture>
+      <source media="(min-width: 640px)" srcSet={desktop} sizes="calc(100vw - 112px)" />
+      <img {...rest} srcSet={mobile} alt={alt} className="object-cover" />
+    </picture>
   );
 }
 
@@ -160,28 +185,11 @@ export default async function ProjectDetailPage({
             }
           >
             {project.coverImageHeroMobileUrl || project.coverImageHeroDesktopUrl ? (
-              <>
-                {(project.coverImageHeroMobileUrl ?? project.coverImageHeroDesktopUrl) && (
-                  <Image
-                    src={project.coverImageHeroMobileUrl ?? project.coverImageHeroDesktopUrl ?? ""}
-                    alt={project.title}
-                    fill
-                    sizes="100vw"
-                    priority
-                    className="object-cover sm:hidden"
-                  />
-                )}
-                {(project.coverImageHeroDesktopUrl ?? project.coverImageHeroMobileUrl) && (
-                  <Image
-                    src={project.coverImageHeroDesktopUrl ?? project.coverImageHeroMobileUrl ?? ""}
-                    alt={project.title}
-                    fill
-                    sizes="100vw"
-                    priority
-                    className="hidden object-cover sm:block"
-                  />
-                )}
-              </>
+              <HeroCover
+                mobileSrc={project.coverImageHeroMobileUrl ?? project.coverImageHeroDesktopUrl ?? ""}
+                desktopSrc={project.coverImageHeroDesktopUrl ?? project.coverImageHeroMobileUrl ?? ""}
+                alt={project.title}
+              />
             ) : (
               <>
                 <div
@@ -220,20 +228,27 @@ export default async function ProjectDetailPage({
                         : undefined
                     }
                   >
+                    {/* next/image en lazy (default): la variante oculta en cada
+                        tamaño nunca entra en pantalla, así que no se descarga.
+                        quality 90: son piezas con texto y bordes finos. */}
                     {(piece.imageUrl ?? piece.imageDesktopUrl) && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={piece.imageUrl ?? piece.imageDesktopUrl ?? undefined}
+                      <Image
+                        src={piece.imageUrl ?? piece.imageDesktopUrl ?? ""}
                         alt={piece.title}
-                        className="absolute inset-0 h-full w-full object-cover sm:hidden"
+                        fill
+                        sizes="calc(100vw - 48px)"
+                        quality={90}
+                        className="object-cover sm:hidden"
                       />
                     )}
                     {(piece.imageDesktopUrl ?? piece.imageUrl) && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={piece.imageDesktopUrl ?? piece.imageUrl ?? undefined}
+                      <Image
+                        src={piece.imageDesktopUrl ?? piece.imageUrl ?? ""}
                         alt={piece.title}
-                        className="absolute inset-0 hidden h-full w-full object-cover sm:block"
+                        fill
+                        sizes="33vw"
+                        quality={90}
+                        className="hidden object-cover sm:block"
                       />
                     )}
                   </div>
