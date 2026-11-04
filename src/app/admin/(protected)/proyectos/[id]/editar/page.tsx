@@ -16,6 +16,8 @@ import { SaveButton } from "@/components/admin/save-button";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { ReorderButtons } from "@/components/admin/reorder-buttons";
 import { UploadBox } from "@/components/admin/upload-box";
+import { ImageGuidelines } from "@/components/admin/image-guidelines";
+import { IMAGE_SPECS } from "@/lib/image-specs";
 import { inputClass, labelClass } from "@/components/admin/form-styles";
 
 // Renderizado dinámico: la sesión ya obliga a esto (verifySession lee
@@ -100,6 +102,9 @@ export default async function EditarProyectoPage({
         <p className="mb-4 text-sm text-white/50">
           Piezas creativas del proyecto (con imagen opcional).
         </p>
+        <div className="mb-4">
+          <ImageGuidelines />
+        </div>
 
         <form action={createProjectPiece} className="mb-4 flex flex-col gap-3 rounded-2xl border border-white/10 bg-card p-5">
           <input type="hidden" name="projectId" value={project.id} />
@@ -117,11 +122,11 @@ export default async function EditarProyectoPage({
             <label className={labelClass}>Subtítulo (opcional)</label>
             <input name="subtitle" className={inputClass} />
           </div>
-          <div className="grid max-w-xs grid-cols-2 gap-3">
-            <UploadBox name="image" title="Mobile" size="760×1350px" />
-            <UploadBox name="imageDesktop" title="Escritorio" size="1180×2100px" />
+          <div className="grid max-w-md grid-cols-2 gap-3">
+            <UploadBox name="image" title="Mobile" spec={IMAGE_SPECS.pieceMobile} />
+            <UploadBox name="imageDesktop" title="Escritorio" spec={IMAGE_SPECS.pieceDesktop} />
           </div>
-          <p className="-mt-1 text-xs text-white/40">Imágenes opcionales — vertical (9:16) en los dos casos, JPG o WEBP.</p>
+          <p className="-mt-1 text-xs text-white/40">Imágenes opcionales — vertical (9:16) en los dos casos.</p>
           <div>
             <SaveButton label="Agregar pieza" />
           </div>
@@ -141,8 +146,8 @@ export default async function EditarProyectoPage({
                 <input type="hidden" name="id" value={piece.id} />
                 <input type="hidden" name="projectId" value={project.id} />
                 <div className="grid grid-cols-2 gap-3">
-                  <UploadBox name="image" title="Mobile" size="760×1350px" currentUrl={piece.imageUrl} />
-                  <UploadBox name="imageDesktop" title="Escritorio" size="1180×2100px" currentUrl={piece.imageDesktopUrl} />
+                  <UploadBox name="image" title="Mobile" spec={IMAGE_SPECS.pieceMobile} currentUrl={piece.imageUrl} />
+                  <UploadBox name="imageDesktop" title="Escritorio" spec={IMAGE_SPECS.pieceDesktop} currentUrl={piece.imageDesktopUrl} />
                 </div>
                 <div>
                   <SaveButton label="Guardar imágenes" />

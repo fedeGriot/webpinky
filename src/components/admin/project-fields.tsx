@@ -2,6 +2,8 @@ import { inputClass, labelClass, textareaClass } from "@/components/admin/form-s
 import { UploadBox } from "@/components/admin/upload-box";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { SeoDescriptionField } from "@/components/admin/seo-description-field";
+import { ImageGuidelines } from "@/components/admin/image-guidelines";
+import { IMAGE_SPECS } from "@/lib/image-specs";
 
 export type ProjectFieldDefaults = {
   slug?: string;
@@ -79,34 +81,35 @@ export function ProjectFields({ defaults = {} }: { defaults?: ProjectFieldDefaul
       </Field>
 
       <Field label="Imagen de portada (opcional) — subí una por cada lugar/tamaño donde aparece">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <ImageGuidelines />
+        <div className="mt-2 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <UploadBox
             name="coverImageListing"
             title="Listado de proyectos"
-            size="1150×1440px"
+            spec={IMAGE_SPECS.projectListing}
             currentUrl={defaults.coverImageListingUrl}
           />
           <UploadBox
             name="coverImageHeroMobile"
             title="Ficha del proyecto — Mobile"
-            size="760×770px"
+            spec={IMAGE_SPECS.projectHeroMobile}
             currentUrl={defaults.coverImageHeroMobileUrl}
           />
           <UploadBox
             name="coverImageHeroDesktop"
             title="Ficha del proyecto — Escritorio"
-            size="3600×1090px"
+            spec={IMAGE_SPECS.projectHeroDesktop}
             currentUrl={defaults.coverImageHeroDesktopUrl}
           />
           <UploadBox
             name="coverImageCarousel"
             title="Carrusel de Home"
-            size="760×1350px"
+            spec={IMAGE_SPECS.projectCarousel}
             currentUrl={defaults.coverImageCarouselUrl}
           />
         </div>
         <p className="mt-2 text-xs text-white/40">
-          JPG o WEBP, hasta 8MB. Si dejás una casilla vacía se conserva la imagen actual de ese lugar.
+          Si dejás una casilla vacía se conserva la imagen actual de ese lugar.
         </p>
       </Field>
 

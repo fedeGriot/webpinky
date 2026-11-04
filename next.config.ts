@@ -5,12 +5,14 @@ import type { NextConfig } from "next";
 // 'unsafe-inline' en script-src es requerido porque Next.js inyecta el payload de
 // React Server Components vía <script> inline; no hay dangerouslySetInnerHTML ni
 // eval en el código de la app, así que el riesgo real que esto habilita es bajo.
+// blob: en img-src es para la vista previa de la imagen elegida en el admin
+// (URL.createObjectURL de un archivo local, antes de subirlo).
 const isDev = process.env.NODE_ENV === "development";
 const cspHeader = `
   default-src 'self';
   script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""};
   style-src 'self' 'unsafe-inline';
-  img-src 'self' data:;
+  img-src 'self' data: blob:;
   font-src 'self' data:;
   connect-src 'self';
   object-src 'none';

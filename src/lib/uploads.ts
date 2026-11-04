@@ -3,6 +3,7 @@ import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import crypto from "crypto";
 import sharp from "sharp";
+import { MAX_UPLOAD_BYTES } from "@/lib/image-specs";
 
 // RAILWAY_VOLUME_MOUNT_PATH apunta al volumen persistente (/data en prod).
 // Antes esto escribía en public/uploads: esa carpeta vive dentro de la imagen
@@ -12,7 +13,6 @@ import sharp from "sharp";
 // public/ a propósito, para que el único camino de lectura sea el route
 // handler de abajo, igual que en producción).
 export const UPLOAD_DIR = path.join(process.env.RAILWAY_VOLUME_MOUNT_PATH ?? path.join(process.cwd(), "data"), "uploads");
-const MAX_SIZE_BYTES = 8 * 1024 * 1024;
 
 // SVG queda deliberadamente afuera: es XML y puede contener <script>, que el
 // navegador ejecuta si el archivo se abre directo (ej. /uploads/xxx.svg). El
@@ -77,8 +77,10 @@ export async function saveUploadedFile(file: File): Promise<string | null> {
   if (!ALLOWED_TYPES.has(file.type)) {
     throw new Error(`Tipo de archivo no permitido: ${file.type}`);
   }
-  if (file.size > MAX_SIZE_BYTES) {
-    throw new Error("El archivo supera el tamaño máximo permitido (8MB).");
+  // El admin ya frena cada casilla en su peso máximo (ImageInput); esto es
+  // solo el tope para lo que llegue sin pasar por ahí.
+  if (file.size > MAX_UPLOAD_BYTES) {
+    throw new Error("El archivo supera el tamaño máximo permitido (2 MB). Exportalo optimizado y volvé a subirlo.");
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());

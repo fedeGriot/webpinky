@@ -3,6 +3,9 @@ import { createService, updateService, deleteService } from "@/lib/actions/secti
 import { SaveButton } from "@/components/admin/save-button";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { UploadHint } from "@/components/admin/upload-hint";
+import { ImageInput } from "@/components/admin/image-input";
+import { ImageGuidelines } from "@/components/admin/image-guidelines";
+import { IMAGE_SPECS } from "@/lib/image-specs";
 import { inputClass, labelClass, textareaClass } from "@/components/admin/form-styles";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
@@ -21,6 +24,10 @@ export default async function ServiciosPage() {
       <p className="mb-8 text-white/50">
         Los 6 servicios que se muestran en Home y en detalle en “¿Qué hacemos?”.
       </p>
+
+      <div className="mb-8">
+        <ImageGuidelines />
+      </div>
 
       <div className="mb-10 rounded-2xl border border-white/10 bg-card p-6">
         <h2 className="mb-4 font-bold text-white">Agregar servicio</h2>
@@ -111,11 +118,12 @@ function ServiceFields({
               // eslint-disable-next-line @next/next/no-img-element
               <img src={defaultIconUrl} alt="" className="h-12 w-12 shrink-0 rounded-lg bg-white/5 object-contain p-1" />
             )}
-            <input name="iconImage" type="file" accept="image/*" className="flex-1 text-sm text-white/70" />
+            <div className="flex flex-1 flex-col gap-1">
+              <ImageInput name="iconImage" spec={IMAGE_SPECS.serviceIcon} className="text-sm text-white/70" />
+            </div>
           </div>
           <UploadHint
-            sizes={[{ mobile: "500×500px" }]}
-            format="PNG con fondo transparente"
+            spec={IMAGE_SPECS.serviceIcon}
             note="tarjetas de servicio en Home y en la lista de ¿Qué hacemos?. Si no se carga, se muestra el emoji de respaldo."
           />
         </div>
@@ -130,11 +138,12 @@ function ServiceFields({
                 className="h-12 w-12 shrink-0 rounded-lg bg-white/5 object-contain p-1"
               />
             )}
-            <input name="iconAccentImage" type="file" accept="image/*" className="flex-1 text-sm text-white/70" />
+            <div className="flex flex-1 flex-col gap-1">
+              <ImageInput name="iconAccentImage" spec={IMAGE_SPECS.serviceIcon} className="text-sm text-white/70" />
+            </div>
           </div>
           <UploadHint
-            sizes={[{ mobile: "500×500px" }]}
-            format="PNG con fondo transparente"
+            spec={IMAGE_SPECS.serviceIcon}
             note="versión más grande en el detalle de cada servicio en ¿Qué hacemos?. Si no se carga, se muestra el emoji de respaldo."
           />
         </div>

@@ -4,6 +4,9 @@ import { SaveButton } from "@/components/admin/save-button";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { inputClass, labelClass } from "@/components/admin/form-styles";
 import { UploadHint } from "@/components/admin/upload-hint";
+import { ImageInput } from "@/components/admin/image-input";
+import { ImageGuidelines } from "@/components/admin/image-guidelines";
+import { IMAGE_SPECS } from "@/lib/image-specs";
 
 // Renderizado dinámico: la sesión ya obliga a esto (verifySession lee
 // cookies en el layout), pero se declara explícito para que el build no
@@ -21,6 +24,10 @@ export default async function ClientesPage() {
         Logos/nombres que aparecen en el marquee de “Nuestros clientes”.
       </p>
 
+      <div className="mb-8">
+        <ImageGuidelines />
+      </div>
+
       <div className="mb-10 rounded-2xl border border-white/10 bg-card p-6">
         <h2 className="mb-4 font-bold text-white">Agregar cliente</h2>
         <form action={createClient} className="flex flex-wrap items-end gap-4">
@@ -34,10 +41,9 @@ export default async function ClientesPage() {
           </div>
           <div className="flex flex-col gap-1.5">
             <label className={labelClass}>Logo (opcional)</label>
-            <input name="logo" type="file" accept="image/*" className="text-sm text-white/70" />
+            <ImageInput name="logo" spec={IMAGE_SPECS.clientLogo} className="text-sm text-white/70" />
             <UploadHint
-              sizes={[{ mobile: "400×200px" }]}
-              format="PNG con fondo transparente"
+              spec={IMAGE_SPECS.clientLogo}
               note="se pinta siempre blanco sólido sin importar su color original — un fondo no transparente lo tapa"
             />
           </div>
@@ -57,8 +63,8 @@ export default async function ClientesPage() {
               <input name="name" defaultValue={client.name} required className={`${inputClass} flex-1`} />
               <input name="order" type="number" defaultValue={client.order} className={`${inputClass} w-20`} />
               <div className="flex flex-col gap-1">
-                <input name="logo" type="file" accept="image/*" className="text-xs text-white/50" />
-                <p className="text-[11px] text-white/40">PNG transparente · 400×200px</p>
+                <ImageInput name="logo" spec={IMAGE_SPECS.clientLogo} className="text-xs text-white/50" />
+                <p className="text-[11px] text-white/40">PNG o WebP transparente · 400×200px · máx. {IMAGE_SPECS.clientLogo.maxKB} KB</p>
               </div>
               <SaveButton />
             </form>

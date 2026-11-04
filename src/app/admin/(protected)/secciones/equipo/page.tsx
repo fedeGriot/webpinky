@@ -4,6 +4,9 @@ import { SaveButton } from "@/components/admin/save-button";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { inputClass, labelClass } from "@/components/admin/form-styles";
 import { UploadHint } from "@/components/admin/upload-hint";
+import { ImageInput } from "@/components/admin/image-input";
+import { ImageGuidelines } from "@/components/admin/image-guidelines";
+import { IMAGE_SPECS } from "@/lib/image-specs";
 
 // Renderizado dinámico: la sesión ya obliga a esto (verifySession lee
 // cookies en el layout), pero se declara explícito para que el build no
@@ -18,6 +21,10 @@ export default async function EquipoPage() {
     <div className="max-w-3xl">
       <h1 className="mb-1 text-2xl font-bold text-white">Equipo</h1>
       <p className="mb-8 text-white/50">Integrantes mostrados en ¿Quiénes somos?.</p>
+
+      <div className="mb-8">
+        <ImageGuidelines />
+      </div>
 
       <div className="mb-10 rounded-2xl border border-white/10 bg-card p-6">
         <h2 className="mb-4 font-bold text-white">Agregar integrante</h2>
@@ -40,10 +47,9 @@ export default async function EquipoPage() {
           </div>
           <div className="flex flex-col gap-1.5">
             <label className={labelClass}>Foto (opcional)</label>
-            <input name="photo" type="file" accept="image/*" className="text-sm text-white/70" />
+            <ImageInput name="photo" spec={IMAGE_SPECS.teamPhoto} className="text-sm text-white/70" />
             <UploadHint
-              sizes={[{ mobile: "400×400px" }]}
-              format="JPG o WEBP"
+              spec={IMAGE_SPECS.teamPhoto}
               note="cuadrada, con la cara centrada — se recorta en círculo"
             />
           </div>
@@ -82,8 +88,8 @@ export default async function EquipoPage() {
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className={labelClass}>Foto</label>
-                <input name="photo" type="file" accept="image/*" className="text-xs text-white/50" />
-                <p className="text-[11px] text-white/40">Cuadrada · mínimo 400×400px</p>
+                <ImageInput name="photo" spec={IMAGE_SPECS.teamPhoto} className="text-xs text-white/50" />
+                <p className="text-[11px] text-white/40">Cuadrada · 400×400px · máx. {IMAGE_SPECS.teamPhoto.maxKB} KB</p>
               </div>
               <SaveButton />
             </form>
