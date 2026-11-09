@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 import { SITE_URL } from "@/lib/seo";
+import { getPublishedLandings } from "@/lib/data";
 
 // Sin esto, Next intenta pre-renderizar /sitemap.xml en build time, y ahí
 // consulta la base — en Railway el volumen persistente (/data, donde vive
@@ -11,10 +12,13 @@ import { SITE_URL } from "@/lib/seo";
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const projects = await prisma.project.findMany({
-    select: { slug: true, updatedAt: true },
-    orderBy: { order: "asc" },
-  });
+  const [projects, landings] = await Promise.all([
+    prisma.project.findMany({
+      select: { slug: true, updatedAt: true },
+      orderBy: { order: "asc" },
+    }),
+    getPublishedLandings(),
+  ]);
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: SITE_URL, changeFrequency: "weekly", priority: 1 },
@@ -31,5 +35,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticRoutes, ...projectRoutes];
+  const landingRoutes: MetadataRoute.Sitemap = landings.map((landing) => ({
+    url: `${SITE_URL}/servicios/${landing.slug}`,
+    lastModified: landing.updatedAt,
+    changeFrequency: "monthly",
+    priority: 0.9,
+  }));
+
+  return [...staticRoutes, ...landingRoutes, ...projectRoutes];
 }

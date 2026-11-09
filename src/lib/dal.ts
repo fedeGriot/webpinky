@@ -25,3 +25,15 @@ export const verifySession = cache(async () => {
 
   return session;
 });
+
+/**
+ * Como verifySession, pero sin redirigir: para páginas públicas que muestran
+ * algo extra a un admin logueado (ej. la vista previa de una landing sin
+ * publicar), y para el resto se comportan normal.
+ */
+export const hasAdminSession = cache(async () => {
+  const session = await decrypt(await getSessionCookieValue());
+  if (!session?.userId) return false;
+  const user = await prisma.adminUser.findUnique({ where: { id: session.userId }, select: { id: true } });
+  return Boolean(user);
+});

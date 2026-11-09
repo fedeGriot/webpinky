@@ -125,3 +125,83 @@ export async function getAdminUsers() {
     orderBy: { createdAt: "asc" },
   });
 }
+
+// --- Landings de servicio ---
+
+export type LandingItem = { title: string; body: string };
+export type LandingServiceItem = LandingItem & { href?: string };
+export type LandingFaq = { question: string; answer: string };
+
+// Un JSON roto (editado a mano en la base, por ejemplo) no tiene que tirar
+// abajo la página entera: esa sección queda vacía y no se muestra.
+function parseList<T>(json: string): T[] {
+  try {
+    const value = JSON.parse(json);
+    return Array.isArray(value) ? value : [];
+  } catch {
+    return [];
+  }
+}
+
+function mapLanding<T extends {
+  painPointsJson: string;
+  servicesJson: string;
+  caseProjectIdsJson: string;
+  methodStepsJson: string;
+  partnerPointsJson: string;
+  testimonialProjectIdsJson: string;
+  faqsJson: string;
+}>(landing: T) {
+  const {
+    painPointsJson,
+    servicesJson,
+    caseProjectIdsJson,
+    methodStepsJson,
+    partnerPointsJson,
+    testimonialProjectIdsJson,
+    faqsJson,
+    ...rest
+  } = landing;
+  return {
+    ...rest,
+    painPoints: parseList<LandingItem>(painPointsJson),
+    services: parseList<LandingServiceItem>(servicesJson),
+    caseProjectIds: parseList<string>(caseProjectIdsJson),
+    methodSteps: parseList<LandingItem>(methodStepsJson),
+    partnerPoints: parseList<LandingItem>(partnerPointsJson),
+    testimonialProjectIds: parseList<string>(testimonialProjectIdsJson),
+    faqs: parseList<LandingFaq>(faqsJson),
+  };
+}
+
+export async function getAllLandings() {
+  return prisma.landing.findMany({ orderBy: [{ order: "asc" }, { createdAt: "asc" }] });
+}
+
+export async function getPublishedLandings() {
+  return prisma.landing.findMany({
+    where: { published: true },
+    select: { slug: true, navLabel: true, updatedAt: true },
+    orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+  });
+}
+
+export async function getLandingBySlug(slug: string) {
+  const landing = await prisma.landing.findUnique({ where: { slug } });
+  return landing ? mapLanding(landing) : null;
+}
+
+export type LandingData = NonNullable<Awaited<ReturnType<typeof getLandingBySlug>>>;
+
+export async function getLandingById(id: string) {
+  const landing = await prisma.landing.findUnique({ where: { id } });
+  return landing ? mapLanding(landing) : null;
+}
+
+/** Proyectos por ID respetando el orden elegido en la landing. */
+export async function getProjectsByIds(ids: string[]) {
+  if (ids.length === 0) return [];
+  const projects = await prisma.project.findMany({ where: { id: { in: ids } } });
+  const byId = new Map(projects.map((p) => [p.id, mapProject(p)]));
+  return ids.flatMap((id) => byId.get(id) ?? []);
+}

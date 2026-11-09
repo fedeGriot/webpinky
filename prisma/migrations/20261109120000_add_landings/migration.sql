@@ -1,0 +1,87 @@
+-- CreateTable
+CREATE TABLE "Landing" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "slug" TEXT NOT NULL,
+    "order" INTEGER NOT NULL DEFAULT 0,
+    "published" BOOLEAN NOT NULL DEFAULT false,
+    "navLabel" TEXT NOT NULL,
+    "seoTitle" TEXT NOT NULL,
+    "seoDescription" TEXT NOT NULL,
+    "heroEyebrow" TEXT NOT NULL,
+    "heroTitle" TEXT NOT NULL,
+    "heroBody" TEXT NOT NULL,
+    "heroCtaLabel" TEXT NOT NULL,
+    "clientsTitle" TEXT NOT NULL,
+    "clientsBody" TEXT NOT NULL,
+    "painTitle" TEXT NOT NULL,
+    "painIntro" TEXT NOT NULL,
+    "painPointsJson" TEXT NOT NULL DEFAULT '[]',
+    "servicesTitle" TEXT NOT NULL,
+    "servicesIntro" TEXT NOT NULL,
+    "servicesJson" TEXT NOT NULL DEFAULT '[]',
+    "casesTitle" TEXT NOT NULL,
+    "casesIntro" TEXT NOT NULL,
+    "caseProjectIdsJson" TEXT NOT NULL DEFAULT '[]',
+    "methodTitle" TEXT NOT NULL,
+    "methodIntro" TEXT NOT NULL,
+    "methodStepsJson" TEXT NOT NULL DEFAULT '[]',
+    "partnerTitle" TEXT NOT NULL,
+    "partnerBody" TEXT NOT NULL,
+    "partnerPointsJson" TEXT NOT NULL DEFAULT '[]',
+    "testimonialsTitle" TEXT NOT NULL,
+    "testimonialProjectIdsJson" TEXT NOT NULL DEFAULT '[]',
+    "faqTitle" TEXT NOT NULL,
+    "faqsJson" TEXT NOT NULL DEFAULT '[]',
+    "ctaEyebrow" TEXT NOT NULL,
+    "ctaTitle" TEXT NOT NULL,
+    "ctaBody" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Landing_slug_key" ON "Landing"("slug");
+
+-- Landing de Marketing Digital con el borrador de textos según las
+-- recomendaciones de Dahseo (planilla "Landings: Pinky"). Queda sin publicar
+-- (published = false) hasta que se valide el copy desde el admin. Los casos
+-- y testimonios se resuelven por slug: si algún proyecto no existe en esta
+-- base, simplemente no se incluye.
+INSERT INTO "Landing" ("id", "slug", "order", "published", "navLabel", "seoTitle", "seoDescription", "heroEyebrow", "heroTitle", "heroBody", "heroCtaLabel", "clientsTitle", "clientsBody", "painTitle", "painIntro", "painPointsJson", "servicesTitle", "servicesIntro", "servicesJson", "casesTitle", "casesIntro", "caseProjectIdsJson", "methodTitle", "methodIntro", "methodStepsJson", "partnerTitle", "partnerBody", "partnerPointsJson", "testimonialsTitle", "testimonialProjectIdsJson", "faqTitle", "faqsJson", "ctaEyebrow", "ctaTitle", "ctaBody", "updatedAt")
+SELECT
+  'landing_marketing_digital',
+  'marketing-digital',
+  0,
+  false,
+  'Marketing digital',
+  'Agencia de Marketing Digital en Uruguay - Pinky',
+  'En Pinky integramos estrategia, creatividad, contenido y datos para impulsar el crecimiento de tu marca. Somos tu agencia de marketing digital.',
+  'Agencia de marketing digital en Uruguay',
+  'Servicios de Marketing Digital *en Uruguay*',
+  'Somos una agencia de marketing digital con base en Montevideo. Diseñamos, ejecutamos y optimizamos estrategias digitales a la medida de los objetivos de cada empresa, con estrategia, creatividad, contenido, medios y datos trabajando como un solo equipo.',
+  'Solicitá una reunión →',
+  'Marcas que *confían* en Pinky',
+  'Desde 2010 acompañamos el crecimiento de marcas de Uruguay y la región en retail, consumo masivo, salud, seguros, gastronomía y deporte, con relaciones que se sostienen en el tiempo.',
+  'Cuando el marketing digital *no da resultados*',
+  'Son los desafíos que más escuchamos cuando una empresa llega a Pinky. Cada uno tiene una respuesta concreta.',
+  '[{"title": "Canales que no hablan entre sí", "body": "Redes, web, pauta y email funcionan por separado, con mensajes distintos y presupuestos que compiten. Los ordenamos bajo una misma estrategia y un mismo calendario."}, {"title": "Acciones sin una estrategia detrás", "body": "Se publica y se invierte, pero sin objetivos claros ni prioridades. Empezamos por definir a dónde querés llegar y qué canales te llevan ahí."}, {"title": "Una marca que se parece a todas", "body": "En digital, la competencia está a un scroll de distancia. Creamos ideas y contenidos con identidad propia para que tu marca se reconozca y se recuerde."}, {"title": "Datos que no se convierten en decisiones", "body": "Hay métricas por todos lados, pero nadie sabe qué hacer con ellas. Medimos lo que importa para el negocio y lo traducimos en próximos pasos."}]',
+  'Servicios de marketing digital *integrados*',
+  'No vendemos canales sueltos: armamos el equipo digital que tu marca necesita, con cada capacidad conectada a un mismo objetivo de negocio.',
+  '[{"title": "Estrategia digital y consultoría", "body": "Diagnóstico, objetivos, públicos y plan de canales: la hoja de ruta que ordena todo lo demás y conecta el marketing con las metas comerciales.", "href": "/que-hacemos#estrategia-consultoria"}, {"title": "Redes sociales y contenido", "body": "Planificación, creatividad, influencer marketing y gestión de contenidos en redes, para que tu marca tenga algo para decir y lo diga bien.", "href": "/que-hacemos#creatividad-contenido"}, {"title": "Publicidad digital", "body": "Campañas en Meta Ads, Google Ads, TikTok Ads y LinkedIn Ads, planificadas y optimizadas en función de tus objetivos, no solo del alcance.", "href": "/que-hacemos#performance-medios"}, {"title": "Medición y reporting", "body": "Dashboards e informes a medida para saber qué funciona, qué no y dónde conviene invertir el próximo peso.", "href": "/que-hacemos#performance-medios"}, {"title": "Branding y diseño", "body": "Identidad visual y sistemas gráficos consistentes en cada punto de contacto digital, para que tu marca se vea igual de bien en todos lados.", "href": "/que-hacemos#branding-diseno"}, {"title": "Producción audiovisual", "body": "Spots, reels y contenidos en video pensados para cada plataforma y formato, del concepto a la edición final.", "href": "/que-hacemos#produccion-audiovisual"}, {"title": "CRM y automatización", "body": "Email marketing, flujos automatizados e integraciones que conectan el marketing con las ventas y aprovechan los datos de tus clientes.", "href": "/que-hacemos#tecnologia-automatizacion"}]',
+  'Casos de *marketing digital*',
+  'Proyectos donde la estrategia, la creatividad y los datos trabajaron juntos para mover los números del negocio.',
+  COALESCE((SELECT json_group_array("id") FROM (SELECT "id" FROM "Project" WHERE "slug" IN ('farmacias-pigalle-cyber', 'mundo-mascota-estrategia', 'cinnabon-lanzamiento-uruguay') ORDER BY CASE "slug" WHEN 'farmacias-pigalle-cyber' THEN 0 WHEN 'mundo-mascota-estrategia' THEN 1 WHEN 'cinnabon-lanzamiento-uruguay' THEN 2 END)), '[]'),
+  'Cómo trabajamos tu *marketing digital*',
+  'El mismo método que aplicamos en cada proyecto, llevado a lo digital. No es una entrega única: es un ciclo que se repite y mejora con cada vuelta.',
+  '[{"title": "Analizamos", "body": "Relevamos tu negocio, tu audiencia, tu competencia y el estado de tus canales digitales: qué funciona, qué no y dónde están las oportunidades."}, {"title": "Planificamos", "body": "Definimos objetivos medibles, mensajes, canales, presupuesto y calendario, y los validamos con tu equipo antes de arrancar."}, {"title": "Ejecutamos", "body": "Creamos contenidos, lanzamos campañas y gestionamos los canales con un equipo coordinado bajo el mismo techo de la agencia."}, {"title": "Optimizamos", "body": "Medimos resultados, los revisamos con vos en cada informe y ajustamos la estrategia. Lo que aprendemos en un ciclo alimenta el siguiente."}]',
+  'Más que una agencia: tu *growth partner*',
+  'Trabajamos como una extensión de tu equipo. Entendemos los objetivos comerciales, participamos en las decisiones y acompañamos a las marcas en el largo plazo, no solo durante una campaña.',
+  '[{"title": "Integrados a tu equipo", "body": "Coordinamos con tus áreas de marketing y ventas para que lo digital empuje en la misma dirección que el negocio."}, {"title": "Todo bajo un mismo techo", "body": "Estrategia, creatividad, medios, producción y tecnología en una sola agencia: menos proveedores que coordinar y un mensaje coherente."}, {"title": "Datos con propósito", "body": "Medimos para decidir, no para llenar reportes. Cada indicador está conectado con un objetivo del negocio."}, {"title": "Relaciones de largo plazo", "body": "Desde 2010 construimos vínculos con marcas que siguen creciendo con nosotros año tras año."}]',
+  'Lo que dicen *las marcas*',
+  COALESCE((SELECT json_group_array("id") FROM (SELECT "id" FROM "Project" WHERE "slug" IN ('cinnabon-lanzamiento-uruguay') ORDER BY CASE "slug" WHEN 'cinnabon-lanzamiento-uruguay' THEN 0 END)), '[]'),
+  'Preguntas *frecuentes*',
+  '[{"question": "¿Qué incluye el servicio de marketing digital de Pinky?", "answer": "Depende de lo que necesite tu marca. Puede abarcar estrategia, gestión de redes y contenidos, campañas pagas, producción audiovisual, medición y automatización. Armamos la propuesta después de entender tus objetivos, para incluir solo lo que suma."}, {"question": "¿Puedo contratar un solo servicio, como redes sociales o Google Ads?", "answer": "Sí. Nuestro diferencial es el trabajo integrado, pero también podemos sumarnos en un área puntual y crecer desde ahí a medida que lo necesites."}, {"question": "¿Cuánto cuesta contratar una agencia de marketing digital?", "answer": "La inversión depende del alcance, de los canales y del presupuesto de medios. Después de la primera reunión te enviamos una propuesta a medida con el detalle de lo que incluye."}, {"question": "¿En cuánto tiempo se ven los resultados?", "answer": "Algunas acciones, como las campañas pagas, muestran resultados en pocas semanas; otras, como el crecimiento de la comunidad o de la marca, se construyen en meses. Desde el inicio acordamos qué indicadores vamos a seguir y cada cuánto los revisamos."}, {"question": "¿Cómo es el trabajo con mi equipo?", "answer": "Trabajamos de forma coordinada con tu equipo, con reuniones de seguimiento e informes periódicos de resultados. Nos adaptamos a la forma de trabajo y a las herramientas que ya usa tu empresa."}, {"question": "¿Trabajan solo con empresas de Montevideo?", "answer": "Estamos en Montevideo y trabajamos con marcas de todo Uruguay y la región. Las reuniones pueden ser presenciales o virtuales."}]',
+  'Hablemos de tu proyecto',
+  'Hagamos que tu marca *crezca en digital.*',
+  'Completá el formulario con algunos datos de tu empresa y coordinamos una primera reunión para conocer tus objetivos. Después te proponemos los próximos pasos.',
+  CURRENT_TIMESTAMP;

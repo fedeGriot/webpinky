@@ -12,6 +12,11 @@ const CARDS = [
     description: "Casos de estudio: crear, editar, reordenar y destacar proyectos.",
   },
   {
+    href: "/admin/landings",
+    title: "Landings de servicios",
+    description: "Páginas por servicio (/servicios/…) con las recomendaciones de SEO.",
+  },
+  {
     href: "/admin/solicitudes",
     title: "Solicitudes",
     description: "Formularios de contacto completados desde el sitio.",

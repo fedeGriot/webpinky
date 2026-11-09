@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { PAGE_DESCRIPTIONS } from "@/lib/seo";
-import Image from "next/image";
 import Link from "next/link";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { BackgroundShape } from "@/components/background-shape";
 import { CtaSection } from "@/components/cta-section";
+import { ProjectCover } from "@/components/project-cover";
 import { Reveal } from "@/components/reveal";
 import { getAllProjects } from "@/lib/data";
 import { staggerForGrid } from "@/lib/stagger";
@@ -66,34 +66,12 @@ export default async function ProyectosPage({
                     <span>{project.category}</span>
                   </div>
 
-                  <div
-                    className="relative aspect-[4/5] overflow-hidden rounded-2xl"
-                    style={
-                      project.coverImageListingUrl
-                        ? undefined
-                        : { background: `linear-gradient(150deg, ${project.accentColor}, ${project.accentColor}99)` }
-                    }
-                  >
-                    {project.coverImageListingUrl ? (
-                      <Image
-                        src={project.coverImageListingUrl}
-                        alt={project.clientName}
-                        fill
-                        sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 30vw"
-                        loading={i < 3 ? "eager" : "lazy"}
-                        fetchPriority={i === 0 ? "high" : "auto"}
-                        className="object-cover transition duration-300 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div
-                        className="absolute inset-0 opacity-25"
-                        style={{
-                          backgroundImage: "radial-gradient(#fff 1.2px, transparent 1.2px)",
-                          backgroundSize: "14px 14px",
-                        }}
-                      />
-                    )}
-                  </div>
+                  <ProjectCover
+                    project={project}
+                    sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 30vw"
+                    loading={i < 3 ? "eager" : "lazy"}
+                    fetchPriority={i === 0 ? "high" : "auto"}
+                  />
 
                   <div className="mt-4 flex items-start justify-between gap-4">
                     <h2 className="text-xl font-bold text-white">{project.clientName}</h2>
