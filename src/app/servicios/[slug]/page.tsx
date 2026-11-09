@@ -214,42 +214,31 @@ export default async function LandingPage({ params }: Props) {
               </SectionHeading>
               <p className="text-lg text-white">{landing.servicesIntro}</p>
             </Reveal>
-            {/* Misma estructura que los servicios de ¿Qué hacemos?: número,
-                bajada, título, texto y la animación del servicio. */}
-            <div className="mt-6 divide-y divide-white/10">
+            {/* Estructura de los servicios de ¿Qué hacemos? (bajada, título,
+                texto y animación del servicio), en dos columnas y con la
+                animación más chica para que la sección no se haga tan larga. */}
+            <div className="mt-14 grid grid-cols-1 gap-x-16 gap-y-16 md:grid-cols-2">
               {landing.services.map((service, i) => {
                 const animation = service.service ? getServiceAnimation(service.service) : null;
                 return (
-                  <Reveal
-                    as="article"
-                    key={service.title}
-                    delay={Math.min(i * 0.05, 0.2)}
-                    className={`grid grid-cols-1 gap-6 py-16 lg:items-center lg:gap-10 ${
-                      animation ? "lg:grid-cols-[48px_1fr_360px]" : "lg:grid-cols-[48px_1fr]"
-                    }`}
-                  >
-                    <p className="text-2xl font-extrabold text-accent lg:self-start">{String(i + 1).padStart(2, "0")}</p>
-                    <div>
-                      {service.tagline && (
-                        <p className="mb-3 text-xs font-bold uppercase tracking-wide text-white/40">— {service.tagline}</p>
-                      )}
-                      <h3 className="mb-5 text-3xl font-extrabold leading-tight text-white sm:text-4xl">
-                        <AccentText text={service.title} />
-                      </h3>
-                      <p className="max-w-2xl text-lg leading-relaxed text-white">{service.body}</p>
-                      {service.href && (
-                        <Link
-                          href={service.href}
-                          className="mt-6 inline-block text-sm font-bold text-white/60 transition hover:text-white"
-                        >
-                          Ver más →
-                        </Link>
-                      )}
-                    </div>
+                  <Reveal as="article" key={service.title} delay={(i % 2) * 0.08}>
                     {animation && (
-                      <div className="order-first mx-auto flex w-full max-w-sm items-center justify-center lg:order-none lg:max-w-none">
-                        <DecorativeVideo {...animation} isolated className="aspect-[960/756] w-full" />
-                      </div>
+                      <DecorativeVideo {...animation} isolated className="mb-6 aspect-[960/756] w-full max-w-[260px]" />
+                    )}
+                    {service.tagline && (
+                      <p className="mb-3 text-xs font-bold uppercase tracking-wide text-white/40">— {service.tagline}</p>
+                    )}
+                    <h3 className="mb-4 text-2xl font-extrabold leading-tight text-white sm:text-3xl">
+                      <AccentText text={service.title} />
+                    </h3>
+                    <p className="max-w-xl text-lg leading-relaxed text-white">{service.body}</p>
+                    {service.href && (
+                      <Link
+                        href={service.href}
+                        className="mt-5 inline-block text-sm font-bold text-white/60 transition hover:text-white"
+                      >
+                        Ver más →
+                      </Link>
                     )}
                   </Reveal>
                 );

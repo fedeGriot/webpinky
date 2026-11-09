@@ -112,7 +112,7 @@ export default async function EditarLandingPage({
 
         <Section
           title="4. Servicios y alcance"
-          description="Se muestran con la misma estructura que en ¿Qué hacemos?: número, bajada, título, texto y la animación del servicio elegido."
+          description="Se muestran en dos columnas, con la estructura de ¿Qué hacemos?: bajada, título, texto y la animación del servicio elegido."
         >
           <Field label="Título" name="servicesTitle" defaultValue={landing.servicesTitle} />
           <Field label="Introducción" name="servicesIntro" defaultValue={landing.servicesIntro} multiline />
