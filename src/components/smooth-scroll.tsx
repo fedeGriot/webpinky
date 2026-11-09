@@ -52,18 +52,19 @@ export function SmoothScroll() {
   return (
     <>
       {/* autoResize: false — por defecto Lenis observa el tamaño del
-          documento con un ResizeObserver (debounce de 250ms) y, cuando
-          detecta un cambio, fuerza animatedScroll = actualScroll,
-          descartando de golpe el suavizado en curso. Esto se sentía como
-          un salto al scrollear, sobre todo justo después de cargar la
-          página (imágenes terminando de decodificar, fuentes haciendo
-          swap) — exactamente cuando alguien hace su primer scroll. El
-          único lugar que necesita recalcular el alto dinámicamente (el
-          paso del formulario de contacto) ya llama a getLenis()?.resize()
-          a mano, así que no depende de este auto-resize. El resize por
-          cambio de ancho de ventana sigue funcionando aparte (no depende
-          de esta opción). */}
-      <ReactLenis key={pathname} root options={{ duration: 1.1, smoothWheel: true, autoResize: false }} />
+          documento con un ResizeObserver y, al detectar un cambio, recalcula
+          con un debounce de 250ms: eso se sentía como un salto al scrollear
+          justo después de cargar (imágenes y fuentes terminando de cargar).
+
+          naiveDimensions: true — sin autoResize, Lenis se quedaba con el
+          alto del documento medido al montar y nunca lo actualizaba (ni
+          siquiera al cambiar el tamaño de la ventana): si la página crecía
+          después (abrir una pregunta frecuente, una imagen o un video que
+          termina de cargar), la rueda del mouse se trababa en el alto viejo
+          y solo se podía seguir con la barra de scroll. Con naiveDimensions
+          el límite se lee del documento real en cada scroll, sin observers
+          ni recálculos diferidos, así que no vuelve el salto. */}
+      <ReactLenis key={pathname} root options={{ duration: 1.1, smoothWheel: true, autoResize: false, naiveDimensions: true }} />
       <LenisBridge />
     </>
   );
