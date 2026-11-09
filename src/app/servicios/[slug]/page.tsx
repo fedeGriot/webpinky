@@ -13,6 +13,8 @@ import { SectionEyebrow } from "@/components/section-eyebrow";
 import { SectionHeading } from "@/components/section-heading";
 import { AccentText } from "@/components/accent-text";
 import { JsonLd } from "@/components/json-ld";
+import { DecorativeVideo } from "@/components/decorative-video";
+import { getServiceAnimation } from "@/lib/service-animations";
 import { getClients, getLandingBySlug, getLandingCases, getProcessSteps, getProjectsByIds } from "@/lib/data";
 import { hasAdminSession } from "@/lib/dal";
 import { splitAccent, stripAccent } from "@/lib/accent";
@@ -212,30 +214,58 @@ export default async function LandingPage({ params }: Props) {
               </SectionHeading>
               <p className="text-lg text-white">{landing.servicesIntro}</p>
             </Reveal>
-            <ul className="mt-12 divide-y divide-white/10 border-t border-white/10">
-              {landing.services.map((service, i) => (
-                <Reveal
-                  as="li"
-                  key={service.title}
-                  delay={Math.min(i * 0.05, 0.3)}
-                  className="grid grid-cols-1 gap-3 py-7 sm:grid-cols-[320px_1fr_auto] sm:items-baseline sm:gap-10"
-                >
-                  <h3 className="flex gap-3 text-lg font-bold leading-snug text-white">
-                    <span className="text-accent">→</span>
-                    {service.title}
-                  </h3>
-                  <p className="leading-relaxed text-white">{service.body}</p>
-                  {service.href && (
-                    <Link
-                      href={service.href}
-                      className="whitespace-nowrap text-sm font-bold text-white/60 transition hover:text-white"
-                    >
-                      Ver más →
-                    </Link>
-                  )}
-                </Reveal>
-              ))}
-            </ul>
+            {/* Misma estructura que los servicios de ¿Qué hacemos?: número,
+                bajada, título, texto, puntos y la animación del servicio. */}
+            <div className="mt-6 divide-y divide-white/10">
+              {landing.services.map((service, i) => {
+                const animation = service.service ? getServiceAnimation(service.service) : null;
+                const bullets = (service.bullets ?? "").split("\n").map((b) => b.trim()).filter(Boolean);
+                return (
+                  <Reveal
+                    as="article"
+                    key={service.title}
+                    delay={Math.min(i * 0.05, 0.2)}
+                    className={`grid grid-cols-1 gap-6 py-16 lg:items-center lg:gap-10 ${
+                      animation ? "lg:grid-cols-[48px_1fr_360px]" : "lg:grid-cols-[48px_1fr]"
+                    }`}
+                  >
+                    <p className="text-2xl font-extrabold text-accent lg:self-start">{String(i + 1).padStart(2, "0")}</p>
+                    <div>
+                      {service.tagline && (
+                        <p className="mb-3 text-xs font-bold uppercase tracking-wide text-white/40">— {service.tagline}</p>
+                      )}
+                      <h3 className="mb-5 text-3xl font-extrabold leading-tight text-white sm:text-4xl">
+                        <AccentText text={service.title} />
+                      </h3>
+                      <p className="mb-6 max-w-2xl text-lg leading-relaxed text-white">{service.body}</p>
+                      {bullets.length > 0 && (
+                        <ul className="divide-y divide-dashed divide-white/15 text-base text-white">
+                          {bullets.map((bullet) => (
+                            <li key={bullet} className="flex gap-3 py-3">
+                              <span className="text-accent">→</span>
+                              {bullet}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                      {service.href && (
+                        <Link
+                          href={service.href}
+                          className="mt-6 inline-block text-sm font-bold text-white/60 transition hover:text-white"
+                        >
+                          Ver más →
+                        </Link>
+                      )}
+                    </div>
+                    {animation && (
+                      <div className="order-first mx-auto flex w-full max-w-sm items-center justify-center lg:order-none lg:max-w-none">
+                        <DecorativeVideo {...animation} isolated className="aspect-[960/756] w-full" />
+                      </div>
+                    )}
+                  </Reveal>
+                );
+              })}
+            </div>
           </section>
         )}
 

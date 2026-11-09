@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
-import { getAllProjects, getLandingById } from "@/lib/data";
+import { getAllProjects, getLandingById, getServices } from "@/lib/data";
+import { getServiceAnimation } from "@/lib/service-animations";
 import { deleteLanding, updateLanding } from "@/lib/actions/landings";
 import { SaveButton } from "@/components/admin/save-button";
 import { DeleteButton } from "@/components/admin/delete-button";
@@ -29,10 +30,16 @@ export default async function EditarLandingPage({
   searchParams: Promise<{ guardado?: string }>;
 }) {
   const [{ id }, { guardado }] = await Promise.all([params, searchParams]);
-  const [landing, projects] = await Promise.all([getLandingById(id), getAllProjects()]);
+  const [landing, projects, siteServices] = await Promise.all([getLandingById(id), getAllProjects(), getServices()]);
   if (!landing) notFound();
 
   const projectOptions = projects.map((p) => ({ id: p.id, label: p.title, hint: `${p.clientName} · ${p.category}` }));
+  const animationOptions = [
+    { value: "", label: "Sin animación" },
+    ...siteServices
+      .filter((s) => getServiceAnimation(s.slug))
+      .map((s) => ({ value: s.slug, label: `${s.title} (personaje de ¿Qué hacemos?)` })),
+  ];
   const quoteOptions = projects
     .filter((p) => p.quoteText)
     .map((p) => ({ id: p.id, label: p.title, hint: `“${p.quoteText}” — ${p.quoteAuthor ?? p.clientName}` }));
@@ -103,16 +110,30 @@ export default async function EditarLandingPage({
           <ListEditor name="painPointsJson" fields={ITEM_FIELDS} defaultItems={landing.painPoints} addLabel="+ Agregar desafío" />
         </Section>
 
-        <Section title="4. Servicios y alcance">
+        <Section
+          title="4. Servicios y alcance"
+          description="Se muestran con la misma estructura que en ¿Qué hacemos?: número, bajada, título, texto, puntos y la animación del servicio elegido."
+        >
           <Field label="Título" name="servicesTitle" defaultValue={landing.servicesTitle} />
           <Field label="Introducción" name="servicesIntro" defaultValue={landing.servicesIntro} multiline />
           <ListEditor
             name="servicesJson"
             fields={[
-              ...ITEM_FIELDS,
-              { key: "href", label: "Link “Ver más” (opcional)", placeholder: "/que-hacemos#performance-medios o /servicios/paid-media" },
+              { key: "tagline", label: "Bajada (arriba del título)", placeholder: "Definimos el rumbo digital" },
+              { key: "title", label: "Título", placeholder: "Estrategia *digital.*" },
+              { key: "body", label: "Texto", multiline: true },
+              { key: "bullets", label: "Puntos (uno por línea)", multiline: true },
+              { key: "service", label: "Animación", options: animationOptions },
+              { key: "href", label: "Link “Ver más” (opcional)", placeholder: "/servicios/paid-media" },
             ]}
-            defaultItems={landing.services.map((s) => ({ ...s, href: s.href ?? "" }))}
+            defaultItems={landing.services.map((s) => ({
+              title: s.title,
+              body: s.body,
+              tagline: s.tagline ?? "",
+              bullets: s.bullets ?? "",
+              service: s.service ?? "",
+              href: s.href ?? "",
+            }))}
             addLabel="+ Agregar servicio"
           />
         </Section>

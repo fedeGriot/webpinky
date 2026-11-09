@@ -66,8 +66,14 @@ async function parseProjectIds(formData: FormData, key: string, max?: number) {
 }
 
 export async function landingFieldsFromForm(formData: FormData) {
-  const services = cleanItems(formData, "servicesJson", ["title", "body", "href"], "title").map(
-    ({ href, ...rest }) => ({ ...rest, ...(cleanHref(href) ? { href: cleanHref(href) } : {}) }),
+  const serviceSlugs = new Set((await prisma.service.findMany({ select: { slug: true } })).map((s) => s.slug));
+  const services = cleanItems(formData, "servicesJson", ["title", "tagline", "body", "bullets", "service", "href"], "title").map(
+    ({ href, service, ...rest }) => ({
+      ...rest,
+      // Animación: solo un servicio existente; cualquier otro valor se descarta.
+      ...(serviceSlugs.has(service) ? { service } : {}),
+      ...(cleanHref(href) ? { href: cleanHref(href) } : {}),
+    }),
   );
   return {
     slug: parseSlug(formData),

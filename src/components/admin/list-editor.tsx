@@ -3,7 +3,14 @@
 import { useState } from "react";
 import { inputClass, textareaClass } from "@/components/admin/form-styles";
 
-export type ListField = { key: string; label: string; multiline?: boolean; placeholder?: string };
+export type ListField = {
+  key: string;
+  label: string;
+  multiline?: boolean;
+  placeholder?: string;
+  /** Si se pasa, el campo es un desplegable con estas opciones (la vacía va primero). */
+  options?: { value: string; label: string }[];
+};
 type Item = Record<string, string>;
 
 /**
@@ -59,7 +66,19 @@ export function ListEditor({
             {fields.map((field) => (
               <label key={field.key} className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-white/50">{field.label}</span>
-                {field.multiline ? (
+                {field.options ? (
+                  <select
+                    value={row.item[field.key] ?? ""}
+                    onChange={(e) => update(i, field.key, e.target.value)}
+                    className={`${inputClass} text-sm`}
+                  >
+                    {field.options.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                ) : field.multiline ? (
                   <textarea
                     value={row.item[field.key] ?? ""}
                     onChange={(e) => update(i, field.key, e.target.value)}
