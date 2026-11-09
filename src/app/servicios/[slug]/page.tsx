@@ -215,31 +215,43 @@ export default async function LandingPage({ params }: Props) {
               <p className="text-lg text-white">{landing.servicesIntro}</p>
             </Reveal>
             {/* Estructura de los servicios de ¿Qué hacemos? (bajada, título,
-                texto y animación del servicio), en dos columnas y con la
-                animación más chica para que la sección no se haga tan larga. */}
-            <div className="mt-14 grid grid-cols-1 gap-x-16 gap-y-16 md:grid-cols-2">
+                texto y animación del servicio a la derecha), en dos columnas
+                desde lg. En mobile la animación va arriba, más chica: al
+                costado le dejaba muy poco ancho al texto. */}
+            <div className="mt-14 grid grid-cols-1 gap-x-16 gap-y-14 lg:grid-cols-2">
               {landing.services.map((service, i) => {
                 const animation = service.service ? getServiceAnimation(service.service) : null;
                 return (
-                  <Reveal as="article" key={service.title} delay={(i % 2) * 0.08}>
+                  <Reveal
+                    as="article"
+                    key={service.title}
+                    delay={(i % 2) * 0.08}
+                    className="flex flex-col gap-5 sm:flex-row-reverse sm:items-center sm:gap-8"
+                  >
                     {animation && (
-                      <DecorativeVideo {...animation} isolated className="mb-6 aspect-[960/756] w-full max-w-[260px]" />
+                      <DecorativeVideo
+                        {...animation}
+                        isolated
+                        className="aspect-[960/756] w-40 shrink-0 sm:w-48 lg:w-40 xl:w-52"
+                      />
                     )}
-                    {service.tagline && (
-                      <p className="mb-3 text-xs font-bold uppercase tracking-wide text-white/40">— {service.tagline}</p>
-                    )}
-                    <h3 className="mb-4 text-2xl font-extrabold leading-tight text-white sm:text-3xl">
-                      <AccentText text={service.title} />
-                    </h3>
-                    <p className="max-w-xl text-lg leading-relaxed text-white">{service.body}</p>
-                    {service.href && (
-                      <Link
-                        href={service.href}
-                        className="mt-5 inline-block text-sm font-bold text-white/60 transition hover:text-white"
-                      >
-                        Ver más →
-                      </Link>
-                    )}
+                    <div className="min-w-0 flex-1">
+                      {service.tagline && (
+                        <p className="mb-3 text-xs font-bold uppercase tracking-wide text-white/40">— {service.tagline}</p>
+                      )}
+                      <h3 className="mb-4 text-2xl font-extrabold leading-tight text-white sm:text-3xl">
+                        <AccentText text={service.title} />
+                      </h3>
+                      <p className="text-lg leading-relaxed text-white">{service.body}</p>
+                      {service.href && (
+                        <Link
+                          href={service.href}
+                          className="mt-5 inline-block text-sm font-bold text-white/60 transition hover:text-white"
+                        >
+                          Ver más →
+                        </Link>
+                      )}
+                    </div>
                   </Reveal>
                 );
               })}
