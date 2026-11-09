@@ -162,7 +162,7 @@ export default async function LandingPage({ params }: Props) {
             <SectionHeading className="leading-tight">
               <AccentText text={landing.clientsTitle} />
             </SectionHeading>
-            <p className="text-white/70">{landing.clientsBody}</p>
+            {landing.clientsBody && <p className="text-white/70">{landing.clientsBody}</p>}
           </Reveal>
           {/* Mismo criterio que en la Home: -mx para que el marquee vaya de
               punta a punta sin unidades de viewport. */}
@@ -178,7 +178,7 @@ export default async function LandingPage({ params }: Props) {
               <SectionHeading className="mb-4 leading-tight">
                 <AccentText text={landing.painTitle} />
               </SectionHeading>
-              <p className="text-lg text-white">{landing.painIntro}</p>
+              {landing.painIntro && <p className="text-lg text-white">{landing.painIntro}</p>}
             </Reveal>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               {landing.painPoints.map((point, i) => (
@@ -209,10 +209,10 @@ export default async function LandingPage({ params }: Props) {
         {landing.services.length > 0 && (
           <section className="px-6 sm:px-14 section-gap">
             <Reveal className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-16">
-              <SectionHeading className="leading-tight">
+              <SectionHeading className={`leading-tight ${landing.servicesIntro ? "" : "sm:col-span-2"}`}>
                 <AccentText text={landing.servicesTitle} />
               </SectionHeading>
-              <p className="text-lg text-white">{landing.servicesIntro}</p>
+              {landing.servicesIntro && <p className="text-lg text-white">{landing.servicesIntro}</p>}
             </Reveal>
             {/* Estructura de los servicios de ¿Qué hacemos? (bajada, título,
                 texto y animación del servicio a la derecha), en dos columnas
@@ -268,7 +268,7 @@ export default async function LandingPage({ params }: Props) {
                 <SectionHeading className="mb-4 leading-tight">
                   <AccentText text={landing.casesTitle} />
                 </SectionHeading>
-                <p className="text-white">{landing.casesIntro}</p>
+                {landing.casesIntro && <p className="text-white">{landing.casesIntro}</p>}
               </div>
               <Link href="/proyectos" className="shrink-0 text-sm font-bold text-white/70 transition hover:text-white">
                 Ver todos los proyectos →
@@ -291,8 +291,8 @@ export default async function LandingPage({ params }: Props) {
             <SectionHeading className="mx-auto mb-4 max-w-3xl leading-tight">
               <AccentText text={landing.methodTitle} />
             </SectionHeading>
-            <p className="mx-auto mb-12 max-w-2xl text-lg text-white">{landing.methodIntro}</p>
-            <ol className="grid grid-cols-1 gap-6 text-left sm:grid-cols-2 lg:grid-cols-4">
+            {landing.methodIntro && <p className="mx-auto max-w-2xl text-lg text-white">{landing.methodIntro}</p>}
+            <ol className="mt-12 grid grid-cols-1 gap-6 text-left sm:grid-cols-2 lg:grid-cols-4">
               {methodSteps.map((step, i) => (
                 <li key={step.title} className="rounded-2xl bg-card p-6">
                   <h3 className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-xs font-bold text-white">
