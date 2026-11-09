@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { PAGE_DESCRIPTIONS } from "@/lib/seo";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
@@ -11,7 +10,7 @@ import { CtaSection } from "@/components/cta-section";
 import { Reveal } from "@/components/reveal";
 import { RichTextContent } from "@/components/rich-text-content";
 import { ResultsSection } from "@/components/results-section";
-import { getServices, getProcessSteps, getAboutContent, getPublishedLandings } from "@/lib/data";
+import { getServices, getProcessSteps, getAboutContent } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "¿Qué hacemos?",
@@ -85,11 +84,10 @@ function ServiceGraphic({ service }: { service: Awaited<ReturnType<typeof getSer
 }
 
 export default async function QueHacemosPage() {
-  const [services, processSteps, about, landings] = await Promise.all([
+  const [services, processSteps, about] = await Promise.all([
     getServices(),
     getProcessSteps(),
     getAboutContent(),
-    getPublishedLandings(),
   ]);
 
   return (
@@ -124,21 +122,6 @@ export default async function QueHacemosPage() {
               datos, creatividad y ejecución para que tu marca{" "}
               <span className="font-bold text-accent">crezca, se vea y venda más.</span>
             </p>
-            {/* Links a las landings de servicio publicadas (enlazado interno
-                recomendado por la consultoría SEO). */}
-            {landings.length > 0 && (
-              <nav aria-label="Servicios en detalle" className="mt-8 flex flex-wrap items-center justify-center gap-3">
-                {landings.map((landing) => (
-                  <Link
-                    key={landing.slug}
-                    href={`/servicios/${landing.slug}`}
-                    className="rounded-full border border-white/20 px-5 py-2.5 text-sm font-bold text-white/80 transition hover:border-accent hover:text-white"
-                  >
-                    {landing.navLabel} →
-                  </Link>
-                ))}
-              </nav>
-            )}
           </Reveal>
         </section>
 

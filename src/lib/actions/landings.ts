@@ -8,7 +8,6 @@ import { formStr as str, landingFieldsFromForm, parseSlug } from "@/lib/landing-
 
 function revalidateLandingPaths(...slugs: string[]) {
   for (const slug of slugs) revalidatePath(`/servicios/${slug}`);
-  revalidatePath("/que-hacemos");
   revalidatePath("/sitemap.xml");
 }
 

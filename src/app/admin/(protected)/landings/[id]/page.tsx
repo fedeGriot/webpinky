@@ -81,7 +81,7 @@ export default async function EditarLandingPage({
           />
           <label className="flex items-center gap-2 text-sm font-semibold text-white/70">
             <input type="checkbox" name="published" defaultChecked={landing.published} className="h-4 w-4" />
-            Publicada (visible en el sitio, el sitemap y los links de ¿Qué hacemos?)
+            Publicada (visible en el sitio y en el sitemap)
           </label>
         </Section>
 
