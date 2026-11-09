@@ -285,33 +285,36 @@ export default async function LandingPage({ params }: Props) {
           </Reveal>
         </section>
 
-        {/* Growth partner */}
-        <section className="px-6 sm:px-14 section-gap">
-          <Reveal className="grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-16">
-            <SectionHeading className="leading-tight">
-              <AccentText text={landing.partnerTitle} />
-            </SectionHeading>
-            <p className="text-lg leading-relaxed text-white">{landing.partnerBody}</p>
-          </Reveal>
-          {landing.partnerPoints.length > 0 && (
-            <ol className="mt-12 divide-y divide-white/10 border-t border-white/10">
-              {landing.partnerPoints.map((point, i) => (
-                <Reveal
-                  as="li"
-                  key={point.title}
-                  delay={Math.min(i * 0.08, 0.32)}
-                  className="grid grid-cols-1 gap-3 py-7 sm:grid-cols-[280px_1fr] sm:gap-10"
-                >
-                  <div className="flex gap-3">
-                    <span className="text-sm font-bold text-accent">{String(i + 1).padStart(2, "0")}</span>
-                    <h3 className="text-lg font-bold leading-snug text-white">{point.title}</h3>
-                  </div>
-                  <p className="leading-relaxed text-white">{point.body}</p>
-                </Reveal>
-              ))}
-            </ol>
-          )}
-        </section>
+        {/* Growth partner: opcional (la consultoría lo reserva para algunas
+            landings, ej. Ecommerce y Performance); vacío no se muestra. */}
+        {(landing.partnerBody || landing.partnerPoints.length > 0) && (
+          <section className="px-6 sm:px-14 section-gap">
+            <Reveal className="grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-16">
+              <SectionHeading className="leading-tight">
+                <AccentText text={landing.partnerTitle} />
+              </SectionHeading>
+              <p className="text-lg leading-relaxed text-white">{landing.partnerBody}</p>
+            </Reveal>
+            {landing.partnerPoints.length > 0 && (
+              <ol className="mt-12 divide-y divide-white/10 border-t border-white/10">
+                {landing.partnerPoints.map((point, i) => (
+                  <Reveal
+                    as="li"
+                    key={point.title}
+                    delay={Math.min(i * 0.08, 0.32)}
+                    className="grid grid-cols-1 gap-3 py-7 sm:grid-cols-[280px_1fr] sm:gap-10"
+                  >
+                    <div className="flex gap-3">
+                      <span className="text-sm font-bold text-accent">{String(i + 1).padStart(2, "0")}</span>
+                      <h3 className="text-lg font-bold leading-snug text-white">{point.title}</h3>
+                    </div>
+                    <p className="leading-relaxed text-white">{point.body}</p>
+                  </Reveal>
+                ))}
+              </ol>
+            )}
+          </section>
+        )}
 
         {/* Testimonios: citas de los casos elegidos */}
         {testimonials.length > 0 && (

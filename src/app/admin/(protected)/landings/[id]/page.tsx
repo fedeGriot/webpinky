@@ -137,7 +137,10 @@ export default async function EditarLandingPage({
           />
         </Section>
 
-        <Section title="7. Growth partner y diferenciales">
+        <Section
+          title="7. Growth partner y diferenciales"
+          description="Opcional: si dejás el texto y la lista vacíos, la sección no se muestra (la idea es usarla en Ecommerce y Performance)."
+        >
           <Field label="Título" name="partnerTitle" defaultValue={landing.partnerTitle} />
           <Field label="Texto" name="partnerBody" defaultValue={landing.partnerBody} multiline />
           <ListEditor name="partnerPointsJson" fields={ITEM_FIELDS} defaultItems={landing.partnerPoints} addLabel="+ Agregar diferencial" />
