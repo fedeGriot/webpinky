@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { normalizeSectionOrder } from "@/lib/landing-sections";
 
 export async function getSiteSettings() {
   const settings = await prisma.siteSettings.findUnique({ where: { id: "singleton" } });
@@ -145,6 +146,8 @@ function parseList<T>(json: string): T[] {
 }
 
 function mapLanding<T extends {
+  sectionOrderJson: string;
+  formatsJson: string;
   painPointsJson: string;
   servicesJson: string;
   caseProjectIdsJson: string;
@@ -154,6 +157,8 @@ function mapLanding<T extends {
   faqsJson: string;
 }>(landing: T) {
   const {
+    sectionOrderJson,
+    formatsJson,
     painPointsJson,
     servicesJson,
     caseProjectIdsJson,
@@ -165,6 +170,8 @@ function mapLanding<T extends {
   } = landing;
   return {
     ...rest,
+    sectionOrder: normalizeSectionOrder(parseList<unknown>(sectionOrderJson)),
+    formats: parseList<LandingItem>(formatsJson),
     painPoints: parseList<LandingItem>(painPointsJson),
     services: parseList<LandingServiceItem>(servicesJson),
     caseProjectIds: parseList<string>(caseProjectIdsJson),

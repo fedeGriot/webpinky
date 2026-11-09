@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
+import { Fragment, type ReactNode } from "react";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { BackgroundShape } from "@/components/background-shape";
@@ -14,12 +16,15 @@ import { SectionEyebrow } from "@/components/section-eyebrow";
 import { SectionHeading } from "@/components/section-heading";
 import { AccentText } from "@/components/accent-text";
 import { JsonLd } from "@/components/json-ld";
+import { VideoLightboxTrigger } from "@/components/video-lightbox";
+import { getYouTubeId } from "@/lib/youtube";
 import { DecorativeVideo } from "@/components/decorative-video";
 import { getServiceAnimation } from "@/lib/service-animations";
 import { getClients, getLandingBySlug, getLandingCases, getProcessSteps, getTestimonialsByIds } from "@/lib/data";
 import { hasAdminSession } from "@/lib/dal";
 import { splitAccent, stripAccent } from "@/lib/accent";
 import { SITE_URL } from "@/lib/seo";
+import type { LandingSectionKey } from "@/lib/landing-sections";
 
 // Renderizado dinámico: el contenido viene del CMS (/admin/landings) y debe
 // reflejarse sin rebuild, igual que el resto del sitio.
@@ -84,6 +89,7 @@ export default async function LandingPage({ params }: Props) {
           return { title: tag ?? step.title, body: headline ? `${headline}. ${step.description}` : step.description };
         });
   const cta = splitCtaTitle(landing.ctaTitle);
+  const showreelId = landing.heroVideoUrl ? getYouTubeId(landing.heroVideoUrl) : null;
 
   const url = `${SITE_URL}/servicios/${landing.slug}`;
   const name = stripAccent(landing.heroTitle);
@@ -116,46 +122,11 @@ export default async function LandingPage({ params }: Props) {
     })),
   };
 
-  return (
-    <>
-      <JsonLd data={serviceJsonLd} />
-      <JsonLd data={breadcrumbJsonLd} />
-      {faqJsonLd && <JsonLd data={faqJsonLd} />}
-      <SiteNav active="que-hacemos" />
-      <main>
-        {!landing.published && (
-          <p className="bg-accent px-6 py-2 text-center text-sm font-bold text-white sm:px-14">
-            Vista previa: esta landing no está publicada y solo la ven los administradores.{" "}
-            <Link href={`/admin/landings/${landing.id}`} className="underline">
-              Editar
-            </Link>
-          </p>
-        )}
-
-        {/* Hero */}
-        <section className="relative px-6 pt-16 sm:px-14 sm:pt-20">
-          <BackgroundShape className="right-[-140px] top-[-60px] h-[600px] w-[600px] opacity-50" />
-          <div className="relative z-10 max-w-3xl">
-            <nav aria-label="Breadcrumb" className="mb-6 text-sm text-white/50">
-              <Link href="/que-hacemos" className="-my-3 inline-block py-3 transition hover:text-white">
-                ¿Qué hacemos?
-              </Link>
-              <span className="mx-2 text-white/30">/</span>
-              <span className="text-white/80">{landing.navLabel}</span>
-            </nav>
-            <SectionEyebrow className="mb-4 text-accent!">{landing.heroEyebrow}</SectionEyebrow>
-            <h1 className="text-4xl font-extrabold leading-[1.05] text-white sm:text-6xl">
-              <AccentText text={landing.heroTitle} underline />
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg text-white">{landing.heroBody}</p>
-            <div className="mt-8 flex flex-wrap items-center gap-4">
-              <FillButton href="/contacto" className="bg-accent px-7 py-4 text-sm">
-                {landing.heroCtaLabel}
-              </FillButton>
-            </div>
-          </div>
-        </section>
-
+  // Cada sección por clave, para renderizarlas en el orden de la landing
+  // (sectionOrder). Las que no tienen contenido quedan en null.
+  const sections: Record<LandingSectionKey, ReactNode> = {
+    clients: (
+      <>
         {/* Marcas que confían */}
         <section className="relative z-10 px-6 sm:px-14 section-gap">
           <Reveal className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:items-end sm:gap-16">
@@ -170,7 +141,10 @@ export default async function LandingPage({ params }: Props) {
             <ClientsMarquee clients={clients} />
           </Reveal>
         </section>
-
+      </>
+    ),
+    pain: (
+      <>
         {/* Puntos de dolor */}
         {landing.painPoints.length > 0 && (
           <section className="px-6 sm:px-14 section-gap">
@@ -204,7 +178,10 @@ export default async function LandingPage({ params }: Props) {
             </div>
           </section>
         )}
-
+      </>
+    ),
+    services: (
+      <>
         {/* Servicios */}
         {landing.services.length > 0 && (
           <section className="px-6 sm:px-14 section-gap">
@@ -264,7 +241,10 @@ export default async function LandingPage({ params }: Props) {
             </div>
           </section>
         )}
-
+      </>
+    ),
+    cases: (
+      <>
         {/* Casos */}
         {cases.length > 0 && (
           <section id="casos" className="scroll-mt-24 px-6 sm:px-14 section-gap">
@@ -297,14 +277,17 @@ export default async function LandingPage({ params }: Props) {
               >
                 {cases.map((project) => (
                   <div key={project.id} className="w-[78vw] shrink-0 snap-start scroll-ml-6 sm:w-[44vw] sm:scroll-ml-14 lg:w-auto">
-                    <CaseStudyCard project={project} />
+                    <CaseStudyCard project={project} showVideo={landing.casesShowVideo} />
                   </div>
                 ))}
               </div>
             </Reveal>
           </section>
         )}
-
+      </>
+    ),
+    method: (
+      <>
         {/* Metodología */}
         <section className="bg-card/40 px-6 py-14 text-center sm:px-14 sm:py-20 section-gap">
           <Reveal>
@@ -325,7 +308,33 @@ export default async function LandingPage({ params }: Props) {
             </ol>
           </Reveal>
         </section>
-
+      </>
+    ),
+    formats: (
+      <>
+        {/* Formatos y canales: cómo se adapta el servicio a cada medio. */}
+        {landing.formats.length > 0 && (
+          <section className="px-6 sm:px-14 section-gap">
+            <Reveal className="mb-10 max-w-2xl">
+              <SectionHeading className="mb-4 leading-tight">
+                <AccentText text={landing.formatsTitle} />
+              </SectionHeading>
+              {landing.formatsIntro && <p className="text-lg text-white">{landing.formatsIntro}</p>}
+            </Reveal>
+            <div className="grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+              {landing.formats.map((format, i) => (
+                <Reveal key={format.title} delay={Math.min(i * 0.08, 0.24)} className="border-t-2 border-accent pt-5">
+                  <h3 className="mb-2 text-xl font-extrabold text-white">{format.title}</h3>
+                  <p className="leading-relaxed text-white/80">{format.body}</p>
+                </Reveal>
+              ))}
+            </div>
+          </section>
+        )}
+      </>
+    ),
+    partner: (
+      <>
         {/* Growth partner: opcional (la consultoría lo reserva para algunas
             landings, ej. Ecommerce y Performance); vacío no se muestra. */}
         {(landing.partnerBody || landing.partnerPoints.length > 0) && (
@@ -356,7 +365,10 @@ export default async function LandingPage({ params }: Props) {
             )}
           </section>
         )}
-
+      </>
+    ),
+    testimonials: (
+      <>
         {/* Testimonios (escritos o en video), administrados aparte en
             /admin/secciones/testimonios y elegidos en cada landing. */}
         {testimonials.length > 0 && (
@@ -375,7 +387,10 @@ export default async function LandingPage({ params }: Props) {
             </Reveal>
           </section>
         )}
-
+      </>
+    ),
+    faq: (
+      <>
         {/* FAQs */}
         {landing.faqs.length > 0 && (
           <section className="px-6 sm:px-14 section-gap">
@@ -402,6 +417,71 @@ export default async function LandingPage({ params }: Props) {
             </Reveal>
           </section>
         )}
+      </>
+    ),
+  };
+
+  return (
+    <>
+      <JsonLd data={serviceJsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
+      {faqJsonLd && <JsonLd data={faqJsonLd} />}
+      <SiteNav active="que-hacemos" />
+      <main>
+        {!landing.published && (
+          <p className="bg-accent px-6 py-2 text-center text-sm font-bold text-white sm:px-14">
+            Vista previa: esta landing no está publicada y solo la ven los administradores.{" "}
+            <Link href={`/admin/landings/${landing.id}`} className="underline">
+              Editar
+            </Link>
+          </p>
+        )}
+
+        {/* Hero */}
+        <section className="relative px-6 pt-16 sm:px-14 sm:pt-20">
+          <BackgroundShape className="right-[-140px] top-[-60px] h-[600px] w-[600px] opacity-50" />
+          <div className="relative z-10 max-w-3xl">
+            <nav aria-label="Breadcrumb" className="mb-6 text-sm text-white/50">
+              <Link href="/que-hacemos" className="-my-3 inline-block py-3 transition hover:text-white">
+                ¿Qué hacemos?
+              </Link>
+              <span className="mx-2 text-white/30">/</span>
+              <span className="text-white/80">{landing.navLabel}</span>
+            </nav>
+            <SectionEyebrow className="mb-4 text-accent!">{landing.heroEyebrow}</SectionEyebrow>
+            <h1 className="text-4xl font-extrabold leading-[1.05] text-white sm:text-6xl">
+              <AccentText text={landing.heroTitle} underline />
+            </h1>
+            <p className="mt-6 max-w-2xl text-lg text-white">{landing.heroBody}</p>
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <FillButton href="/contacto" className="bg-accent px-7 py-4 text-sm">
+                {landing.heroCtaLabel}
+              </FillButton>
+            </div>
+          </div>
+          {/* Showreel (ej. Producción audiovisual): la miniatura del video con
+              el mismo reproductor de las fichas de proyecto. */}
+          {showreelId && (
+            <Reveal className="relative z-10 mt-12 aspect-video w-full max-w-5xl overflow-hidden rounded-3xl bg-black">
+              <Image
+                src={`https://i.ytimg.com/vi/${showreelId}/hqdefault.jpg`}
+                alt=""
+                fill
+                sizes="(max-width: 1100px) 90vw, 1024px"
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-black/25" />
+              <span className="pointer-events-none absolute bottom-5 left-6 text-sm font-bold uppercase tracking-wide text-white">
+                Showreel
+              </span>
+              <VideoLightboxTrigger videoId={showreelId} label={`Ver showreel — ${landing.navLabel}`} />
+            </Reveal>
+          )}
+        </section>
+
+        {landing.sectionOrder.map((key) => (
+          <Fragment key={key}>{sections[key]}</Fragment>
+        ))}
 
         <div className="bg-card/40 section-gap">
           <CtaSection eyebrow={landing.ctaEyebrow} titleLine1={cta.line1} titleAccent={cta.accent} body={landing.ctaBody} />

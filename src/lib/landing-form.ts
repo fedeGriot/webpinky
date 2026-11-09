@@ -1,5 +1,6 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
+import { normalizeSectionOrder } from "@/lib/landing-sections";
 
 // Lectura y validación del formulario de /admin/landings, separada de las
 // server actions para que solo ellas queden expuestas como endpoints.
@@ -47,6 +48,16 @@ function cleanItems<K extends string>(formData: FormData, key: string, fields: r
 
 // Links de los servicios: solo rutas internas (/que-hacemos#..., /servicios/...)
 // o http(s), para no terminar guardando un href tipo javascript: en un <a>.
+function optionalVideoUrl(formData: FormData, key: string) {
+  const value = formStr(formData, key);
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    if (url.protocol === "http:" || url.protocol === "https:") return value;
+  } catch {}
+  throw new Error(`"${value}" no es un link válido: pegá la URL completa del video (https://…).`);
+}
+
 function cleanHref(href: string) {
   if (!href) return undefined;
   if (href.startsWith("/") && !href.startsWith("//")) return href;
@@ -85,12 +96,14 @@ export async function landingFieldsFromForm(formData: FormData) {
     slug: parseSlug(formData),
     navLabel: formStr(formData, "navLabel"),
     published: formData.get("published") === "on",
+    sectionOrderJson: JSON.stringify(normalizeSectionOrder(parseJsonArray(formData, "sectionOrderJson"))),
     seoTitle: formStr(formData, "seoTitle"),
     seoDescription: formStr(formData, "seoDescription"),
     heroEyebrow: formStr(formData, "heroEyebrow"),
     heroTitle: formStr(formData, "heroTitle"),
     heroBody: formStr(formData, "heroBody"),
     heroCtaLabel: formStr(formData, "heroCtaLabel"),
+    heroVideoUrl: optionalVideoUrl(formData, "heroVideoUrl"),
     clientsTitle: formStr(formData, "clientsTitle"),
     clientsBody: formStr(formData, "clientsBody"),
     painTitle: formStr(formData, "painTitle"),
@@ -100,11 +113,15 @@ export async function landingFieldsFromForm(formData: FormData) {
     servicesIntro: formStr(formData, "servicesIntro"),
     servicesJson: JSON.stringify(services),
     casesTitle: formStr(formData, "casesTitle"),
+    casesShowVideo: formData.get("casesShowVideo") === "on",
     casesIntro: formStr(formData, "casesIntro"),
     caseProjectIdsJson: JSON.stringify(await parseIds(formData, "caseProjectIdsJson", existingProjects, MAX_CASES)),
     methodTitle: formStr(formData, "methodTitle"),
     methodIntro: formStr(formData, "methodIntro"),
     methodStepsJson: JSON.stringify(cleanItems(formData, "methodStepsJson", ["title", "body"], "title")),
+    formatsTitle: formStr(formData, "formatsTitle"),
+    formatsIntro: formStr(formData, "formatsIntro"),
+    formatsJson: JSON.stringify(cleanItems(formData, "formatsJson", ["title", "body"], "title")),
     partnerTitle: formStr(formData, "partnerTitle"),
     partnerBody: formStr(formData, "partnerBody"),
     partnerPointsJson: JSON.stringify(cleanItems(formData, "partnerPointsJson", ["title", "body"], "title")),

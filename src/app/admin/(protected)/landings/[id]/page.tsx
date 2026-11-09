@@ -10,6 +10,7 @@ import { ListEditor } from "@/components/admin/list-editor";
 import { ProjectPicker } from "@/components/admin/project-picker";
 import { SeoDescriptionField, SeoTitleField } from "@/components/admin/seo-description-field";
 import { inputClass, labelClass, textareaClass } from "@/components/admin/form-styles";
+import { SectionOrder } from "@/components/admin/section-order";
 
 // Renderizado dinámico: la sesión ya obliga a esto (verifySession lee
 // cookies en el layout), pero se declara explícito para que el build no
@@ -99,26 +100,39 @@ export default async function EditarLandingPage({
           </label>
         </Section>
 
-        <Section title="1. Hero" description="El H1 es el título principal: usá el de la planilla de SEO.">
+        <Section
+          title="Orden de las secciones"
+          description="El hero va siempre primero y el contacto al final. Las secciones sin contenido no se muestran aunque estén en la lista."
+        >
+          <SectionOrder name="sectionOrderJson" defaultOrder={landing.sectionOrder} />
+        </Section>
+
+        <Section title="Hero" description="El H1 es el título principal: usá el de la planilla de SEO.">
           <Field label="Etiqueta sobre el título" name="heroEyebrow" defaultValue={landing.heroEyebrow} />
           <Field label="Título (H1)" name="heroTitle" defaultValue={landing.heroTitle} />
           <Field label="Texto" name="heroBody" defaultValue={landing.heroBody} multiline />
           <Field label="Texto del botón" name="heroCtaLabel" defaultValue={landing.heroCtaLabel} hint="Lleva a Contacto." />
+          <Field
+            label="Showreel (opcional)"
+            name="heroVideoUrl"
+            defaultValue={landing.heroVideoUrl ?? ""}
+            hint="Link de YouTube: se muestra grande debajo del texto, con play. Vacío = sin showreel."
+          />
         </Section>
 
-        <Section title="2. Marcas que confían" description="Los logos salen de Secciones → Clientes.">
+        <Section title="Marcas que confían" description="Los logos salen de Secciones → Clientes.">
           <Field label="Título" name="clientsTitle" defaultValue={landing.clientsTitle} />
           <Field label="Texto" name="clientsBody" defaultValue={landing.clientsBody} multiline />
         </Section>
 
-        <Section title="3. Puntos de dolor">
+        <Section title="Puntos de dolor">
           <Field label="Título" name="painTitle" defaultValue={landing.painTitle} />
           <Field label="Introducción" name="painIntro" defaultValue={landing.painIntro} multiline />
           <ListEditor name="painPointsJson" fields={ITEM_FIELDS} defaultItems={landing.painPoints} addLabel="+ Agregar desafío" />
         </Section>
 
         <Section
-          title="4. Servicios y alcance"
+          title="Servicios y alcance"
           description="Se muestran en dos columnas, con la estructura de ¿Qué hacemos?: bajada, título, texto y la animación del servicio elegido."
         >
           <Field label="Título" name="servicesTitle" defaultValue={landing.servicesTitle} />
@@ -143,14 +157,18 @@ export default async function EditarLandingPage({
           />
         </Section>
 
-        <Section title="5. Casos de éxito" description="Elegí entre 3 y 4 proyectos: se muestran con su desafío, qué hicimos, resultado y servicios. Si quedan menos de 3, se completa con proyectos destacados.">
+        <Section title="Casos de éxito" description="Elegí entre 3 y 4 proyectos: se muestran con su desafío, qué hicimos, resultado y servicios. Si quedan menos de 3, se completa con proyectos destacados.">
           <Field label="Título" name="casesTitle" defaultValue={landing.casesTitle} />
           <Field label="Introducción" name="casesIntro" defaultValue={landing.casesIntro} multiline />
           <ProjectPicker name="caseProjectIdsJson" options={projectOptions} defaultIds={landing.caseProjectIds} max={4} />
+          <label className="flex items-center gap-2 text-sm font-semibold text-white/70">
+            <input type="checkbox" name="casesShowVideo" defaultChecked={landing.casesShowVideo} className="h-4 w-4" />
+            Mostrar como portafolio: play sobre la imagen para ver el video de cada caso
+          </label>
         </Section>
 
         <Section
-          title="6. Metodología"
+          title="Metodología"
           description="Una etapa por paso (Analizamos, Planificamos, Ejecutamos, Optimizamos), contada para este servicio. Si la dejás vacía, se usan las etapas generales de Secciones → Proceso."
         >
           <Field label="Título" name="methodTitle" defaultValue={landing.methodTitle} />
@@ -164,7 +182,16 @@ export default async function EditarLandingPage({
         </Section>
 
         <Section
-          title="7. Growth partner y diferenciales"
+          title="Formatos y canales"
+          description="Opcional: cómo se adapta el servicio a cada medio (ej. TV, redes, pauta). Vacía, no se muestra."
+        >
+          <Field label="Título" name="formatsTitle" defaultValue={landing.formatsTitle} />
+          <Field label="Introducción" name="formatsIntro" defaultValue={landing.formatsIntro} multiline />
+          <ListEditor name="formatsJson" fields={ITEM_FIELDS} defaultItems={landing.formats} addLabel="+ Agregar formato" />
+        </Section>
+
+        <Section
+          title="Growth partner y diferenciales"
           description="Opcional: si dejás el texto y la lista vacíos, la sección no se muestra (la idea es usarla en Ecommerce y Performance)."
         >
           <Field label="Título" name="partnerTitle" defaultValue={landing.partnerTitle} />
@@ -173,7 +200,7 @@ export default async function EditarLandingPage({
         </Section>
 
         <Section
-          title="8. Testimonios"
+          title="Testimonios"
           description="Elegí cuáles mostrar. Los testimonios (escritos o en video) se cargan en Secciones → Testimonios."
         >
           <Field label="Título" name="testimonialsTitle" defaultValue={landing.testimonialsTitle} />
@@ -188,7 +215,7 @@ export default async function EditarLandingPage({
           </Link>
         </Section>
 
-        <Section title="9. Preguntas frecuentes" description="Enfocadas en la contratación: alcance, presupuesto, tiempos, coordinación.">
+        <Section title="Preguntas frecuentes" description="Enfocadas en la contratación: alcance, presupuesto, tiempos, coordinación.">
           <Field label="Título" name="faqTitle" defaultValue={landing.faqTitle} />
           <ListEditor
             name="faqsJson"
@@ -201,7 +228,7 @@ export default async function EditarLandingPage({
           />
         </Section>
 
-        <Section title="10. Contacto" description="Explicá qué pasa después de completar el formulario. El botón lleva a Contacto.">
+        <Section title="Contacto" description="Explicá qué pasa después de completar el formulario. El botón lleva a Contacto.">
           <Field label="Etiqueta" name="ctaEyebrow" defaultValue={landing.ctaEyebrow} />
           <Field label="Título" name="ctaTitle" defaultValue={landing.ctaTitle} />
           <Field label="Texto" name="ctaBody" defaultValue={landing.ctaBody} multiline />
