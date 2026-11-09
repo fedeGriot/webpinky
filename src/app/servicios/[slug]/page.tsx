@@ -13,7 +13,7 @@ import { SectionEyebrow } from "@/components/section-eyebrow";
 import { SectionHeading } from "@/components/section-heading";
 import { AccentText } from "@/components/accent-text";
 import { JsonLd } from "@/components/json-ld";
-import { getClients, getLandingBySlug, getProcessSteps, getProjectsByIds } from "@/lib/data";
+import { getClients, getLandingBySlug, getLandingCases, getProcessSteps, getProjectsByIds } from "@/lib/data";
 import { hasAdminSession } from "@/lib/dal";
 import { splitAccent, stripAccent } from "@/lib/accent";
 import { SITE_URL } from "@/lib/seo";
@@ -67,7 +67,7 @@ export default async function LandingPage({ params }: Props) {
 
   const [clients, cases, testimonialProjects, processSteps] = await Promise.all([
     getClients(),
-    getProjectsByIds(landing.caseProjectIds),
+    getLandingCases(landing.caseProjectIds),
     getProjectsByIds(landing.testimonialProjectIds),
     getProcessSteps(),
   ]);

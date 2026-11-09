@@ -198,6 +198,19 @@ export async function getLandingById(id: string) {
   return landing ? mapLanding(landing) : null;
 }
 
+/**
+ * Casos de una landing: los elegidos en el admin, en su orden, completados
+ * con proyectos destacados hasta llegar a `min` (por si se eligieron menos o
+ * se borró alguno), así la sección nunca queda con uno o dos casos sueltos.
+ */
+export async function getLandingCases(ids: string[], min = 3) {
+  const chosen = await getProjectsByIds(ids);
+  if (chosen.length >= min) return chosen;
+  const used = new Set(chosen.map((p) => p.id));
+  const featured = (await getFeaturedProjects()).filter((p) => !used.has(p.id));
+  return [...chosen, ...featured.slice(0, min - chosen.length)];
+}
+
 /** Proyectos por ID respetando el orden elegido en la landing. */
 export async function getProjectsByIds(ids: string[]) {
   if (ids.length === 0) return [];

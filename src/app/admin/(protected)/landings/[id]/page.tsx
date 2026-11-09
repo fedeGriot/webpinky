@@ -117,7 +117,7 @@ export default async function EditarLandingPage({
           />
         </Section>
 
-        <Section title="5. Casos de éxito" description="Elegí hasta 4 proyectos: se muestran con su desafío, qué hicimos, resultado y servicios.">
+        <Section title="5. Casos de éxito" description="Elegí entre 3 y 4 proyectos: se muestran con su desafío, qué hicimos, resultado y servicios. Si quedan menos de 3, se completa con proyectos destacados.">
           <Field label="Título" name="casesTitle" defaultValue={landing.casesTitle} />
           <Field label="Introducción" name="casesIntro" defaultValue={landing.casesIntro} multiline />
           <ProjectPicker name="caseProjectIdsJson" options={projectOptions} defaultIds={landing.caseProjectIds} max={4} />
