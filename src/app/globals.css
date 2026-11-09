@@ -144,6 +144,49 @@ body {
   animation: reveal-intro 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0s) backwards;
 }
 
+/* Efecto "sonar" de las tarjetas de puntos de dolor (landings): ondas que
+   salen del punto rosa y se abren por el fondo de la tarjeta mientras el
+   mouse está encima. Solo con puntero real (hover: hover), para que en
+   touch no quede trabado después de tocar; con reduced-motion la regla
+   global de abajo las deja en una sola pasada invisible. */
+@keyframes sonar {
+  from {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(0.04);
+  }
+  55% {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+.sonar-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 760px;
+  height: 760px;
+  border-radius: 9999px;
+  border: 1.5px solid rgb(217 11 145 / 0.45);
+  background: radial-gradient(circle, rgb(217 11 145 / 0) 40%, rgb(217 11 145 / 0.12) 70%, rgb(217 11 145 / 0) 71%);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.04);
+  pointer-events: none;
+}
+@media (hover: hover) {
+  .group:hover .sonar-ring {
+    animation: sonar 2.7s cubic-bezier(0.25, 0.5, 0.4, 1) infinite;
+  }
+  .group:hover .sonar-ring:nth-child(2) {
+    animation-delay: 0.9s;
+  }
+  .group:hover .sonar-ring:nth-child(3) {
+    animation-delay: 1.8s;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

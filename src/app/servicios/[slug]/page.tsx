@@ -150,14 +150,6 @@ export default async function LandingPage({ params }: Props) {
               <FillButton href="/contacto" className="bg-accent px-7 py-4 text-sm">
                 {landing.heroCtaLabel}
               </FillButton>
-              {cases.length > 0 && (
-                <a
-                  href="#casos"
-                  className="rounded-full border border-white/20 px-7 py-4 text-sm font-bold text-white/80 transition hover:border-white hover:text-white"
-                >
-                  Ver casos ↓
-                </a>
-              )}
             </div>
           </div>
         </section>
@@ -188,12 +180,23 @@ export default async function LandingPage({ params }: Props) {
             </Reveal>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               {landing.painPoints.map((point, i) => (
-                <Reveal key={point.title} delay={Math.min(i * 0.08, 0.24)} className="rounded-3xl bg-card p-8">
-                  <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-accent/15">
-                    <span className="h-2.5 w-2.5 rounded-full bg-accent" />
-                  </span>
-                  <h3 className="mb-3 text-[22px] font-extrabold leading-snug text-white">{point.title}</h3>
-                  <p className="text-white">{point.body}</p>
+                <Reveal
+                  key={point.title}
+                  delay={Math.min(i * 0.08, 0.24)}
+                  className="group relative overflow-hidden rounded-3xl bg-card p-8"
+                >
+                  <div className="mb-4 flex items-center gap-4">
+                    {/* Las ondas (.sonar-ring, globals.css) nacen del centro
+                        del punto; el overflow-hidden de la tarjeta las recorta. */}
+                    <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/15">
+                      <span aria-hidden="true" className="sonar-ring" />
+                      <span aria-hidden="true" className="sonar-ring" />
+                      <span aria-hidden="true" className="sonar-ring" />
+                      <span className="relative h-2.5 w-2.5 rounded-full bg-accent" />
+                    </span>
+                    <h3 className="relative text-[22px] font-extrabold leading-snug text-white">{point.title}</h3>
+                  </div>
+                  <p className="relative text-white">{point.body}</p>
                 </Reveal>
               ))}
             </div>
