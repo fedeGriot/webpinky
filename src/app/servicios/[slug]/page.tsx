@@ -137,7 +137,7 @@ export default async function LandingPage({ params }: Props) {
           <BackgroundShape className="right-[-140px] top-[-60px] h-[600px] w-[600px] opacity-50" />
           <div className="relative z-10 max-w-3xl">
             <nav aria-label="Breadcrumb" className="mb-6 text-sm text-white/50">
-              <Link href="/que-hacemos" className="transition hover:text-white">
+              <Link href="/que-hacemos" className="-my-3 inline-block py-3 transition hover:text-white">
                 ¿Qué hacemos?
               </Link>
               <span className="mx-2 text-white/30">/</span>
@@ -174,20 +174,20 @@ export default async function LandingPage({ params }: Props) {
         {/* Puntos de dolor */}
         {landing.painPoints.length > 0 && (
           <section className="px-6 sm:px-14 section-gap">
-            <Reveal className="mb-12 max-w-2xl">
+            <Reveal className="mb-8 max-w-2xl sm:mb-12">
               <SectionHeading className="mb-4 leading-tight">
                 <AccentText text={landing.painTitle} />
               </SectionHeading>
               {landing.painIntro && <p className="text-lg text-white">{landing.painIntro}</p>}
             </Reveal>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
               {landing.painPoints.map((point, i) => (
                 <Reveal
                   key={point.title}
                   delay={Math.min(i * 0.08, 0.24)}
-                  className="group relative overflow-hidden rounded-3xl bg-card p-8"
+                  className="group relative overflow-hidden rounded-3xl bg-card p-6 sm:p-8"
                 >
-                  <div className="mb-4 flex items-center gap-4">
+                  <div className="mb-3 flex items-center gap-4 sm:mb-4">
                     {/* Las ondas (.sonar-ring, globals.css) nacen del centro
                         del punto; el overflow-hidden de la tarjeta las recorta. */}
                     <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/15">
@@ -218,30 +218,36 @@ export default async function LandingPage({ params }: Props) {
                 texto y animación del servicio a la derecha), en dos columnas
                 desde lg. En mobile la animación va arriba, más chica: al
                 costado le dejaba muy poco ancho al texto. */}
-            <div className="mt-14 grid grid-cols-1 gap-x-16 gap-y-14 lg:grid-cols-2">
+            <div className="mt-10 grid grid-cols-1 gap-x-16 gap-y-12 sm:mt-14 sm:gap-y-14 lg:grid-cols-2">
               {landing.services.map((service, i) => {
                 const animation = service.service ? getServiceAnimation(service.service) : null;
                 return (
+                  // Grilla de dos columnas: título a la izquierda y animación a la
+                  // derecha. En mobile el párrafo va debajo a todo el ancho (con
+                  // la animación al costado del texto completo quedaba muy
+                  // angosto); desde sm la animación ocupa las dos filas.
                   <Reveal
                     as="article"
                     key={service.title}
                     delay={(i % 2) * 0.08}
-                    className="flex flex-col gap-5 sm:flex-row-reverse sm:items-center sm:gap-8"
+                    className="grid grid-cols-[1fr_auto] gap-x-4 sm:gap-x-8"
                   >
+                    <div className="min-w-0 self-center sm:self-end">
+                      {service.tagline && (
+                        <p className="mb-3 text-xs font-bold uppercase tracking-wide text-white/40">— {service.tagline}</p>
+                      )}
+                      <h3 className="text-2xl font-extrabold leading-tight text-white sm:text-3xl">
+                        <AccentText text={service.title} />
+                      </h3>
+                    </div>
                     {animation && (
                       <DecorativeVideo
                         {...animation}
                         isolated
-                        className="aspect-[960/756] w-40 shrink-0 sm:w-48 lg:w-40 xl:w-52"
+                        className="col-start-2 row-start-1 aspect-[960/756] w-28 self-center sm:row-span-2 sm:w-48 lg:w-40 xl:w-52"
                       />
                     )}
-                    <div className="min-w-0 flex-1">
-                      {service.tagline && (
-                        <p className="mb-3 text-xs font-bold uppercase tracking-wide text-white/40">— {service.tagline}</p>
-                      )}
-                      <h3 className="mb-4 text-2xl font-extrabold leading-tight text-white sm:text-3xl">
-                        <AccentText text={service.title} />
-                      </h3>
+                    <div className="col-span-2 mt-4 sm:col-span-1">
                       <p className="text-lg leading-relaxed text-white">{service.body}</p>
                       {service.href && (
                         <Link
@@ -270,31 +276,46 @@ export default async function LandingPage({ params }: Props) {
                 </SectionHeading>
                 {landing.casesIntro && <p className="text-white">{landing.casesIntro}</p>}
               </div>
-              <Link href="/proyectos" className="shrink-0 text-sm font-bold text-white/70 transition hover:text-white">
+              <Link
+                href="/proyectos"
+                className="-my-3 shrink-0 py-3 text-sm font-bold text-white/70 transition hover:text-white"
+              >
                 Ver todos los proyectos →
               </Link>
             </Reveal>
-            <div className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
-              {cases.map((project, i) => (
-                <Reveal key={project.id} delay={Math.min(i * 0.08, 0.24)}>
-                  <CaseStudyCard project={project} />
-                </Reveal>
-              ))}
-            </div>
+            {/* Hasta lg, carrusel deslizable con scroll-snap (como el de la Home,
+                pero solo CSS): tres tarjetas verticales apiladas ocupaban casi
+                tres pantallas en el celular, y en tablet la tercera quedaba sola.
+                El -mx/px lleva el carrusel de borde a borde y deja asomar la
+                tarjeta siguiente como pista de que se puede deslizar. Un solo
+                Reveal para todo: los de cada tarjeta no se disparaban en las que
+                arrancan fuera de pantalla hacia el costado. */}
+            <Reveal>
+              <div
+                data-lenis-prevent-touch
+                className="-mx-6 flex snap-x snap-mandatory gap-6 overflow-x-auto px-6 pb-2 [scrollbar-width:none] sm:-mx-14 sm:px-14 lg:mx-0 lg:grid lg:grid-cols-3 lg:gap-8 lg:overflow-visible lg:px-0 lg:pb-0"
+              >
+                {cases.map((project) => (
+                  <div key={project.id} className="w-[78vw] shrink-0 snap-start scroll-ml-6 sm:w-[44vw] sm:scroll-ml-14 lg:w-auto">
+                    <CaseStudyCard project={project} />
+                  </div>
+                ))}
+              </div>
+            </Reveal>
           </section>
         )}
 
         {/* Metodología */}
-        <section className="bg-card/40 px-6 py-20 text-center sm:px-14 section-gap">
+        <section className="bg-card/40 px-6 py-14 text-center sm:px-14 sm:py-20 section-gap">
           <Reveal>
             <SectionEyebrow className="mb-2">Metodología</SectionEyebrow>
             <SectionHeading className="mx-auto mb-4 max-w-3xl leading-tight">
               <AccentText text={landing.methodTitle} />
             </SectionHeading>
             {landing.methodIntro && <p className="mx-auto max-w-2xl text-lg text-white">{landing.methodIntro}</p>}
-            <ol className="mt-12 grid grid-cols-1 gap-6 text-left sm:grid-cols-2 lg:grid-cols-4">
+            <ol className="mt-10 grid grid-cols-1 gap-4 text-left sm:mt-12 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
               {methodSteps.map((step, i) => (
-                <li key={step.title} className="rounded-2xl bg-card p-6">
+                <li key={step.title} className="rounded-2xl bg-card p-5 sm:p-6">
                   <h3 className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-xs font-bold text-white">
                     {String(i + 1).padStart(2, "0")} — {step.title}
                   </h3>
