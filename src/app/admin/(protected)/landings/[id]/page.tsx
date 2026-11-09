@@ -112,7 +112,7 @@ export default async function EditarLandingPage({
 
         <Section
           title="4. Servicios y alcance"
-          description="Se muestran con la misma estructura que en ¿Qué hacemos?: número, bajada, título, texto, puntos y la animación del servicio elegido."
+          description="Se muestran con la misma estructura que en ¿Qué hacemos?: número, bajada, título, texto y la animación del servicio elegido."
         >
           <Field label="Título" name="servicesTitle" defaultValue={landing.servicesTitle} />
           <Field label="Introducción" name="servicesIntro" defaultValue={landing.servicesIntro} multiline />
@@ -122,7 +122,6 @@ export default async function EditarLandingPage({
               { key: "tagline", label: "Bajada (arriba del título)", placeholder: "Definimos el rumbo digital" },
               { key: "title", label: "Título", placeholder: "Estrategia *digital.*" },
               { key: "body", label: "Texto", multiline: true },
-              { key: "bullets", label: "Puntos (uno por línea)", multiline: true },
               { key: "service", label: "Animación", options: animationOptions },
               { key: "href", label: "Link “Ver más” (opcional)", placeholder: "/servicios/paid-media" },
             ]}
@@ -130,7 +129,6 @@ export default async function EditarLandingPage({
               title: s.title,
               body: s.body,
               tagline: s.tagline ?? "",
-              bullets: s.bullets ?? "",
               service: s.service ?? "",
               href: s.href ?? "",
             }))}

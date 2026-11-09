@@ -129,8 +129,8 @@ export async function getAdminUsers() {
 // --- Landings de servicio ---
 
 export type LandingItem = { title: string; body: string };
-/** bullets: un punto por línea; service: slug del servicio cuya animación se muestra. */
-export type LandingServiceItem = LandingItem & { href?: string; tagline?: string; bullets?: string; service?: string };
+/** service: slug del servicio cuya animación se muestra. */
+export type LandingServiceItem = LandingItem & { href?: string; tagline?: string; service?: string };
 export type LandingFaq = { question: string; answer: string };
 
 // Un JSON roto (editado a mano en la base, por ejemplo) no tiene que tirar

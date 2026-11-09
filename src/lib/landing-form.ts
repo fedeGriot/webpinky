@@ -67,7 +67,7 @@ async function parseProjectIds(formData: FormData, key: string, max?: number) {
 
 export async function landingFieldsFromForm(formData: FormData) {
   const serviceSlugs = new Set((await prisma.service.findMany({ select: { slug: true } })).map((s) => s.slug));
-  const services = cleanItems(formData, "servicesJson", ["title", "tagline", "body", "bullets", "service", "href"], "title").map(
+  const services = cleanItems(formData, "servicesJson", ["title", "tagline", "body", "service", "href"], "title").map(
     ({ href, service, ...rest }) => ({
       ...rest,
       // Animación: solo un servicio existente; cualquier otro valor se descarta.

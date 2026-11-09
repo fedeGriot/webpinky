@@ -215,11 +215,10 @@ export default async function LandingPage({ params }: Props) {
               <p className="text-lg text-white">{landing.servicesIntro}</p>
             </Reveal>
             {/* Misma estructura que los servicios de ¿Qué hacemos?: número,
-                bajada, título, texto, puntos y la animación del servicio. */}
+                bajada, título, texto y la animación del servicio. */}
             <div className="mt-6 divide-y divide-white/10">
               {landing.services.map((service, i) => {
                 const animation = service.service ? getServiceAnimation(service.service) : null;
-                const bullets = (service.bullets ?? "").split("\n").map((b) => b.trim()).filter(Boolean);
                 return (
                   <Reveal
                     as="article"
@@ -237,17 +236,7 @@ export default async function LandingPage({ params }: Props) {
                       <h3 className="mb-5 text-3xl font-extrabold leading-tight text-white sm:text-4xl">
                         <AccentText text={service.title} />
                       </h3>
-                      <p className="mb-6 max-w-2xl text-lg leading-relaxed text-white">{service.body}</p>
-                      {bullets.length > 0 && (
-                        <ul className="divide-y divide-dashed divide-white/15 text-base text-white">
-                          {bullets.map((bullet) => (
-                            <li key={bullet} className="flex gap-3 py-3">
-                              <span className="text-accent">→</span>
-                              {bullet}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                      <p className="max-w-2xl text-lg leading-relaxed text-white">{service.body}</p>
                       {service.href && (
                         <Link
                           href={service.href}
