@@ -6,20 +6,22 @@ import { inputClass } from "@/components/admin/form-styles";
 type Option = { id: string; label: string; hint?: string };
 
 /**
- * Elegir proyectos existentes (casos, testimonios) en un orden propio, sin
- * duplicar contenido: la landing guarda solo los IDs y muestra siempre los
- * datos actuales de cada proyecto. Viaja como JSON en el input oculto `name`.
+ * Elegir elementos existentes (proyectos, testimonios) en un orden propio,
+ * sin duplicar contenido: la landing guarda solo los IDs y muestra siempre
+ * los datos actuales de cada uno. Viaja como JSON en el input oculto `name`.
  */
 export function ProjectPicker({
   name,
   options,
   defaultIds = [],
   max,
+  addLabel = "+ Agregar proyecto…",
 }: {
   name: string;
   options: Option[];
   defaultIds?: string[];
   max?: number;
+  addLabel?: string;
 }) {
   const byId = new Map(options.map((o) => [o.id, o]));
   const [ids, setIds] = useState(() => defaultIds.filter((id) => byId.has(id)));
@@ -74,7 +76,7 @@ export function ProjectPicker({
           onChange={(e) => e.target.value && setIds((prev) => [...prev, e.target.value])}
           className={`${inputClass} text-sm`}
         >
-          <option value="">+ Agregar proyecto…</option>
+          <option value="">{addLabel}</option>
           {available.map((o) => (
             <option key={o.id} value={o.id}>
               {o.label}

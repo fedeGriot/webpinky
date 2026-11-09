@@ -45,8 +45,11 @@ const nextConfig: NextConfig = {
     inlineCss: true,
   },
   images: {
-    // Todas las imágenes son same-origin (subidas del CMS en /uploads, o
-    // assets estáticos en public/) — no hace falta remotePatterns.
+    // Las imágenes son same-origin (subidas del CMS en /uploads, o assets
+    // estáticos en public/), salvo las miniaturas de YouTube de los
+    // testimonios en video: next/image las baja del servidor y las sirve
+    // desde el propio sitio, así que la CSP (img-src 'self') no cambia.
+    remotePatterns: [{ protocol: "https", hostname: "i.ytimg.com", pathname: "/vi/**" }],
     formats: ["image/avif", "image/webp"],
     // 75 (default) para fotos; 90 para piezas/gráficos con texto o bordes
     // finos, donde 75 deja artefactos visibles.

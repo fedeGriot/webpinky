@@ -150,7 +150,7 @@ function mapLanding<T extends {
   caseProjectIdsJson: string;
   methodStepsJson: string;
   partnerPointsJson: string;
-  testimonialProjectIdsJson: string;
+  testimonialIdsJson: string;
   faqsJson: string;
 }>(landing: T) {
   const {
@@ -159,7 +159,7 @@ function mapLanding<T extends {
     caseProjectIdsJson,
     methodStepsJson,
     partnerPointsJson,
-    testimonialProjectIdsJson,
+    testimonialIdsJson,
     faqsJson,
     ...rest
   } = landing;
@@ -170,7 +170,7 @@ function mapLanding<T extends {
     caseProjectIds: parseList<string>(caseProjectIdsJson),
     methodSteps: parseList<LandingItem>(methodStepsJson),
     partnerPoints: parseList<LandingItem>(partnerPointsJson),
-    testimonialProjectIds: parseList<string>(testimonialProjectIdsJson),
+    testimonialIds: parseList<string>(testimonialIdsJson),
     faqs: parseList<LandingFaq>(faqsJson),
   };
 }
@@ -210,6 +210,18 @@ export async function getLandingCases(ids: string[], min = 3) {
   const used = new Set(chosen.map((p) => p.id));
   const featured = (await getFeaturedProjects()).filter((p) => !used.has(p.id));
   return [...chosen, ...featured.slice(0, min - chosen.length)];
+}
+
+export async function getTestimonials() {
+  return prisma.testimonial.findMany({ orderBy: [{ order: "asc" }, { createdAt: "asc" }] });
+}
+
+/** Testimonios por ID respetando el orden elegido en la landing. */
+export async function getTestimonialsByIds(ids: string[]) {
+  if (ids.length === 0) return [];
+  const testimonials = await prisma.testimonial.findMany({ where: { id: { in: ids } } });
+  const byId = new Map(testimonials.map((t) => [t.id, t]));
+  return ids.flatMap((id) => byId.get(id) ?? []);
 }
 
 /** Proyectos por ID respetando el orden elegido en la landing. */

@@ -402,3 +402,40 @@ export async function deleteStat(formData: FormData) {
   revalidatePath("/que-hacemos");
   revalidatePath("/admin/secciones/stats");
 }
+
+// --- Testimonios ---
+
+function testimonialFieldsFromForm(formData: FormData) {
+  return {
+    order: int(formData, "order"),
+    quote: str(formData, "quote"),
+    authorName: str(formData, "authorName"),
+    authorRole: optionalStr(formData, "authorRole"),
+    company: str(formData, "company"),
+    videoUrl: parseOptionalUrl(formData, "videoUrl"),
+  };
+}
+
+// Los testimonios se muestran en las landings de servicio (/servicios/<slug>).
+function revalidateTestimonials() {
+  revalidatePath("/servicios/[slug]", "page");
+  revalidatePath("/admin/secciones/testimonios");
+}
+
+export async function createTestimonial(formData: FormData) {
+  await verifySession();
+  await prisma.testimonial.create({ data: testimonialFieldsFromForm(formData) });
+  revalidateTestimonials();
+}
+
+export async function updateTestimonial(formData: FormData) {
+  await verifySession();
+  await prisma.testimonial.update({ where: { id: str(formData, "id") }, data: testimonialFieldsFromForm(formData) });
+  revalidateTestimonials();
+}
+
+export async function deleteTestimonial(formData: FormData) {
+  await verifySession();
+  await prisma.testimonial.delete({ where: { id: str(formData, "id") } });
+  revalidateTestimonials();
+}

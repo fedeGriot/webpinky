@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
-import { getAllProjects, getLandingById, getServices } from "@/lib/data";
+import { getAllProjects, getLandingById, getServices, getTestimonials } from "@/lib/data";
 import { getServiceAnimation } from "@/lib/service-animations";
 import { deleteLanding, updateLanding } from "@/lib/actions/landings";
 import { SaveButton } from "@/components/admin/save-button";
@@ -30,7 +30,12 @@ export default async function EditarLandingPage({
   searchParams: Promise<{ guardado?: string }>;
 }) {
   const [{ id }, { guardado }] = await Promise.all([params, searchParams]);
-  const [landing, projects, siteServices] = await Promise.all([getLandingById(id), getAllProjects(), getServices()]);
+  const [landing, projects, siteServices, testimonials] = await Promise.all([
+    getLandingById(id),
+    getAllProjects(),
+    getServices(),
+    getTestimonials(),
+  ]);
   if (!landing) notFound();
 
   const projectOptions = projects.map((p) => ({ id: p.id, label: p.title, hint: `${p.clientName} · ${p.category}` }));
@@ -40,9 +45,11 @@ export default async function EditarLandingPage({
       .filter((s) => getServiceAnimation(s.slug))
       .map((s) => ({ value: s.slug, label: `${s.title} (personaje de ¿Qué hacemos?)` })),
   ];
-  const quoteOptions = projects
-    .filter((p) => p.quoteText)
-    .map((p) => ({ id: p.id, label: p.title, hint: `“${p.quoteText}” — ${p.quoteAuthor ?? p.clientName}` }));
+  const testimonialOptions = testimonials.map((t) => ({
+    id: t.id,
+    label: `${t.authorName} — ${t.company}${t.videoUrl ? " (video)" : ""}`,
+    hint: `“${t.quote}”`,
+  }));
 
   return (
     <div className="max-w-3xl">
@@ -167,10 +174,18 @@ export default async function EditarLandingPage({
 
         <Section
           title="8. Testimonios"
-          description="Se usan las citas cargadas en los proyectos (campos “Cita” y “Autor de la cita”). Solo aparecen los proyectos que tienen cita."
+          description="Elegí cuáles mostrar. Los testimonios (escritos o en video) se cargan en Secciones → Testimonios."
         >
           <Field label="Título" name="testimonialsTitle" defaultValue={landing.testimonialsTitle} />
-          <ProjectPicker name="testimonialProjectIdsJson" options={quoteOptions} defaultIds={landing.testimonialProjectIds} />
+          <ProjectPicker
+            name="testimonialIdsJson"
+            options={testimonialOptions}
+            defaultIds={landing.testimonialIds}
+            addLabel="+ Agregar testimonio…"
+          />
+          <Link href="/admin/secciones/testimonios" className="self-start text-sm font-semibold text-white/60 hover:text-white">
+            Administrar testimonios →
+          </Link>
         </Section>
 
         <Section title="9. Preguntas frecuentes" description="Enfocadas en la contratación: alcance, presupuesto, tiempos, coordinación.">

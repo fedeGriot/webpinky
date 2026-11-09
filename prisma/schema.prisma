@@ -265,9 +265,9 @@ model Landing {
   partnerBody       String
   partnerPointsJson String @default("[]")
 
-  testimonialsTitle         String
-  /// IDs de Project cuya cita (quoteText/quoteAuthor) se muestra como testimonio.
-  testimonialProjectIdsJson String @default("[]")
+  testimonialsTitle  String
+  /// IDs de Testimonial, en el orden en que se muestran.
+  testimonialIdsJson String @default("[]")
 
   faqTitle String
   /// { question, answer }
@@ -276,6 +276,24 @@ model Landing {
   ctaEyebrow String
   ctaTitle   String
   ctaBody    String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Testimonios de clientes, independientes de los proyectos: escritos o en
+// video. Se administran en /admin/secciones/testimonios y cada landing elige
+// cuáles mostrar.
+model Testimonial {
+  id         String  @id @default(cuid())
+  order      Int     @default(0)
+  /// El testimonio escrito, o un extracto de lo que dice en el video.
+  quote      String
+  authorName String
+  authorRole String?
+  company    String
+  /// Link al video (YouTube se reproduce en el sitio; otro link abre aparte).
+  videoUrl   String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

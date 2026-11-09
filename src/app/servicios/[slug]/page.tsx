@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { BackgroundShape } from "@/components/background-shape";
 import { ClientsMarquee } from "@/components/home/clients-marquee";
 import { CaseStudyCard } from "@/components/case-study-card";
+import { TestimonialCard } from "@/components/testimonial-card";
 import { CtaSection } from "@/components/cta-section";
 import { Reveal } from "@/components/reveal";
 import { FillButton } from "@/components/fill-button";
@@ -15,7 +16,7 @@ import { AccentText } from "@/components/accent-text";
 import { JsonLd } from "@/components/json-ld";
 import { DecorativeVideo } from "@/components/decorative-video";
 import { getServiceAnimation } from "@/lib/service-animations";
-import { getClients, getLandingBySlug, getLandingCases, getProcessSteps, getProjectsByIds } from "@/lib/data";
+import { getClients, getLandingBySlug, getLandingCases, getProcessSteps, getTestimonialsByIds } from "@/lib/data";
 import { hasAdminSession } from "@/lib/dal";
 import { splitAccent, stripAccent } from "@/lib/accent";
 import { SITE_URL } from "@/lib/seo";
@@ -67,13 +68,12 @@ export default async function LandingPage({ params }: Props) {
   const landing = await getVisibleLanding(slug);
   if (!landing) notFound();
 
-  const [clients, cases, testimonialProjects, processSteps] = await Promise.all([
+  const [clients, cases, testimonials, processSteps] = await Promise.all([
     getClients(),
     getLandingCases(landing.caseProjectIds),
-    getProjectsByIds(landing.testimonialProjectIds),
+    getTestimonialsByIds(landing.testimonialIds),
     getProcessSteps(),
   ]);
-  const testimonials = testimonialProjects.filter((p) => p.quoteText);
   // Si la landing no adapta el método, se usan las etapas generales del sitio
   // (las mismas de ¿Qué hacemos?), para no dejar la sección vacía.
   const methodSteps =
@@ -336,29 +336,19 @@ export default async function LandingPage({ params }: Props) {
           </section>
         )}
 
-        {/* Testimonios: citas de los casos elegidos */}
+        {/* Testimonios (escritos o en video), administrados aparte en
+            /admin/secciones/testimonios y elegidos en cada landing. */}
         {testimonials.length > 0 && (
           <section className="px-6 sm:px-14 section-gap">
             <Reveal>
               <SectionHeading className="mb-10 leading-tight">
                 <AccentText text={landing.testimonialsTitle} />
               </SectionHeading>
-              <div className={`grid grid-cols-1 gap-10 ${testimonials.length > 1 ? "lg:grid-cols-2" : ""}`}>
-                {testimonials.map((project) => (
-                  <figure key={project.id} className="border-l-2 border-accent pl-6">
-                    <blockquote style={{ fontFamily: "var(--font-serif)" }}>
-                      <p className="text-2xl italic leading-snug text-white sm:text-3xl">
-                        &ldquo;{project.quoteText}&rdquo;
-                      </p>
-                    </blockquote>
-                    <figcaption className="mt-4 text-sm text-white/50">
-                      — {project.quoteAuthor ?? project.clientName}
-                      {" · "}
-                      <Link href={`/proyectos/${project.slug}`} className="font-bold text-white/70 hover:text-white">
-                        Ver el caso
-                      </Link>
-                    </figcaption>
-                  </figure>
+              <div
+                className={`grid grid-cols-1 gap-x-16 gap-y-14 ${testimonials.length > 1 ? "lg:grid-cols-2" : "max-w-3xl"}`}
+              >
+                {testimonials.map((testimonial) => (
+                  <TestimonialCard key={testimonial.id} testimonial={testimonial} />
                 ))}
               </div>
             </Reveal>

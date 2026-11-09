@@ -57,13 +57,19 @@ function cleanHref(href: string) {
   throw new Error(`El link "${href}" no es válido: usá una ruta del sitio (ej. /que-hacemos) o una URL http(s).`);
 }
 
-async function parseProjectIds(formData: FormData, key: string, max?: number) {
+// IDs elegidos con el selector (casos, testimonios): sin repetidos y solo
+// los que existen en la tabla correspondiente.
+async function parseIds(formData: FormData, key: string, existingIds: (ids: string[]) => Promise<string[]>, max?: number) {
   const ids = [...new Set(parseJsonArray(formData, key).map(String))].slice(0, max);
   if (ids.length === 0) return [];
-  const existing = await prisma.project.findMany({ where: { id: { in: ids } }, select: { id: true } });
-  const valid = new Set(existing.map((p) => p.id));
+  const valid = new Set(await existingIds(ids));
   return ids.filter((id) => valid.has(id));
 }
+
+const existingProjects = async (ids: string[]) =>
+  (await prisma.project.findMany({ where: { id: { in: ids } }, select: { id: true } })).map((p) => p.id);
+const existingTestimonials = async (ids: string[]) =>
+  (await prisma.testimonial.findMany({ where: { id: { in: ids } }, select: { id: true } })).map((t) => t.id);
 
 export async function landingFieldsFromForm(formData: FormData) {
   const serviceSlugs = new Set((await prisma.service.findMany({ select: { slug: true } })).map((s) => s.slug));
@@ -95,7 +101,7 @@ export async function landingFieldsFromForm(formData: FormData) {
     servicesJson: JSON.stringify(services),
     casesTitle: formStr(formData, "casesTitle"),
     casesIntro: formStr(formData, "casesIntro"),
-    caseProjectIdsJson: JSON.stringify(await parseProjectIds(formData, "caseProjectIdsJson", MAX_CASES)),
+    caseProjectIdsJson: JSON.stringify(await parseIds(formData, "caseProjectIdsJson", existingProjects, MAX_CASES)),
     methodTitle: formStr(formData, "methodTitle"),
     methodIntro: formStr(formData, "methodIntro"),
     methodStepsJson: JSON.stringify(cleanItems(formData, "methodStepsJson", ["title", "body"], "title")),
@@ -103,7 +109,7 @@ export async function landingFieldsFromForm(formData: FormData) {
     partnerBody: formStr(formData, "partnerBody"),
     partnerPointsJson: JSON.stringify(cleanItems(formData, "partnerPointsJson", ["title", "body"], "title")),
     testimonialsTitle: formStr(formData, "testimonialsTitle"),
-    testimonialProjectIdsJson: JSON.stringify(await parseProjectIds(formData, "testimonialProjectIdsJson")),
+    testimonialIdsJson: JSON.stringify(await parseIds(formData, "testimonialIdsJson", existingTestimonials)),
     faqTitle: formStr(formData, "faqTitle"),
     faqsJson: JSON.stringify(cleanItems(formData, "faqsJson", ["question", "answer"], "question")),
     ctaEyebrow: formStr(formData, "ctaEyebrow"),
