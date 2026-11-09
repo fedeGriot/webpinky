@@ -30,8 +30,9 @@ export function VideoLightboxTrigger({ videoId, label }: { videoId: string; labe
         aria-label={label}
         className="group absolute inset-0 flex cursor-pointer items-center justify-center bg-ink/0 transition-colors hover:bg-ink/20"
       >
-        <span className="flex h-20 w-20 items-center justify-center rounded-full bg-accent shadow-lg transition group-hover:scale-110 group-hover:bg-accent-dark">
-          <svg viewBox="0 0 24 24" fill="white" className="ml-1 h-8 w-8">
+        {/* Más chico en mobile: 80px tapaba buena parte de un video de ~180px de alto. */}
+        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-accent shadow-lg transition group-hover:scale-110 group-hover:bg-accent-dark sm:h-20 sm:w-20">
+          <svg viewBox="0 0 24 24" fill="white" className="ml-1 h-6 w-6 sm:h-8 sm:w-8">
             <path d="M8 5v14l11-7z" />
           </svg>
         </span>

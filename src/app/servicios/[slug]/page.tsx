@@ -227,32 +227,39 @@ export default async function LandingPage({ params }: Props) {
             {!servicesHaveAnimations ? (
               // Sin animaciones (ej. Producción audiovisual): tarjetas en tres
               // columnas, para que los textos no queden sueltos en la página.
-              <div className="mt-10 grid grid-cols-1 gap-4 sm:mt-12 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-                {landing.services.map((service, i) => (
-                  <Reveal
-                    as="article"
-                    key={service.title}
-                    delay={Math.min((i % 3) * 0.08, 0.16)}
-                    className="flex flex-col rounded-3xl border border-white/10 bg-card/60 p-6 transition-colors hover:border-accent/50 sm:p-8"
-                  >
-                    {service.tagline && (
-                      <p className="mb-3 text-xs font-bold uppercase tracking-wide text-accent">{service.tagline}</p>
-                    )}
-                    <h3 className="mb-3 text-2xl font-extrabold leading-tight text-white">
-                      <AccentText text={service.title} />
-                    </h3>
-                    <p className="leading-relaxed text-white/80">{service.body}</p>
-                    {service.href && (
-                      <Link
-                        href={service.href}
-                        className="mt-auto pt-5 text-sm font-bold text-white/60 transition hover:text-white"
-                      >
-                        Ver más →
-                      </Link>
-                    )}
-                  </Reveal>
-                ))}
-              </div>
+              // En el celular, carrusel deslizable (mismo criterio que los
+              // casos): seis tarjetas apiladas eran la sección más larga. Un
+              // solo Reveal para todo, por las tarjetas que arrancan fuera de
+              // pantalla hacia el costado.
+              <Reveal className="mt-10 sm:mt-12">
+                <div
+                  data-lenis-prevent-touch
+                  className="-mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-2 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3"
+                >
+                  {landing.services.map((service) => (
+                    <article
+                      key={service.title}
+                      className="flex w-[82vw] shrink-0 snap-start scroll-ml-6 flex-col rounded-3xl border border-white/10 bg-card/60 p-6 transition-colors hover:border-accent/50 sm:w-auto sm:p-8"
+                    >
+                      {service.tagline && (
+                        <p className="mb-3 text-xs font-bold uppercase tracking-wide text-accent">{service.tagline}</p>
+                      )}
+                      <h3 className="mb-3 text-2xl font-extrabold leading-tight text-white">
+                        <AccentText text={service.title} />
+                      </h3>
+                      <p className="leading-relaxed text-white/80">{service.body}</p>
+                      {service.href && (
+                        <Link
+                          href={service.href}
+                          className="mt-auto pt-5 text-sm font-bold text-white/60 transition hover:text-white"
+                        >
+                          Ver más →
+                        </Link>
+                      )}
+                    </article>
+                  ))}
+                </div>
+              </Reveal>
             ) : (
               <div className="mt-10 grid grid-cols-1 gap-x-16 gap-y-12 sm:mt-14 sm:gap-y-14 lg:grid-cols-2">
                 {landing.services.map((service, i) => {
