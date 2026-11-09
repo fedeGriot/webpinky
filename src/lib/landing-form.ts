@@ -1,6 +1,6 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
-import { normalizeSectionOrder } from "@/lib/landing-sections";
+import { isSectionKey, normalizeSectionOrder } from "@/lib/landing-sections";
 
 // Lectura y validación del formulario de /admin/landings, separada de las
 // server actions para que solo ellas queden expuestas como endpoints.
@@ -97,13 +97,16 @@ export async function landingFieldsFromForm(formData: FormData) {
     navLabel: formStr(formData, "navLabel"),
     published: formData.get("published") === "on",
     sectionOrderJson: JSON.stringify(normalizeSectionOrder(parseJsonArray(formData, "sectionOrderJson"))),
+    hiddenSectionsJson: JSON.stringify([...new Set(parseJsonArray(formData, "hiddenSectionsJson").filter(isSectionKey))]),
     seoTitle: formStr(formData, "seoTitle"),
     seoDescription: formStr(formData, "seoDescription"),
     heroEyebrow: formStr(formData, "heroEyebrow"),
     heroTitle: formStr(formData, "heroTitle"),
     heroBody: formStr(formData, "heroBody"),
     heroCtaLabel: formStr(formData, "heroCtaLabel"),
-    heroVideoUrl: optionalVideoUrl(formData, "heroVideoUrl"),
+    showreelUrl: optionalVideoUrl(formData, "showreelUrl"),
+    showreelTitle: formStr(formData, "showreelTitle"),
+    showreelBody: formStr(formData, "showreelBody"),
     clientsTitle: formStr(formData, "clientsTitle"),
     clientsBody: formStr(formData, "clientsBody"),
     painTitle: formStr(formData, "painTitle"),

@@ -31,3 +31,17 @@ export function getYouTubeId(url: string): string | null {
 export function isYouTubeUrl(url: string): boolean {
   return getYouTubeId(url) !== null;
 }
+
+/**
+ * Miniatura de mejor calidad disponible: maxresdefault (1280×720) no existe
+ * para todos los videos, así que se chequea y si no está se usa hqdefault
+ * (480×360, siempre presente). El chequeo queda cacheado un día.
+ */
+export async function getYouTubeThumbnail(videoId: string): Promise<string> {
+  const maxres = `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`;
+  try {
+    const res = await fetch(maxres, { method: "HEAD", next: { revalidate: 86400 } });
+    if (res.ok) return maxres;
+  } catch {}
+  return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+}

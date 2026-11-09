@@ -102,9 +102,14 @@ export default async function EditarLandingPage({
 
         <Section
           title="Orden de las secciones"
-          description="El hero va siempre primero y el contacto al final. Las secciones sin contenido no se muestran aunque estén en la lista."
+          description="El hero va siempre primero y el contacto al final. Destildá una sección para ocultarla sin perder su contenido; las que no tienen contenido tampoco se muestran."
         >
-          <SectionOrder name="sectionOrderJson" defaultOrder={landing.sectionOrder} />
+          <SectionOrder
+            name="sectionOrderJson"
+            hiddenName="hiddenSectionsJson"
+            defaultOrder={landing.sectionOrder}
+            defaultHidden={landing.hiddenSections}
+          />
         </Section>
 
         <Section title="Hero" description="El H1 es el título principal: usá el de la planilla de SEO.">
@@ -112,12 +117,18 @@ export default async function EditarLandingPage({
           <Field label="Título (H1)" name="heroTitle" defaultValue={landing.heroTitle} />
           <Field label="Texto" name="heroBody" defaultValue={landing.heroBody} multiline />
           <Field label="Texto del botón" name="heroCtaLabel" defaultValue={landing.heroCtaLabel} hint="Lleva a Contacto." />
+
+        </Section>
+
+        <Section title="Showreel" description="Opcional: el video con un título y un texto al lado. Sin link, la sección no se muestra.">
           <Field
-            label="Showreel (opcional)"
-            name="heroVideoUrl"
-            defaultValue={landing.heroVideoUrl ?? ""}
-            hint="Link de YouTube: se muestra grande debajo del texto, con play. Vacío = sin showreel."
+            label="Link del video (YouTube)"
+            name="showreelUrl"
+            defaultValue={landing.showreelUrl ?? ""}
+            hint="Ej: https://www.youtube.com/watch?v=..."
           />
+          <Field label="Título" name="showreelTitle" defaultValue={landing.showreelTitle} />
+          <Field label="Texto" name="showreelBody" defaultValue={landing.showreelBody} multiline />
         </Section>
 
         <Section title="Marcas que confían" description="Los logos salen de Secciones → Clientes.">

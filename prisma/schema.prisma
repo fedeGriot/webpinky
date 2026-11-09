@@ -224,15 +224,18 @@ model MeetingRequest {
 // bulletsJson/servicesTagsJson: cada ítem es { title, body } salvo donde se
 // indica. En los títulos, el texto entre *asteriscos* va en color de acento.
 model Landing {
-  id               String  @id @default(cuid())
-  slug             String  @unique
-  order            Int     @default(0)
-  published        Boolean @default(false)
+  id                 String  @id @default(cuid())
+  slug               String  @unique
+  order              Int     @default(0)
+  published          Boolean @default(false)
   /// Nombre corto para links internos y el breadcrumb (ej. "Marketing digital").
-  navLabel         String
+  navLabel           String
   /// Orden de las secciones entre el hero y el contacto (claves de
   /// LANDING_SECTIONS en src/lib/landing-sections.ts). Vacío = orden por defecto.
-  sectionOrderJson String  @default("[]")
+  sectionOrderJson   String  @default("[]")
+  /// Secciones ocultas en esta landing (mismas claves): no se muestran aunque
+  /// tengan contenido, y el contenido se conserva por si se vuelven a mostrar.
+  hiddenSectionsJson String  @default("[]")
 
   seoTitle       String
   seoDescription String
@@ -241,8 +244,11 @@ model Landing {
   heroTitle    String
   heroBody     String
   heroCtaLabel String
-  /// Showreel opcional debajo del texto del hero (YouTube).
-  heroVideoUrl String?
+
+  /// Sección Showreel (YouTube): el video con un título y un texto al lado.
+  showreelUrl   String?
+  showreelTitle String  @default("")
+  showreelBody  String  @default("")
 
   clientsTitle String
   clientsBody  String

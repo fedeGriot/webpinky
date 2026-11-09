@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { normalizeSectionOrder } from "@/lib/landing-sections";
+import { isSectionKey, normalizeSectionOrder } from "@/lib/landing-sections";
 
 export async function getSiteSettings() {
   const settings = await prisma.siteSettings.findUnique({ where: { id: "singleton" } });
@@ -147,6 +147,7 @@ function parseList<T>(json: string): T[] {
 
 function mapLanding<T extends {
   sectionOrderJson: string;
+  hiddenSectionsJson: string;
   formatsJson: string;
   painPointsJson: string;
   servicesJson: string;
@@ -158,6 +159,7 @@ function mapLanding<T extends {
 }>(landing: T) {
   const {
     sectionOrderJson,
+    hiddenSectionsJson,
     formatsJson,
     painPointsJson,
     servicesJson,
@@ -171,6 +173,7 @@ function mapLanding<T extends {
   return {
     ...rest,
     sectionOrder: normalizeSectionOrder(parseList<unknown>(sectionOrderJson)),
+    hiddenSections: parseList<unknown>(hiddenSectionsJson).filter(isSectionKey),
     formats: parseList<LandingItem>(formatsJson),
     painPoints: parseList<LandingItem>(painPointsJson),
     services: parseList<LandingServiceItem>(servicesJson),
@@ -210,10 +213,12 @@ export async function getLandingById(id: string) {
  * Casos de una landing: los elegidos en el admin, en su orden, completados
  * con proyectos destacados hasta llegar a `min` (por si se eligieron menos o
  * se borró alguno), así la sección nunca queda con uno o dos casos sueltos.
+ * Si no se eligió ninguno, no devuelve nada y la sección no se muestra.
  */
 export async function getLandingCases(ids: string[], min = 3) {
   const chosen = await getProjectsByIds(ids);
-  if (chosen.length >= min) return chosen;
+  // Sin casos elegidos la sección no se muestra (no se rellena de cero).
+  if (chosen.length === 0 || chosen.length >= min) return chosen;
   const used = new Set(chosen.map((p) => p.id));
   const featured = (await getFeaturedProjects()).filter((p) => !used.has(p.id));
   return [...chosen, ...featured.slice(0, min - chosen.length)];

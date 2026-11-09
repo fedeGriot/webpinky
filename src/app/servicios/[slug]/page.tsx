@@ -17,7 +17,7 @@ import { SectionHeading } from "@/components/section-heading";
 import { AccentText } from "@/components/accent-text";
 import { JsonLd } from "@/components/json-ld";
 import { VideoLightboxTrigger } from "@/components/video-lightbox";
-import { getYouTubeId } from "@/lib/youtube";
+import { getYouTubeId, getYouTubeThumbnail } from "@/lib/youtube";
 import { DecorativeVideo } from "@/components/decorative-video";
 import { getServiceAnimation } from "@/lib/service-animations";
 import { getClients, getLandingBySlug, getLandingCases, getProcessSteps, getTestimonialsByIds } from "@/lib/data";
@@ -89,7 +89,9 @@ export default async function LandingPage({ params }: Props) {
           return { title: tag ?? step.title, body: headline ? `${headline}. ${step.description}` : step.description };
         });
   const cta = splitCtaTitle(landing.ctaTitle);
-  const showreelId = landing.heroVideoUrl ? getYouTubeId(landing.heroVideoUrl) : null;
+  const servicesHaveAnimations = landing.services.some((s) => s.service && getServiceAnimation(s.service));
+  const showreelId = landing.showreelUrl ? getYouTubeId(landing.showreelUrl) : null;
+  const showreelThumb = showreelId ? await getYouTubeThumbnail(showreelId) : null;
 
   const url = `${SITE_URL}/servicios/${landing.slug}`;
   const name = stripAccent(landing.heroTitle);
@@ -141,6 +143,33 @@ export default async function LandingPage({ params }: Props) {
             <ClientsMarquee clients={clients} />
           </Reveal>
         </section>
+      </>
+    ),
+    showreel: (
+      <>
+        {/* Showreel: título y texto junto al video (no suelto en la página),
+            con un marco rosa desplazado detrás como acento. */}
+        {showreelId && showreelThumb && (
+          <section className="px-6 sm:px-14 section-gap">
+            <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
+              <Reveal>
+                <SectionEyebrow className="mb-3">Showreel</SectionEyebrow>
+                <SectionHeading className="mb-4 leading-tight">
+                  <AccentText text={landing.showreelTitle || "Showreel"} />
+                </SectionHeading>
+                {landing.showreelBody && <p className="text-lg text-white">{landing.showreelBody}</p>}
+              </Reveal>
+              <Reveal delay={0.1} className="relative">
+                <div aria-hidden="true" className="absolute -bottom-3 -right-3 h-full w-full rounded-3xl bg-accent/25 sm:-bottom-4 sm:-right-4" />
+                <div className="relative aspect-video overflow-hidden rounded-3xl bg-black shadow-2xl shadow-black/40">
+                  <Image src={showreelThumb} alt="" fill sizes="(max-width: 1024px) 90vw, 760px" className="object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+                  <VideoLightboxTrigger videoId={showreelId} label={`Ver showreel — ${landing.navLabel}`} />
+                </div>
+              </Reveal>
+            </div>
+          </section>
+        )}
       </>
     ),
     pain: (
@@ -195,50 +224,81 @@ export default async function LandingPage({ params }: Props) {
                 texto y animación del servicio a la derecha), en dos columnas
                 desde lg. En mobile la animación va arriba, más chica: al
                 costado le dejaba muy poco ancho al texto. */}
-            <div className="mt-10 grid grid-cols-1 gap-x-16 gap-y-12 sm:mt-14 sm:gap-y-14 lg:grid-cols-2">
-              {landing.services.map((service, i) => {
-                const animation = service.service ? getServiceAnimation(service.service) : null;
-                return (
-                  // Grilla de dos columnas: título a la izquierda y animación a la
-                  // derecha. En mobile el párrafo va debajo a todo el ancho (con
-                  // la animación al costado del texto completo quedaba muy
-                  // angosto); desde sm la animación ocupa las dos filas.
+            {!servicesHaveAnimations ? (
+              // Sin animaciones (ej. Producción audiovisual): tarjetas en tres
+              // columnas, para que los textos no queden sueltos en la página.
+              <div className="mt-10 grid grid-cols-1 gap-4 sm:mt-12 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+                {landing.services.map((service, i) => (
                   <Reveal
                     as="article"
                     key={service.title}
-                    delay={(i % 2) * 0.08}
-                    className="grid grid-cols-[1fr_auto] gap-x-4 sm:gap-x-8"
+                    delay={Math.min((i % 3) * 0.08, 0.16)}
+                    className="flex flex-col rounded-3xl border border-white/10 bg-card/60 p-6 transition-colors hover:border-accent/50 sm:p-8"
                   >
-                    <div className="min-w-0 self-center sm:self-end">
-                      {service.tagline && (
-                        <p className="mb-3 text-xs font-bold uppercase tracking-wide text-white/40">— {service.tagline}</p>
-                      )}
-                      <h3 className="text-2xl font-extrabold leading-tight text-white sm:text-3xl">
-                        <AccentText text={service.title} />
-                      </h3>
-                    </div>
-                    {animation && (
-                      <DecorativeVideo
-                        {...animation}
-                        isolated
-                        className="col-start-2 row-start-1 aspect-[960/756] w-28 self-center sm:row-span-2 sm:w-48 lg:w-40 xl:w-52"
-                      />
+                    {service.tagline && (
+                      <p className="mb-3 text-xs font-bold uppercase tracking-wide text-accent">{service.tagline}</p>
                     )}
-                    <div className="col-span-2 mt-4 sm:col-span-1">
-                      <p className="text-lg leading-relaxed text-white">{service.body}</p>
-                      {service.href && (
-                        <Link
-                          href={service.href}
-                          className="mt-5 inline-block text-sm font-bold text-white/60 transition hover:text-white"
-                        >
-                          Ver más →
-                        </Link>
-                      )}
-                    </div>
+                    <h3 className="mb-3 text-2xl font-extrabold leading-tight text-white">
+                      <AccentText text={service.title} />
+                    </h3>
+                    <p className="leading-relaxed text-white/80">{service.body}</p>
+                    {service.href && (
+                      <Link
+                        href={service.href}
+                        className="mt-auto pt-5 text-sm font-bold text-white/60 transition hover:text-white"
+                      >
+                        Ver más →
+                      </Link>
+                    )}
                   </Reveal>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="mt-10 grid grid-cols-1 gap-x-16 gap-y-12 sm:mt-14 sm:gap-y-14 lg:grid-cols-2">
+                {landing.services.map((service, i) => {
+                  const animation = service.service ? getServiceAnimation(service.service) : null;
+                  return (
+                    // Grilla de dos columnas: título a la izquierda y animación a la
+                    // derecha. En mobile el párrafo va debajo a todo el ancho (con
+                    // la animación al costado del texto completo quedaba muy
+                    // angosto); desde sm la animación ocupa las dos filas.
+                    <Reveal
+                      as="article"
+                      key={service.title}
+                      delay={(i % 2) * 0.08}
+                      className="grid grid-cols-[1fr_auto] gap-x-4 sm:gap-x-8"
+                    >
+                      <div className="min-w-0 self-center sm:self-end">
+                        {service.tagline && (
+                          <p className="mb-3 text-xs font-bold uppercase tracking-wide text-white/40">— {service.tagline}</p>
+                        )}
+                        <h3 className="text-2xl font-extrabold leading-tight text-white sm:text-3xl">
+                          <AccentText text={service.title} />
+                        </h3>
+                      </div>
+                      {animation && (
+                        <DecorativeVideo
+                          {...animation}
+                          isolated
+                          className="col-start-2 row-start-1 aspect-[960/756] w-28 self-center sm:row-span-2 sm:w-48 lg:w-40 xl:w-52"
+                        />
+                      )}
+                      <div className="col-span-2 mt-4 sm:col-span-1">
+                        <p className="text-lg leading-relaxed text-white">{service.body}</p>
+                        {service.href && (
+                          <Link
+                            href={service.href}
+                            className="mt-5 inline-block text-sm font-bold text-white/60 transition hover:text-white"
+                          >
+                            Ver más →
+                          </Link>
+                        )}
+                      </div>
+                    </Reveal>
+                  );
+                })}
+              </div>
+            )}
           </section>
         )}
       </>
@@ -459,29 +519,13 @@ export default async function LandingPage({ params }: Props) {
               </FillButton>
             </div>
           </div>
-          {/* Showreel (ej. Producción audiovisual): la miniatura del video con
-              el mismo reproductor de las fichas de proyecto. */}
-          {showreelId && (
-            <Reveal className="relative z-10 mt-12 aspect-video w-full max-w-5xl overflow-hidden rounded-3xl bg-black">
-              <Image
-                src={`https://i.ytimg.com/vi/${showreelId}/hqdefault.jpg`}
-                alt=""
-                fill
-                sizes="(max-width: 1100px) 90vw, 1024px"
-                className="object-cover"
-              />
-              <div className="absolute inset-0 bg-black/25" />
-              <span className="pointer-events-none absolute bottom-5 left-6 text-sm font-bold uppercase tracking-wide text-white">
-                Showreel
-              </span>
-              <VideoLightboxTrigger videoId={showreelId} label={`Ver showreel — ${landing.navLabel}`} />
-            </Reveal>
-          )}
         </section>
 
-        {landing.sectionOrder.map((key) => (
-          <Fragment key={key}>{sections[key]}</Fragment>
-        ))}
+        {landing.sectionOrder
+          .filter((key) => !landing.hiddenSections.includes(key))
+          .map((key) => (
+            <Fragment key={key}>{sections[key]}</Fragment>
+          ))}
 
         <div className="bg-card/40 section-gap">
           <CtaSection eyebrow={landing.ctaEyebrow} titleLine1={cta.line1} titleAccent={cta.accent} body={landing.ctaBody} />
